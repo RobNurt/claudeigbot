@@ -31,6 +31,8 @@ class MainWindow:
         self.use_limit_orders = tk.BooleanVar(value=True)
         self.use_auto_replace = tk.BooleanVar(value=False)
         self.use_trailing_stops = tk.BooleanVar(value=False)
+        self.stop_distance_var = tk.StringVar(value="20")
+        self.use_guaranteed_stops = tk.BooleanVar(value=False)
 
         # Better background color - pale blue
         bg_color = "#dce6f0"
@@ -229,7 +231,7 @@ class MainWindow:
 
     def create_trading_tab(self, parent):
         """Create trading tab with more compact layout"""
-        # Market selection - MORE COMPACT
+        # Market selection
         market_frame = ttk.LabelFrame(parent, text="Market Selection", padding=10)
         market_frame.pack(pady=8, padx=20, fill="x")
 
@@ -273,7 +275,7 @@ class MainWindow:
         config_row = tk.Frame(ladder_frame, bg="#f8f9fb")
         config_row.pack(fill="x", pady=3)
 
-        # All parameters in one row - FIXED SYNTAX
+        # Direction
         ttk.Label(config_row, text="Dir:", font=("Segoe UI", 9, "bold")).pack(
             side="left", padx=3
         )
@@ -287,7 +289,7 @@ class MainWindow:
 
         ttk.Separator(config_row, orient="vertical").pack(side="left", fill="y", padx=8)
 
-        # Initialize variables properly
+        # Initialize variables
         self.offset_var = tk.StringVar(value="5")
         self.step_var = tk.StringVar(value="10")
         self.num_orders_var = tk.StringVar(value="4")
@@ -295,8 +297,9 @@ class MainWindow:
         self.retry_jump_var = tk.StringVar(value="10")
         self.max_retries_var = tk.StringVar(value="3")
         self.limit_distance_var = tk.StringVar(value="0")
+        # stop_distance_var is already initialized in create_gui
 
-        # Create labels and entries
+        # Parameters
         params = [
             ("Offset:", self.offset_var),
             ("Step:", self.step_var),
@@ -304,6 +307,7 @@ class MainWindow:
             ("Size:", self.size_var),
             ("Retry:", self.retry_jump_var),
             ("MaxRetry:", self.max_retries_var),
+            ("Stop:", self.stop_distance_var),
             ("Limit:", self.limit_distance_var),
         ]
 
@@ -315,6 +319,11 @@ class MainWindow:
 
         ttk.Separator(config_row, orient="vertical").pack(side="left", fill="y", padx=8)
 
+        # Guaranteed stop checkbox (use_guaranteed_stops already initialized in create_gui)
+        ttk.Checkbutton(config_row, text="Guar.", variable=self.use_guaranteed_stops).pack(
+            side="left", padx=2
+        )
+
         ladder_btn = ttk.Button(
             config_row,
             text="Place Ladder",
@@ -323,7 +332,7 @@ class MainWindow:
         )
         ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
 
-        # Orders management - MORE VERTICAL SPACE
+        # Orders management
         orders_frame = ttk.LabelFrame(parent, text="Order Management", padding=12)
         orders_frame.pack(pady=8, padx=20, fill="both", expand=True)
 
@@ -343,7 +352,7 @@ class MainWindow:
                 side="left", padx=4, ipadx=10, ipady=3
             )
 
-        # BIGGER orders display area
+        # Orders display area
         self.orders_text = scrolledtext.ScrolledText(
             orders_frame,
             width=100,
@@ -703,9 +712,14 @@ class MainWindow:
 
     def on_place_ladder(self):
         """Handle place ladder button with optional feature checks"""
+
+        stop_distance = float(self.stop_distance_var.get())
+        guaranteed_stop = self.use_guaranteed_stops.get()
+        limit_distance = float(self.limit_distance_var.get()) if self.use_limit_orders.get() else 0
+
         if not self.ig_client.logged_in:
             self.log("Not connected")
-        return
+            return
 
         try:
             selected_market = self.market_var.get()
@@ -740,10 +754,11 @@ class MainWindow:
                 self.log(f"With limit orders at {limit_distance} points distance")
             
             # Run in thread
+            # Run in thread
             thread = threading.Thread(target=self.ladder_strategy.place_ladder,
                                     args=(epic, direction, start_offset, step_size, 
-                                         num_orders, order_size, retry_jump, max_retries, 
-                                         self.log, limit_distance))
+                                        num_orders, order_size, retry_jump, max_retries, 
+                                        self.log, limit_distance, stop_distance, guaranteed_stop))  # Added params
             thread.daemon = True
             thread.start()
         except ValueError as e:

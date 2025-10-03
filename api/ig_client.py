@@ -91,8 +91,8 @@ class IGClient:
             print(f"Price error: {str(e)}")
             return None
     
-    def place_order(self, epic, direction, size, level, order_type="STOP"):
-        """Place a single working order"""
+    def place_order(self, epic, direction, size, level, order_type="STOP", stop_distance=0, guaranteed_stop=False):
+        """Place a single working order with optional stop loss"""
         url = f"{self.base_url}/workingorders/otc"
         
         # Determine expiry based on epic
@@ -110,9 +110,13 @@ class IGClient:
             "type": order_type,
             "timeInForce": "GOOD_TILL_CANCELLED",
             "goodTillDate": None,
-            "guaranteedStop": "false",
+            "guaranteedStop": "true" if guaranteed_stop else "false",
             "currencyCode": "GBP"
         }
+        
+        # Add stop loss if specified
+        if stop_distance > 0:
+            order_data["stopDistance"] = str(stop_distance)
         
         headers = self.session.headers.copy()
         headers["version"] = "2"

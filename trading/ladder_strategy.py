@@ -11,7 +11,8 @@ class LadderStrategy:
         self.ig_client = ig_client
     
     def place_ladder(self, epic, direction, start_offset, step_size, num_orders, 
-                    order_size, retry_jump=10, max_retries=3, log_callback=None, limit_distance=0):
+                    order_size, retry_jump=10, max_retries=3, log_callback=None, 
+                    limit_distance=0, stop_distance=0, guaranteed_stop=False):
         """
         Place a ladder of orders with configurable retry on level errors
         
@@ -26,6 +27,8 @@ class LadderStrategy:
             max_retries: Maximum retry attempts
             log_callback: Function to call for logging (optional)
             limit_distance: Distance for limit orders (0 = no limits)
+            stop_distance: Distance for stop loss (0 = no stop)
+            guaranteed_stop: Whether to use guaranteed stops
         
         Returns:
             Tuple of (successful_count, total_orders)
@@ -45,6 +48,11 @@ class LadderStrategy:
         current_price = price_data['mid']
         log(f"Current {epic} price: {current_price}")
         
+        # Log stop loss configuration
+        if stop_distance > 0:
+            stop_type = "Guaranteed" if guaranteed_stop else "Regular"
+            log(f"Using {stop_type} stops at {stop_distance} points distance")
+        
         successful_orders = 0
         
         for i in range(num_orders):
@@ -59,8 +67,12 @@ class LadderStrategy:
                 else:
                     order_level = current_price - current_offset - (i * step_size)
                 
-                # Try to place the order
-                response = self.ig_client.place_order(epic, direction, order_size, order_level)
+                # Try to place the order WITH stop loss
+                response = self.ig_client.place_order(
+                    epic, direction, order_size, order_level, 
+                    stop_distance=stop_distance, 
+                    guaranteed_stop=guaranteed_stop
+                )
                 
                 if response.status_code == 200:
                     deal_ref = response.json().get('dealReference')
