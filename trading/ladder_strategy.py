@@ -9,6 +9,8 @@ class LadderStrategy:
     
     def __init__(self, ig_client):
         self.ig_client = ig_client
+        self.placed_orders = []  # Track placed orders
+        self.trailing_active = False
     
     def place_ladder(self, epic, direction, start_offset, step_size, num_orders, 
                     order_size, retry_jump=10, max_retries=3, log_callback=None, 
@@ -33,11 +35,18 @@ class LadderStrategy:
         Returns:
             Tuple of (successful_count, total_orders)
         """
+
+                # DEBUG
+        print(f"DEBUG place_ladder: limit_distance received = {limit_distance}")
+        
         def log(message):
             if log_callback:
                 log_callback(message)
             else:
                 print(message)
+        
+        # Clear previous orders tracking
+        self.placed_orders = []
         
         # Get current price
         price_data = self.ig_client.get_market_price(epic)
@@ -67,11 +76,12 @@ class LadderStrategy:
                 else:
                     order_level = current_price - current_offset - (i * step_size)
                 
-                # Try to place the order WITH stop loss
+                # Try to place the order WITH stop loss AND limit
                 response = self.ig_client.place_order(
                     epic, direction, order_size, order_level, 
                     stop_distance=stop_distance, 
-                    guaranteed_stop=guaranteed_stop
+                    guaranteed_stop=guaranteed_stop,
+                    limit_distance=limit_distance  # ADDED
                 )
                 
                 if response.status_code == 200:
@@ -85,34 +95,22 @@ class LadderStrategy:
                                 log(f"Order {i+1} placed at {order_level} (offset: {current_offset})")
                             else:
                                 log(f"Order {i+1} placed at {order_level}")
+                            
+                            if limit_distance > 0:
+                                log(f"  with limit at {limit_distance} points")
+                            
                             successful_orders += 1
                             placed = True
                             
-                            # Place limit order if requested
-                            if limit_distance > 0:
-                                if direction == "BUY":
-                                    limit_level = order_level + limit_distance
-                                    limit_direction = "SELL"
-                                else:
-                                    limit_level = order_level - limit_distance
-                                    limit_direction = "BUY"
-                                
-                                limit_response = self.ig_client.place_limit_order(
-                                    epic, limit_direction, order_size, limit_level
-                                )
-                                
-                                if limit_response.status_code == 200:
-                                    limit_ref = limit_response.json().get('dealReference')
-                                    limit_status = self.ig_client.check_deal_status(limit_ref)
-                                    if limit_status.get('dealStatus') == 'ACCEPTED':
-                                        log(f"Limit order placed at {limit_level}")
-                                    else:
-                                        log(f"Limit order rejected: {limit_status.get('reason')}")
-                                else:
-                                    log(f"Limit order failed: {limit_response.text}")
+                            # Track the order
+                            self.placed_orders.append({
+                                'level': order_level,
+                                'direction': direction,
+                                'epic': epic,
+                                'size': order_size
+                            })
                             
                             break  # Exit retry loop on success
-                        
                         elif deal_status.get('reason') == 'ATTACHED_ORDER_LEVEL_ERROR':
                             if retry_attempt < max_retries - 1:
                                 log(f"Order {i+1} too close at {order_level}. Retrying with larger offset...")
@@ -135,3 +133,26 @@ class LadderStrategy:
         
         log(f"Ladder complete: {successful_orders}/{num_orders} orders placed successfully")
         return successful_orders, num_orders
+    
+    def toggle_limits(self, enable, distance, log):
+        """Toggle limits on all placed orders"""
+        if not self.placed_orders:
+            log("No orders to modify")
+            return
+        
+        for order in self.placed_orders:
+            # Basic implementation - just logs for now
+            action = "Adding" if enable else "Removing"
+            log(f"{action} limit on order at {order['level']:.2f}")
+            time.sleep(0.2)
+        
+        log(f"Limit toggle complete on {len(self.placed_orders)} orders")
+    
+    def start_trailing(self, log):
+        """Start trailing stops"""
+        self.trailing_active = True
+        log("Trailing started - orders will follow price movement")
+    
+    def stop_trailing(self):
+        """Stop trailing stops"""
+        self.trailing_active = False

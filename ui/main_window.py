@@ -8,6 +8,34 @@ from tkinter import ttk, scrolledtext, messagebox, simpledialog
 import threading
 import time
 
+class ToggleSwitch(tk.Canvas):
+    """Toggle switch - Green=ON, Red=OFF"""
+    def __init__(self, parent, initial_state=False, callback=None, **kwargs):
+        super().__init__(parent, width=50, height=24, highlightthickness=0, bg=kwargs.get('bg', '#f8f9fb'))
+        self.callback = callback
+        self.state = initial_state
+        self.color_on = '#4CAF50'
+        self.color_off = '#f44336'
+        
+        self.bg_rect = self.create_rectangle(0, 0, 50, 24, fill=self.color_off, outline='', tags='bg')
+        self.knob = self.create_oval(2, 2, 22, 22, fill='#ffffff', outline='', tags='knob')
+        
+        self.bind('<Button-1>', lambda e: self.toggle())
+        self.set_state(initial_state)
+    
+    def toggle(self):
+        self.set_state(not self.state)
+        if self.callback:
+            self.callback(self.state)
+    
+    def set_state(self, state):
+        self.state = state
+        self.itemconfig('bg', fill=self.color_on if state else self.color_off)
+        x = 26 if state else 2
+        self.coords('knob', x, 2, x+20, 22)
+    
+    def get(self):
+        return self.state
 
 class MainWindow:
     """Main GUI window for trading bot"""
@@ -21,11 +49,31 @@ class MainWindow:
         self.root = None
         self.auto_trading = False
 
+    def on_limit_toggled(self, state):
+        """Handle limit toggle"""
+        if hasattr(self.ladder_strategy, 'placed_orders') and self.ladder_strategy.placed_orders:
+            self.log(f"{'Adding' if state else 'Removing'} limits on existing orders...")
+            # Run in background
+            threading.Thread(target=self.ladder_strategy.toggle_limits, 
+                             args=(state, float(self.limit_distance_var.get()), self.log), 
+                             daemon=True).start()
+        else:
+            self.log(f"Limits: {'ON' if state else 'OFF'} - will apply to new orders")
+
+    def on_trailing_toggled(self, state):
+        """Handle trailing toggle"""
+        if state:
+            self.log("Trailing enabled - entries will follow price")
+            self.ladder_strategy.start_trailing(self.log)
+        else:
+            self.log("Trailing stopped")
+            self.ladder_strategy.stop_trailing()
+
     def create_gui(self):
         """Create the GUI with improved contrast and layout"""
         self.root = tk.Tk()
         self.root.title("IG Trading Bot")
-        self.root.geometry("1100x850")
+        self.root.geometry("1100x950")
 
         self.use_risk_management = tk.BooleanVar(value=False)
         self.use_limit_orders = tk.BooleanVar(value=True)
@@ -157,24 +205,33 @@ class MainWindow:
         notebook.add(risk_frame, text="Risk Management")
         self.create_risk_tab(risk_frame)
 
-        # Add this line in the create_gui method, after the risk tab
         config_frame = tk.Frame(notebook, bg=bg_color)
         notebook.add(config_frame, text="Configuration")
         self.create_config_tab(config_frame)
 
         notebook.pack(expand=True, fill="both", padx=15, pady=5)
 
-        # Log area - BIGGER
-        log_outer = tk.Frame(self.root, bg=bg_color)
-        log_outer.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        # Bottom section - split into two columns
+        bottom_frame = tk.Frame(self.root, bg=bg_color)
+        bottom_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
 
-        log_frame = ttk.LabelFrame(log_outer, text="Activity Log", padding=10)
+        # Left column - Order Management
+        left_col = tk.Frame(bottom_frame, bg=bg_color, width=700)
+        left_col.pack(side="left", fill="both", expand=False, padx=(0, 7))
+        left_col.pack_propagate(False)
+
+        # Right column - Activity Log
+        right_col = tk.Frame(bottom_frame, bg=bg_color)
+        right_col.pack(side="right", fill="both", expand=True, padx=(7, 0))
+
+        # Activity Log (right column)
+        log_frame = ttk.LabelFrame(right_col, text="Activity Log", padding=10)
         log_frame.pack(fill="both", expand=True)
 
         self.log_text = scrolledtext.ScrolledText(
             log_frame,
-            width=100,
-            height=10,
+            width=50,
+            height=15,
             bg="#ffffff",
             fg="#2d7a4f",
             font=("Consolas", 9, "bold"),
@@ -184,6 +241,44 @@ class MainWindow:
             highlightbackground="#b0c4de",
         )
         self.log_text.pack(fill="both", expand=True)
+
+        # Store left_col for use in trading tab
+        self.bottom_left_col = left_col
+        
+        # Create Order Management in the left column
+        orders_frame = ttk.LabelFrame(left_col, text="Order Management", padding=12)
+        orders_frame.pack(fill="both", expand=True, padx=5, pady=5)
+
+        btn_frame = tk.Frame(orders_frame, bg="#f8f9fb")
+        btn_frame.pack(fill="x", pady=5)
+
+        buttons = [
+            ("Refresh", self.on_refresh_orders, "Primary.TButton"),
+            ("Cancel Orders", self.on_cancel_all_orders, "Danger.TButton"),
+            ("Close Positions", self.on_close_positions, "Danger.TButton"),
+            ("Search Markets", self.on_search_markets, "Secondary.TButton"),
+            ("TEST Stop", self.test_stop_update, "Secondary.TButton"),
+        ]
+
+        for text, cmd, style in buttons:
+            ttk.Button(btn_frame, text=text, command=cmd, style=style).pack(
+                side="left", padx=4, ipadx=10, ipady=3
+            )
+
+        # Orders display area
+        self.orders_text = scrolledtext.ScrolledText(
+            orders_frame,
+            width=60,
+            height=15,
+            bg="#ffffff",
+            fg="#1a2332",
+            font=("Consolas", 9),
+            relief="flat",
+            borderwidth=1,
+            highlightthickness=1,
+            highlightbackground="#b0c4de",
+        )
+        self.orders_text.pack(fill="both", expand=True, pady=8)
 
     def create_connection_tab(self, parent):
         """Create connection tab contents"""
@@ -324,48 +419,34 @@ class MainWindow:
             side="left", padx=2
         )
 
-        ladder_btn = ttk.Button(
+        self.ladder_btn = ttk.Button(
             config_row,
             text="Place Ladder",
             command=self.on_place_ladder,
             style="Success.TButton",
         )
-        ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
+        self.ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
 
-        # Orders management
-        orders_frame = ttk.LabelFrame(parent, text="Order Management", padding=12)
-        orders_frame.pack(pady=8, padx=20, fill="both", expand=True)
+        # Toggle switches section
+        toggles_frame = ttk.LabelFrame(parent, text="Order Options", padding=10)
+        toggles_frame.pack(pady=8, padx=20, fill="x")
 
-        btn_frame = tk.Frame(orders_frame, bg="#f8f9fb")
-        btn_frame.pack(fill="x", pady=5)
+        toggle_row = tk.Frame(toggles_frame, bg='#f8f9fb')
+        toggle_row.pack(fill="x", pady=5)
 
-        buttons = [
-            ("Refresh", self.on_refresh_orders, "Primary.TButton"),
-            ("Cancel Orders", self.on_cancel_all_orders, "Danger.TButton"),
-            ("Close Positions", self.on_close_positions, "Danger.TButton"),
-            ("Search Markets", self.on_search_markets, "Secondary.TButton"),
-            ("TEST Stop", self.test_stop_update, "Secondary.TButton"),
-        ]
+        # Limit toggle
+        tk.Label(toggle_row, text="Limit Orders:", font=('Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
+        self.limit_toggle = ToggleSwitch(toggle_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
+        self.limit_toggle.pack(side='left', padx=5)
 
-        for text, cmd, style in buttons:
-            ttk.Button(btn_frame, text=text, command=cmd, style=style).pack(
-                side="left", padx=4, ipadx=10, ipady=3
-            )
+        tk.Label(toggle_row, text="Distance:", font=('Segoe UI', 8), bg='#f8f9fb').pack(side='left', padx=5)
+        # Use existing limit_distance_var
+        ttk.Entry(toggle_row, textvariable=self.limit_distance_var, width=6).pack(side='left', padx=2)
 
-        # Orders display area
-        self.orders_text = scrolledtext.ScrolledText(
-            orders_frame,
-            width=100,
-            height=16,
-            bg="#ffffff",
-            fg="#1a2332",
-            font=("Consolas", 9),
-            relief="flat",
-            borderwidth=1,
-            highlightthickness=1,
-            highlightbackground="#b0c4de",
-        )
-        self.orders_text.pack(fill="both", expand=True, pady=8)
+        # Trailing toggle
+        tk.Label(toggle_row, text="Trailing:", font=('Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=20)
+        self.trailing_toggle = ToggleSwitch(toggle_row, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
+        self.trailing_toggle.pack(side='left', padx=5)
 
     def create_risk_tab(self, parent):
         """Create risk management tab"""
@@ -651,15 +732,24 @@ class MainWindow:
         self.log(f"Update result: {message}")
 
     def log(self, message):
-        """Add message to log"""
+        """Add message to log - thread safe"""
         from datetime import datetime
-
         timestamp = datetime.now().strftime("%H:%M:%S")
         log_message = f"[{timestamp}] {message}"
         print(log_message)
-        self.log_text.insert(tk.END, log_message + "\n")
-        self.log_text.see(tk.END)
-
+        
+        # Schedule the GUI update on the main thread
+        try:
+            if self.root and self.log_text:
+                def do_update():
+                    try:
+                        self.log_text.insert(tk.END, log_message + "\n")
+                        self.log_text.see(tk.END)
+                    except:
+                        pass
+                self.root.after(0, do_update)
+        except:
+            pass  # If there's any issue, at least we printed to console
     def on_connect(self):
         """Handle connect button"""
         if not self.ig_client.logged_in:
@@ -712,16 +802,16 @@ class MainWindow:
 
     def on_place_ladder(self):
         """Handle place ladder button with optional feature checks"""
-
-        stop_distance = float(self.stop_distance_var.get())
-        guaranteed_stop = self.use_guaranteed_stops.get()
-        limit_distance = float(self.limit_distance_var.get()) if self.use_limit_orders.get() else 0
-
+        
         if not self.ig_client.logged_in:
             self.log("Not connected")
             return
 
+        # Disable button to prevent accidental multiple triggers
+        self.ladder_btn.config(state="disabled", text="Placing...")
+        
         try:
+            # Get all the parameters FIRST
             selected_market = self.market_var.get()
             epic = self.config.markets.get(selected_market)
             direction = self.direction_var.get()
@@ -731,10 +821,17 @@ class MainWindow:
             order_size = float(self.size_var.get())
             retry_jump = float(self.retry_jump_var.get())
             max_retries = int(self.max_retries_var.get())
+            stop_distance = float(self.stop_distance_var.get())
+            guaranteed_stop = self.use_guaranteed_stops.get()
             
-            # Optional limit orders
-            limit_distance = float(self.limit_distance_var.get()) if self.use_limit_orders.get() else 0
+            # Use the toggle switch state for limits
+            limit_distance = float(self.limit_distance_var.get()) if self.limit_toggle.get() else 0
             
+            # DEBUG - see what we're getting
+            print(f"DEBUG on_place_ladder: limit_toggle state = {self.limit_toggle.get()}")
+            print(f"DEBUG on_place_ladder: limit_distance_var = {self.limit_distance_var.get()}")
+            print(f"DEBUG on_place_ladder: calculated limit_distance = {limit_distance}")
+
             # Optional risk check
             if self.use_risk_management.get():
                 can_trade, safety_checks = self.risk_manager.can_trade(order_size, epic)
@@ -743,26 +840,34 @@ class MainWindow:
                     for check_name, passed, message in safety_checks:
                         if not passed:
                             self.log(f"  {check_name}: {message}")
+                    self.ladder_btn.config(state="normal", text="Place Ladder")
                     return
                 else:
                     self.log("Risk check passed")
             else:
                 self.log("Risk management disabled - trading without safety checks")
             
+            # NOW log with the variables defined
             self.log(f"Placing {num_orders} {direction} orders for {selected_market}")
             if limit_distance > 0:
                 self.log(f"With limit orders at {limit_distance} points distance")
             
-            # Run in thread
-            # Run in thread
-            thread = threading.Thread(target=self.ladder_strategy.place_ladder,
-                                    args=(epic, direction, start_offset, step_size, 
-                                        num_orders, order_size, retry_jump, max_retries, 
-                                        self.log, limit_distance, stop_distance, guaranteed_stop))  # Added params
+            # Create wrapper to re-enable button when done
+            def place_and_reenable():
+                try:
+                    self.ladder_strategy.place_ladder(epic, direction, start_offset, step_size, 
+                                                    num_orders, order_size, retry_jump, max_retries, 
+                                                    self.log, limit_distance, stop_distance, guaranteed_stop)
+                finally:
+                    self.root.after(0, lambda: self.ladder_btn.config(state="normal", text="Place Ladder"))
+            
+            thread = threading.Thread(target=place_and_reenable)
             thread.daemon = True
             thread.start()
+            
         except ValueError as e:
             self.log(f"Invalid parameters: {str(e)}")
+            self.ladder_btn.config(state="normal", text="Place Ladder")
 
     def on_refresh_orders(self):
         """Handle refresh orders button"""
@@ -840,6 +945,15 @@ class MainWindow:
                 self.on_refresh_orders()
             else:
                 self.log("No orders to cancel")
+
+                            # Clear the internal order list
+            if hasattr(self.ladder_strategy, 'placed_orders'):
+                self.ladder_strategy.placed_orders = []
+                self.log("Internal order tracking cleared")
+            
+            self.on_refresh_orders()
+        else:
+            self.log("No orders to cancel")
 
     def on_close_positions(self):
         """Handle close positions button"""

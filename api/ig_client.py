@@ -91,8 +91,8 @@ class IGClient:
             print(f"Price error: {str(e)}")
             return None
     
-    def place_order(self, epic, direction, size, level, order_type="STOP", stop_distance=0, guaranteed_stop=False):
-        """Place a single working order with optional stop loss"""
+    def place_order(self, epic, direction, size, level, order_type="STOP", stop_distance=0, guaranteed_stop=False, limit_distance=0):
+        """Place a single working order with optional stop loss and limit"""
         url = f"{self.base_url}/workingorders/otc"
         
         # Determine expiry based on epic
@@ -118,10 +118,19 @@ class IGClient:
         if stop_distance > 0:
             order_data["stopDistance"] = str(stop_distance)
         
+        # Add limit if specified
+        if limit_distance > 0:
+            order_data["limitDistance"] = str(limit_distance)
+            print(f"DEBUG: Adding limitDistance={limit_distance} to order")  # ADD THIS
+        
+        print(f"DEBUG: Order data being sent: {order_data}")  # ADD THIS
+        
         headers = self.session.headers.copy()
         headers["version"] = "2"
         
         response = self.session.post(url, json=order_data, headers=headers)
+        print(f"DEBUG: Response status: {response.status_code}")  # ADD THIS
+        print(f"DEBUG: Response body: {response.text}")  # ADD THIS
         return response
     
     def check_deal_status(self, deal_reference):
