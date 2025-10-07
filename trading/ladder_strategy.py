@@ -136,116 +136,101 @@ class LadderStrategy:
         log(f"Limit toggle complete on {len(self.placed_orders)} orders")
 
     def start_trailing(self, log):
-        """Start trailing stops - monitor ALL working orders and adjust based on current price"""
+        """
+        Start trailing stops - maintains individual ladder spacing for each order
+        Works on ALL working orders, preserving their offset from current price
+        """
         import threading
         import time
         
         self.trailing_active = True
         log("Trailing started - monitoring all working orders")
-        print("DEBUG: Trailing thread starting")
         
         def trail_orders():
-            """Background thread to monitor and adjust ALL orders"""
-            trailing_distance = 5
-            min_move = 0.1  # Very sensitive for testing
-            check_interval = 3
-            
-            print("DEBUG: Trail thread running")
+            """Background thread to monitor and adjust ALL orders while preserving ladder spacing"""
+            min_move = 0.1  # Minimum price movement to trigger adjustment (testing: 0.1, production: 2.0)
+            check_interval = 3  # Seconds between checks (testing: 3, production: 10)
             
             while self.trailing_active:
                 try:
-                    print("DEBUG: Checking for orders to trail...")
-                    
                     # Get ALL current working orders from IG
                     working_orders = self.ig_client.get_working_orders()
-                    print(f"DEBUG: Found {len(working_orders)} working orders")
                     
                     if not working_orders:
                         time.sleep(check_interval)
                         continue
                     
-                    # Process each order
+                    # Process each order individually
                     for order in working_orders:
                         try:
                             order_data = order.get('workingOrderData', {})
                             market_data = order.get('marketData', {})
-
-                            print(f"DEBUG: order_data keys: {order_data.keys()}")
-                            print(f"DEBUG: Full order_data: {order_data}")
                             
                             epic = market_data.get('epic')
                             current_level = order_data.get('level')
                             direction = order_data.get('direction')
                             deal_id = order_data.get('dealId')
                             
-                            print(f"DEBUG: Order - {epic} {direction} @ {current_level}")
-                            
                             if not all([epic, current_level, direction, deal_id]):
-                                print("DEBUG: Missing data, skipping")
                                 continue
                             
                             # Get current price for this instrument
                             price_data = self.ig_client.get_market_price(epic)
-                            print(f"DEBUG: price_data response: {price_data}")
                             if not price_data or not price_data['mid']:
-                                print(f"DEBUG: Could not get price for {epic}")
                                 continue
                             
                             current_price = price_data['mid']
-                            print(f"DEBUG: Current price for {epic}: {current_price}")
                             
-                            # Calculate where order SHOULD be
-                            if direction == "BUY":
-                                ideal_level = current_price + trailing_distance
-                                print(f"DEBUG: BUY - ideal={ideal_level}, current={current_level}, diff={current_level - ideal_level}")
+                            # KEY FIX: Calculate THIS order's offset from current price
+                            # This preserves the ladder spacing!
+                            if direction == "SELL":
+                                # SELL orders are ABOVE the market (stop entry to go short)
+                                current_offset = current_level - current_price
                                 
-                                # Only move DOWN (better entry for buys)
+                                # Calculate where order SHOULD be with same offset
+                                ideal_level = current_price + current_offset
+                                
+                                # Only trail DOWN (better entry = lower price for sells)
+                                # And only if the improvement is significant enough
                                 if ideal_level < current_level - min_move:
                                     new_level = ideal_level
-                                    print(f"DEBUG: Will trail from {current_level} to {new_level}")
                                     
                                     success, message = self.ig_client.update_working_order(deal_id, new_level)
                                     
                                     if success:
-                                        log(f"{epic}: Order trailed {current_level:.2f} → {new_level:.2f}")
+                                        log(f"{epic} SELL: Trailed {current_level:.2f} → {new_level:.2f} (offset: {current_offset:.1f})")
                                     else:
                                         log(f"{epic}: Trail failed - {message}")
-                                        print(f"DEBUG: Trail failed - {message}")
-                                else:
-                                    print(f"DEBUG: Not trailing - improvement too small")
                             
-                            else:  # SELL
-                                ideal_level = current_price - trailing_distance
-                                print(f"DEBUG: SELL - ideal={ideal_level}, current={current_level}, diff={ideal_level - current_level}")
+                            elif direction == "BUY":
+                                # BUY orders are BELOW the market (stop entry to go long)
+                                current_offset = current_price - current_level
                                 
-                                # Only move UP (better entry for sells)
+                                # Calculate where order SHOULD be with same offset
+                                ideal_level = current_price - current_offset
+                                
+                                # Only trail UP (better entry = higher price for buys)
+                                # And only if the improvement is significant enough
                                 if ideal_level > current_level + min_move:
                                     new_level = ideal_level
-                                    print(f"DEBUG: Will trail from {current_level} to {new_level}")
                                     
                                     success, message = self.ig_client.update_working_order(deal_id, new_level)
                                     
                                     if success:
-                                        log(f"{epic}: Order trailed {current_level:.2f} → {new_level:.2f}")
+                                        log(f"{epic} BUY: Trailed {current_level:.2f} → {new_level:.2f} (offset: {current_offset:.1f})")
                                     else:
                                         log(f"{epic}: Trail failed - {message}")
-                                        print(f"DEBUG: Trail failed - {message}")
-                                else:
-                                    print(f"DEBUG: Not trailing - improvement too small")
                         
                         except Exception as e:
-                            print(f"DEBUG: Error processing order: {str(e)}")
                             log(f"Error processing order: {str(e)}")
                             continue
                     
                 except Exception as e:
-                    print(f"DEBUG: Trailing error: {str(e)}")
                     log(f"Trailing error: {str(e)}")
                 
                 time.sleep(check_interval)
             
             log("Trailing stopped")
-            print("DEBUG: Trailing thread stopped")
         
         # Start the trailing thread
         trail_thread = threading.Thread(target=trail_orders, daemon=True)
