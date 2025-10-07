@@ -64,6 +64,35 @@ class IGClient:
         self.logged_in = False
         self.session = requests.Session()
         self.base_url = ""
+
+    def update_working_order(self, deal_id, new_level):
+        """Update the level of a working order"""
+        try:
+            url = f"{self.base_url}/workingorders/otc/{deal_id}"
+            
+            update_data = {
+                "level": str(new_level)
+            }
+            
+            headers = self.session.headers.copy()
+            headers["version"] = "2"
+            headers["_method"] = "PUT"
+            
+            response = self.session.post(url, json=update_data, headers=headers)
+            
+            if response.status_code == 200:
+                deal_ref = response.json().get('dealReference')
+                if deal_ref:
+                    deal_status = self.check_deal_status(deal_ref)
+                    if deal_status.get('dealStatus') == 'ACCEPTED':
+                        return True, "Order updated"
+                    else:
+                        return False, deal_status.get('reason')
+            else:
+                return False, response.text
+                
+        except Exception as e:
+            return False, str(e)
     
     def get_market_price(self, epic):
         """Get current market price for an epic"""

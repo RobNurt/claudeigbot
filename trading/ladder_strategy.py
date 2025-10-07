@@ -67,12 +67,18 @@ class LadderStrategy:
 
         successful_orders = 0
 
-        for i in range(num_orders):
-            placed = False
+successful_orders = 0
 
-            for retry_attempt in range(max_retries):
-                # Calculate offset: start + (retry_attempt * retry_jump)
-                current_offset = start_offset + (retry_attempt * retry_jump)
+        for i in range(num_orders):
+            # Check for cancellation
+            if self.cancel_requested:
+                log("Ladder placement cancelled by user")
+                self.cancel_requested = False  # Reset flag
+                return successful_orders, num_orders
+            
+            placed = False
+            
+                for retry_attempt in range(max_retries):
 
                 if direction == "BUY":
                     order_level = current_price + \
@@ -157,9 +163,106 @@ class LadderStrategy:
         log(f"Limit toggle complete on {len(self.placed_orders)} orders")
 
     def start_trailing(self, log):
-        """Start trailing stops"""
+        """Start trailing stops - monitor price and adjust orders"""
+        import threading
+        
         self.trailing_active = True
         log("Trailing started - orders will follow price movement")
+        
+        def trail_orders():
+            """Background thread to monitor and adjust orders"""
+            import time
+            
+            trailing_distance = 5  # Points behind current price
+            check_interval = 5  # Seconds between checks
+            
+            while self.trailing_active:
+                try:
+                    if not self.placed_orders:
+                        time.sleep(check_interval)
+                        continue
+                    
+                    # Get current price for the epic
+                    epic = self.placed_orders[0]['epic']
+                    price_data = self.ig_client.get_market_price(epic)
+                    
+                    if not price_data or not price_data['mid']:
+                        time.sleep(check_interval)
+                        continue
+                    
+                    current_price = price_data['mid']
+                    direction = self.placed_orders[0]['direction']
+                    
+                    # Get current working orders from API
+                    working_orders = self.ig_client.get_working_orders()
+                    
+                    # Match our tracked orders with actual working orders
+                    for tracked_order in self.placed_orders:
+                        old_level = tracked_order['level']
+                        
+                        # Calculate new level based on trailing distance
+                        if direction == "BUY":
+                            # For buys, trail down as price drops
+                            new_level = current_price + trailing_distance
+                            
+                            # Only move if new level is lower (better entry)
+                            if new_level < old_level - 2:  # At least 2 points improvement
+                                # Find the actual order in working orders
+                                for wo in working_orders:
+                                    wo_data = wo.get('workingOrderData', {})
+                                    wo_level = wo_data.get('orderLevel')
+                                    
+                                    # Match by level (approximate)
+                                    if wo_level and abs(wo_level - old_level) < 1:
+                                        deal_id = wo_data.get('dealId')
+                                        
+                                        # Update the order
+                                        success, message = self.ig_client.update_working_order(
+                                            deal_id, new_level
+                                        )
+                                        
+                                        if success:
+                                            log(f"Order trailed: {old_level:.2f} → {new_level:.2f}")
+                                            tracked_order['level'] = new_level
+                                        else:
+                                            log(f"Trail failed: {message}")
+                                        
+                                        break
+                        
+                        else:  # SELL
+                            # For sells, trail up as price rises
+                            new_level = current_price - trailing_distance
+                            
+                            # Only move if new level is higher (better entry)
+                            if new_level > old_level + 2:
+                                # Find and update order (same logic as above)
+                                for wo in working_orders:
+                                    wo_data = wo.get('workingOrderData', {})
+                                    wo_level = wo_data.get('orderLevel')
+                                    
+                                    if wo_level and abs(wo_level - old_level) < 1:
+                                        deal_id = wo_data.get('dealId')
+                                        
+                                        success, message = self.ig_client.update_working_order(
+                                            deal_id, new_level
+                                        )
+                                        
+                                        if success:
+                                            log(f"Order trailed: {old_level:.2f} → {new_level:.2f}")
+                                            tracked_order['level'] = new_level
+                                        else:
+                                            log(f"Trail failed: {message}")
+                                        
+                                        break
+                    
+                except Exception as e:
+                    log(f"Trailing error: {str(e)}")
+                
+                time.sleep(check_interval)
+        
+        # Start the trailing thread
+        trail_thread = threading.Thread(target=trail_orders, daemon=True)
+        trail_thread.start()
 
     def stop_trailing(self):
         """Stop trailing stops"""
