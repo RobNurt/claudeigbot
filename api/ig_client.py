@@ -71,7 +71,9 @@ class IGClient:
             url = f"{self.base_url}/workingorders/otc/{deal_id}"
             
             update_data = {
-                "level": str(new_level)
+                "level": str(new_level),
+                "type": "STOP",
+                "timeInForce": "GOOD_TILL_CANCELLED"  # ADD THIS
             }
             
             headers = self.session.headers.copy()
