@@ -3,39 +3,46 @@ Main GUI Window
 Tkinter-based interface for the IG trading bot with improved aesthetics
 """
 
+from concurrent.futures import thread
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox, simpledialog
 import threading
 import time
 
+
 class ToggleSwitch(tk.Canvas):
     """Toggle switch - Green=ON, Red=OFF"""
+
     def __init__(self, parent, initial_state=False, callback=None, **kwargs):
-        super().__init__(parent, width=50, height=24, highlightthickness=0, bg=kwargs.get('bg', '#f8f9fb'))
+        super().__init__(parent, width=50, height=24,
+                         highlightthickness=0, bg=kwargs.get('bg', '#f8f9fb'))
         self.callback = callback
         self.state = initial_state
         self.color_on = '#4CAF50'
         self.color_off = '#f44336'
-        
-        self.bg_rect = self.create_rectangle(0, 0, 50, 24, fill=self.color_off, outline='', tags='bg')
-        self.knob = self.create_oval(2, 2, 22, 22, fill='#ffffff', outline='', tags='knob')
-        
+
+        self.bg_rect = self.create_rectangle(
+            0, 0, 50, 24, fill=self.color_off, outline='', tags='bg')
+        self.knob = self.create_oval(
+            2, 2, 22, 22, fill='#ffffff', outline='', tags='knob')
+
         self.bind('<Button-1>', lambda e: self.toggle())
         self.set_state(initial_state)
-    
+
     def toggle(self):
         self.set_state(not self.state)
         if self.callback:
             self.callback(self.state)
-    
+
     def set_state(self, state):
         self.state = state
         self.itemconfig('bg', fill=self.color_on if state else self.color_off)
         x = 26 if state else 2
         self.coords('knob', x, 2, x+20, 22)
-    
+
     def get(self):
         return self.state
+
 
 class MainWindow:
     """Main GUI window for trading bot"""
@@ -52,13 +59,16 @@ class MainWindow:
     def on_limit_toggled(self, state):
         """Handle limit toggle"""
         if hasattr(self.ladder_strategy, 'placed_orders') and self.ladder_strategy.placed_orders:
-            self.log(f"{'Adding' if state else 'Removing'} limits on existing orders...")
+            self.log(
+                f"{'Adding' if state else 'Removing'} limits on existing orders...")
             # Run in background
-            threading.Thread(target=self.ladder_strategy.toggle_limits, 
-                             args=(state, float(self.limit_distance_var.get()), self.log), 
+            threading.Thread(target=self.ladder_strategy.toggle_limits,
+                             args=(state, float(
+                                 self.limit_distance_var.get()), self.log),
                              daemon=True).start()
         else:
-            self.log(f"Limits: {'ON' if state else 'OFF'} - will apply to new orders")
+            self.log(
+                f"Limits: {'ON' if state else 'OFF'} - will apply to new orders")
 
     def on_trailing_toggled(self, state):
         """Handle trailing toggle"""
@@ -151,7 +161,8 @@ class MainWindow:
             borderwidth=0,
         )
 
-        style.configure("TLabelframe", background=card_bg, relief="flat", borderwidth=1)
+        style.configure("TLabelframe", background=card_bg,
+                        relief="flat", borderwidth=1)
         style.configure(
             "TLabelframe.Label",
             background=card_bg,
@@ -164,16 +175,17 @@ class MainWindow:
         header_frame.pack(fill="x", pady=10, padx=15)
 
         title_label = ttk.Label(
-            header_frame, text="IG Trading Bot", style="Title.TLabel"
-        )
+            header_frame, text="IG Trading Bot", style="Title.TLabel")
         title_label.pack(side="left")
 
-        self.panic_btn = ttk.Button(
-            header_frame,
-            text="⚠ EMERGENCY STOP",
-            command=self.on_panic,
-            style="Emergency.TButton",
-        )
+        # Add margin display
+        self.margin_var = tk.StringVar(value="Margin: --")
+        self.margin_label = ttk.Label(header_frame, textvariable=self.margin_var,
+                                      font=("Segoe UI", 11), foreground="#4a7ba7")
+        self.margin_label.pack(side="left", padx=30)
+
+        self.panic_btn = ttk.Button(header_frame, text="⚠ EMERGENCY STOP",
+                                    command=self.on_panic, style="Emergency.TButton")
         self.panic_btn.pack(side="right", ipadx=15, ipady=8)
 
         # Notebook
@@ -244,9 +256,10 @@ class MainWindow:
 
         # Store left_col for use in trading tab
         self.bottom_left_col = left_col
-        
+
         # Create Order Management in the left column
-        orders_frame = ttk.LabelFrame(left_col, text="Order Management", padding=12)
+        orders_frame = ttk.LabelFrame(
+            left_col, text="Order Management", padding=12)
         orders_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
         btn_frame = tk.Frame(orders_frame, bg="#f8f9fb")
@@ -327,7 +340,8 @@ class MainWindow:
     def create_trading_tab(self, parent):
         """Create trading tab with more compact layout"""
         # Market selection
-        market_frame = ttk.LabelFrame(parent, text="Market Selection", padding=10)
+        market_frame = ttk.LabelFrame(
+            parent, text="Market Selection", padding=10)
         market_frame.pack(pady=8, padx=20, fill="x")
 
         market_row = tk.Frame(market_frame, bg="#f8f9fb")
@@ -364,7 +378,8 @@ class MainWindow:
         price_label.pack(side="left", padx=15)
 
         # Ladder configuration - SINGLE ROW
-        ladder_frame = ttk.LabelFrame(parent, text="Ladder Configuration", padding=10)
+        ladder_frame = ttk.LabelFrame(
+            parent, text="Ladder Configuration", padding=10)
         ladder_frame.pack(pady=8, padx=20, fill="x")
 
         config_row = tk.Frame(ladder_frame, bg="#f8f9fb")
@@ -382,16 +397,17 @@ class MainWindow:
             config_row, text="Sell", variable=self.direction_var, value="SELL"
         ).pack(side="left", padx=2)
 
-        ttk.Separator(config_row, orient="vertical").pack(side="left", fill="y", padx=8)
+        ttk.Separator(config_row, orient="vertical").pack(
+            side="left", fill="y", padx=8)
 
         # Initialize variables
         self.offset_var = tk.StringVar(value="5")
         self.step_var = tk.StringVar(value="10")
         self.num_orders_var = tk.StringVar(value="4")
-        self.size_var = tk.StringVar(value="1")
+        self.size_var = tk.StringVar(value="0.5")
         self.retry_jump_var = tk.StringVar(value="10")
         self.max_retries_var = tk.StringVar(value="3")
-        self.limit_distance_var = tk.StringVar(value="0")
+        self.limit_distance_var = tk.StringVar(value="5")
         # stop_distance_var is already initialized in create_gui
 
         # Parameters
@@ -410,9 +426,11 @@ class MainWindow:
             ttk.Label(config_row, text=label_text, font=("Segoe UI", 8)).pack(
                 side="left", padx=2
             )
-            ttk.Entry(config_row, textvariable=var, width=6).pack(side="left", padx=1)
+            ttk.Entry(config_row, textvariable=var,
+                      width=6).pack(side="left", padx=1)
 
-        ttk.Separator(config_row, orient="vertical").pack(side="left", fill="y", padx=8)
+        ttk.Separator(config_row, orient="vertical").pack(
+            side="left", fill="y", padx=8)
 
         # Guaranteed stop checkbox (use_guaranteed_stops already initialized in create_gui)
         ttk.Checkbutton(config_row, text="Guar.", variable=self.use_guaranteed_stops).pack(
@@ -428,30 +446,38 @@ class MainWindow:
         self.ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
 
         # Toggle switches section
-        toggles_frame = ttk.LabelFrame(parent, text="Order Options", padding=10)
+        toggles_frame = ttk.LabelFrame(
+            parent, text="Order Options", padding=10)
         toggles_frame.pack(pady=8, padx=20, fill="x")
 
         toggle_row = tk.Frame(toggles_frame, bg='#f8f9fb')
         toggle_row.pack(fill="x", pady=5)
 
         # Limit toggle
-        tk.Label(toggle_row, text="Limit Orders:", font=('Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
-        self.limit_toggle = ToggleSwitch(toggle_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
+        tk.Label(toggle_row, text="Limit Orders:", font=(
+            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
+        self.limit_toggle = ToggleSwitch(
+            toggle_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
         self.limit_toggle.pack(side='left', padx=5)
 
-        tk.Label(toggle_row, text="Distance:", font=('Segoe UI', 8), bg='#f8f9fb').pack(side='left', padx=5)
+        tk.Label(toggle_row, text="Distance:", font=('Segoe UI', 8),
+                 bg='#f8f9fb').pack(side='left', padx=5)
         # Use existing limit_distance_var
-        ttk.Entry(toggle_row, textvariable=self.limit_distance_var, width=6).pack(side='left', padx=2)
+        ttk.Entry(toggle_row, textvariable=self.limit_distance_var,
+                  width=6).pack(side='left', padx=2)
 
         # Trailing toggle
-        tk.Label(toggle_row, text="Trailing:", font=('Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=20)
-        self.trailing_toggle = ToggleSwitch(toggle_row, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
+        tk.Label(toggle_row, text="Trailing:", font=('Segoe UI', 9),
+                 bg='#f8f9fb').pack(side='left', padx=20)
+        self.trailing_toggle = ToggleSwitch(
+            toggle_row, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
         self.trailing_toggle.pack(side='left', padx=5)
 
     def create_risk_tab(self, parent):
         """Create risk management tab"""
         # Account Overview Section
-        account_frame = ttk.LabelFrame(parent, text="Account Overview", padding=15)
+        account_frame = ttk.LabelFrame(
+            parent, text="Account Overview", padding=15)
         account_frame.pack(pady=10, padx=20, fill="x")
 
         account_grid = tk.Frame(account_frame, bg="#f8f9fb")
@@ -464,20 +490,25 @@ class MainWindow:
         self.unrealized_pnl_var = tk.StringVar(value="Unrealized P&L: --")
 
         ttk.Label(
-            account_grid, textvariable=self.balance_var, font=("Segoe UI", 11, "bold")
+            account_grid, textvariable=self.balance_var, font=(
+                "Segoe UI", 11, "bold")
         ).grid(row=0, column=0, sticky="w", padx=20, pady=5)
         ttk.Label(
-            account_grid, textvariable=self.available_var, font=("Segoe UI", 11)
+            account_grid, textvariable=self.available_var, font=(
+                "Segoe UI", 11)
         ).grid(row=0, column=1, sticky="w", padx=20, pady=5)
         ttk.Label(
-            account_grid, textvariable=self.daily_pnl_var, font=("Segoe UI", 11, "bold")
+            account_grid, textvariable=self.daily_pnl_var, font=(
+                "Segoe UI", 11, "bold")
         ).grid(row=1, column=0, sticky="w", padx=20, pady=5)
         ttk.Label(
-            account_grid, textvariable=self.unrealized_pnl_var, font=("Segoe UI", 11)
+            account_grid, textvariable=self.unrealized_pnl_var, font=(
+                "Segoe UI", 11)
         ).grid(row=1, column=1, sticky="w", padx=20, pady=5)
 
         # Risk Limits Section
-        limits_frame = ttk.LabelFrame(parent, text="Risk Limits & Status", padding=15)
+        limits_frame = ttk.LabelFrame(
+            parent, text="Risk Limits & Status", padding=15)
         limits_frame.pack(pady=10, padx=20, fill="x")
 
         limits_grid = tk.Frame(limits_frame, bg="#f8f9fb")
@@ -492,17 +523,20 @@ class MainWindow:
             limits_grid, textvariable=self.positions_var, font=("Segoe UI", 10)
         ).grid(row=0, column=0, sticky="w", padx=20, pady=3)
         ttk.Label(
-            limits_grid, textvariable=self.daily_loss_var, font=("Segoe UI", 10)
+            limits_grid, textvariable=self.daily_loss_var, font=(
+                "Segoe UI", 10)
         ).grid(row=0, column=1, sticky="w", padx=20, pady=3)
         ttk.Label(
-            limits_grid, textvariable=self.margin_usage_var, font=("Segoe UI", 10)
+            limits_grid, textvariable=self.margin_usage_var, font=(
+                "Segoe UI", 10)
         ).grid(row=1, column=0, sticky="w", padx=20, pady=3)
         ttk.Label(
             limits_grid, textvariable=self.exposure_var, font=("Segoe UI", 10)
         ).grid(row=1, column=1, sticky="w", padx=20, pady=3)
 
         # Risk Controls Section
-        controls_frame = ttk.LabelFrame(parent, text="Risk Controls", padding=15)
+        controls_frame = ttk.LabelFrame(
+            parent, text="Risk Controls", padding=15)
         controls_frame.pack(pady=10, padx=20, fill="x")
 
         controls_row = tk.Frame(controls_frame, bg="#f8f9fb")
@@ -511,140 +545,148 @@ class MainWindow:
     def create_config_tab(self, parent):
         """Create configuration tab for optional features"""
         # Optional Features Section
-        features_frame = ttk.LabelFrame(parent, text="Optional Features", padding=15)
+        features_frame = ttk.LabelFrame(
+            parent, text="Optional Features", padding=15)
         features_frame.pack(pady=10, padx=20, fill="x")
-                
-        ttk.Checkbutton(features_frame, text="Enable Risk Management", 
-                    variable=self.use_risk_management).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Limit Orders", 
-                    variable=self.use_limit_orders).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Auto-Replace Strategy", 
-                    variable=self.use_auto_replace).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Trailing Stops", 
-                    variable=self.use_trailing_stops).pack(anchor="w", pady=3)
-        
+
+        ttk.Checkbutton(features_frame, text="Enable Risk Management",
+                        variable=self.use_risk_management).pack(anchor="w", pady=3)
+        ttk.Checkbutton(features_frame, text="Enable Limit Orders",
+                        variable=self.use_limit_orders).pack(anchor="w", pady=3)
+        ttk.Checkbutton(features_frame, text="Enable Auto-Replace Strategy",
+                        variable=self.use_auto_replace).pack(anchor="w", pady=3)
+        ttk.Checkbutton(features_frame, text="Enable Trailing Stops",
+                        variable=self.use_trailing_stops).pack(anchor="w", pady=3)
+
         # Status display
-        status_frame = ttk.LabelFrame(parent, text="Feature Status", padding=15)
+        status_frame = ttk.LabelFrame(
+            parent, text="Feature Status", padding=15)
         status_frame.pack(pady=10, padx=20, fill="x")
-        
+
         self.feature_status_text = scrolledtext.ScrolledText(status_frame, width=80, height=8,
-                                                            bg='#ffffff', fg='#1a2332',
-                                                            font=('Consolas', 9),
-                                                            relief='flat', borderwidth=1)
+                                                             bg='#ffffff', fg='#1a2332',
+                                                             font=(
+                                                                 'Consolas', 9),
+                                                             relief='flat', borderwidth=1)
         self.feature_status_text.pack(fill="both", expand=True, pady=5)
-        
+
         # Update status initially
         self.update_feature_status()
-        
+
         # Button to refresh status
         ttk.Button(status_frame, text="Update Status", command=self.update_feature_status,
-                style='Primary.TButton').pack(pady=5)
-        
+                   style='Primary.TButton').pack(pady=5)
+
     def update_feature_status(self):
         """Update feature status display"""
         self.feature_status_text.delete(1.0, tk.END)
-        
+
         timestamp = time.strftime("%H:%M:%S")
-        self.feature_status_text.insert(tk.END, f"[{timestamp}] Feature Status:\n\n")
-        
+        self.feature_status_text.insert(
+            tk.END, f"[{timestamp}] Feature Status:\n\n")
+
         features = [
             ("Risk Management", self.use_risk_management.get()),
             ("Limit Orders", self.use_limit_orders.get()),
             ("Auto-Replace", self.use_auto_replace.get()),
             ("Trailing Stops", self.use_trailing_stops.get())
         ]
-        
+
         for name, enabled in features:
             status = "ENABLED" if enabled else "DISABLED"
             color = "enabled" if enabled else "disabled"
-            self.feature_status_text.insert(tk.END, f"{name}: {status}\n", color)
-        
+            self.feature_status_text.insert(
+                tk.END, f"{name}: {status}\n", color)
+
         # Configure colors
-        self.feature_status_text.tag_config('enabled', foreground='#27ae60', font=('Consolas', 9, 'bold'))
+        self.feature_status_text.tag_config(
+            'enabled', foreground='#27ae60', font=('Consolas', 9, 'bold'))
         self.feature_status_text.tag_config('disabled', foreground='#e74c3c')
 
     def update_risk_display(self):
-            """Update risk management display"""
-            if not self.ig_client.logged_in:
-                self.log("Not connected - cannot update risk data")
-                return
+        """Update risk management display"""
+        if not self.ig_client.logged_in:
+            self.log("Not connected - cannot update risk data")
+            return
 
-            try:
-                # Get risk summary
-                summary = self.risk_manager.get_risk_summary()
+        try:
+            # Get risk summary
+            summary = self.risk_manager.get_risk_summary()
 
-                # Update account info
-                self.balance_var.set(f"Balance: £{summary['account_balance']:.2f}")
-                self.available_var.set(f"Available: £{summary['available_funds']:.2f}")
+            # Update account info
+            self.balance_var.set(f"Balance: £{summary['account_balance']:.2f}")
+            self.available_var.set(
+                f"Available: £{summary['available_funds']:.2f}")
 
-                # Color-code daily P&L
-                daily_pnl = summary["daily_pnl"]
-                if daily_pnl >= 0:
-                    pnl_text = f"Daily P&L: +£{daily_pnl:.2f}"
-                else:
-                    pnl_text = f"Daily P&L: -£{abs(daily_pnl):.2f}"
+            # Color-code daily P&L
+            daily_pnl = summary["daily_pnl"]
+            if daily_pnl >= 0:
+                pnl_text = f"Daily P&L: +£{daily_pnl:.2f}"
+            else:
+                pnl_text = f"Daily P&L: -£{abs(daily_pnl):.2f}"
 
-                self.daily_pnl_var.set(pnl_text)
+            self.daily_pnl_var.set(pnl_text)
 
-                unrealized = summary["unrealized_pnl"]
-                if unrealized >= 0:
-                    unrealized_text = f"Unrealized P&L: +£{unrealized:.2f}"
-                else:
-                    unrealized_text = f"Unrealized P&L: -£{abs(unrealized):.2f}"
-                self.unrealized_pnl_var.set(unrealized_text)
+            unrealized = summary["unrealized_pnl"]
+            if unrealized >= 0:
+                unrealized_text = f"Unrealized P&L: +£{unrealized:.2f}"
+            else:
+                unrealized_text = f"Unrealized P&L: -£{abs(unrealized):.2f}"
+            self.unrealized_pnl_var.set(unrealized_text)
 
-                # Update limits
-                self.positions_var.set(
-                    f"Positions: {summary['open_positions']}/{summary['max_positions']}"
+            # Update limits
+            self.positions_var.set(
+                f"Positions: {summary['open_positions']}/{summary['max_positions']}"
+            )
+
+            loss_remaining = summary["daily_loss_limit"] - \
+                abs(min(0, daily_pnl))
+            self.daily_loss_var.set(f"Loss Remaining: £{loss_remaining:.2f}")
+
+            # Check trading safety
+            can_trade, safety_checks = self.risk_manager.can_trade()
+
+            # Update safety status display
+            self.safety_text.delete(1.0, tk.END)
+
+            timestamp = time.strftime("%H:%M:%S")
+            if can_trade:
+                self.safety_text.insert(
+                    tk.END,
+                    f"[{timestamp}] TRADING ALLOWED - All safety checks passed\n\n",
+                    "safe",
+                )
+            else:
+                self.safety_text.insert(
+                    tk.END,
+                    f"[{timestamp}] TRADING BLOCKED - Safety limits breached\n\n",
+                    "danger",
                 )
 
-                loss_remaining = summary["daily_loss_limit"] - abs(min(0, daily_pnl))
-                self.daily_loss_var.set(f"Loss Remaining: £{loss_remaining:.2f}")
-
-                # Check trading safety
-                can_trade, safety_checks = self.risk_manager.can_trade()
-
-                # Update safety status display
-                self.safety_text.delete(1.0, tk.END)
-
-                timestamp = time.strftime("%H:%M:%S")
-                if can_trade:
-                    self.safety_text.insert(
-                        tk.END,
-                        f"[{timestamp}] TRADING ALLOWED - All safety checks passed\n\n",
-                        "safe",
-                    )
-                else:
-                    self.safety_text.insert(
-                        tk.END,
-                        f"[{timestamp}] TRADING BLOCKED - Safety limits breached\n\n",
-                        "danger",
-                    )
-
-                # Show detailed safety checks
-                for check_name, passed, message in safety_checks:
-                    status = "PASS" if passed else "FAIL"
-                    status_tag = "pass" if passed else "fail"
-                    self.safety_text.insert(
-                        tk.END, f"{check_name}: {status} - {message}\n", status_tag
-                    )
-
-                # Configure text tags for colors
-                self.safety_text.tag_config(
-                    "safe", foreground="#27ae60", font=("Consolas", 9, "bold")
-                )
-                self.safety_text.tag_config(
-                    "danger", foreground="#e74c3c", font=("Consolas", 9, "bold")
-                )
-                self.safety_text.tag_config("pass", foreground="#27ae60")
-                self.safety_text.tag_config(
-                    "fail", foreground="#e74c3c", font=("Consolas", 9, "bold")
+            # Show detailed safety checks
+            for check_name, passed, message in safety_checks:
+                status = "PASS" if passed else "FAIL"
+                status_tag = "pass" if passed else "fail"
+                self.safety_text.insert(
+                    tk.END, f"{check_name}: {status} - {message}\n", status_tag
                 )
 
-                self.log("Risk data updated")
+            # Configure text tags for colors
+            self.safety_text.tag_config(
+                "safe", foreground="#27ae60", font=("Consolas", 9, "bold")
+            )
+            self.safety_text.tag_config(
+                "danger", foreground="#e74c3c", font=("Consolas", 9, "bold")
+            )
+            self.safety_text.tag_config("pass", foreground="#27ae60")
+            self.safety_text.tag_config(
+                "fail", foreground="#e74c3c", font=("Consolas", 9, "bold")
+            )
 
-            except Exception as e:
-                self.log(f"Risk update error: {str(e)}")
+            self.log("Risk data updated")
+
+        except Exception as e:
+            self.log(f"Risk update error: {str(e)}")
 
     def reset_daily_tracking(self):
         """Reset daily P&L tracking"""
@@ -665,44 +707,40 @@ class MainWindow:
 
     def on_panic(self):
         """Handle emergency stop button"""
-        if messagebox.askyesno(
-            "EMERGENCY STOP",
-            "This will:\n- Stop all auto trading\n- Cancel all pending orders\n- Close all open positions\n\nContinue?",
-            icon="warning",
-        ):
-            self.log("EMERGENCY STOP ACTIVATED")
+        # Remove the messagebox - just execute immediately
+        self.log("EMERGENCY STOP ACTIVATED")
 
-            # Stop auto trading if running
-            if self.auto_strategy.running:
-                self.auto_strategy.stop()
+        # Stop auto trading if running
+        if self.auto_strategy.running:
+            self.auto_strategy.stop()
 
-            # Set emergency flag
-            self.ig_client.trigger_emergency_stop()
+        # Set emergency flag
+        self.ig_client.trigger_emergency_stop()
 
-            # Cancel all orders
-            self.log("Cancelling all working orders...")
-            orders = self.ig_client.get_working_orders()
-            for order in orders:
-                deal_id = order.get("workingOrderData", {}).get("dealId")
-                if deal_id:
-                    self.ig_client.cancel_order(deal_id)
-                    time.sleep(0.2)
+        # Cancel all orders
+        self.log("Cancelling all working orders...")
+        orders = self.ig_client.get_working_orders()
+        for order in orders:
+            deal_id = order.get("workingOrderData", {}).get("dealId")
+            if deal_id:
+                self.ig_client.cancel_order(deal_id)
+                time.sleep(0.2)
 
-            # Close all positions
-            self.log("Closing all open positions...")
-            positions = self.ig_client.get_open_positions()
-            for position in positions:
-                deal_id = position.get("position", {}).get("dealId")
-                direction = position.get("position", {}).get("direction")
-                size = position.get("position", {}).get("dealSize")
+        # Close all positions
+        self.log("Closing all open positions...")
+        positions = self.ig_client.get_open_positions()
+        for position in positions:
+            deal_id = position.get("position", {}).get("dealId")
+            direction = position.get("position", {}).get("direction")
+            size = position.get("position", {}).get("dealSize")
 
-                if deal_id and direction and size:
-                    self.ig_client.close_position(deal_id, direction, size)
-                    time.sleep(0.5)
+            if deal_id and direction and size:
+                self.ig_client.close_position(deal_id, direction, size)
+                time.sleep(0.5)
 
-            self.log("EMERGENCY STOP COMPLETE - All positions closed")
-            self.ig_client.reset_emergency_stop()
-            self.on_refresh_orders()
+        self.log("EMERGENCY STOP COMPLETE - All positions closed")
+        self.ig_client.reset_emergency_stop()
+        self.on_refresh_orders()
 
     def test_stop_update(self):
         """Test stop level update on first position"""
@@ -728,7 +766,8 @@ class MainWindow:
         # Try to update stop to 10 points below open level
         test_stop = open_level - 10
 
-        success, message = self.ig_client.update_position_stop(deal_id, test_stop)
+        success, message = self.ig_client.update_position_stop(
+            deal_id, test_stop)
         self.log(f"Update result: {message}")
 
     def log(self, message):
@@ -737,7 +776,7 @@ class MainWindow:
         timestamp = datetime.now().strftime("%H:%M:%S")
         log_message = f"[{timestamp}] {message}"
         print(log_message)
-        
+
         # Schedule the GUI update on the main thread
         try:
             if self.root and self.log_text:
@@ -750,6 +789,7 @@ class MainWindow:
                 self.root.after(0, do_update)
         except:
             pass  # If there's any issue, at least we printed to console
+
     def on_connect(self):
         """Handle connect button"""
         if not self.ig_client.logged_in:
@@ -766,7 +806,9 @@ class MainWindow:
             if success:
                 self.status_var.set(f"Connected to {account_type}")
                 self.status_label.config(style="Connected.TLabel")
-                self.connect_btn.config(text="Disconnect", style="Danger.TButton")
+                self.connect_btn.config(
+                    text="Disconnect", style="Danger.TButton")
+                self.update_margin_display()  # Start margin updates
                 self.log(message)
             else:
                 self.status_var.set("Connection failed")
@@ -803,12 +845,19 @@ class MainWindow:
     def on_place_ladder(self):
         """Handle place ladder button with optional feature checks"""
         
+        # CHECK FOR CANCEL FIRST - before anything else
+        if self.ladder_btn.cget("text") == "Cancel Ladder":
+            self.ladder_strategy.cancel_requested = True
+            self.log("Cancelling ladder placement...")
+            return
+        
+        # NOW check if connected
         if not self.ig_client.logged_in:
             self.log("Not connected")
             return
 
-        # Disable button to prevent accidental multiple triggers
-        self.ladder_btn.config(state="disabled", text="Placing...")
+        # Disable button and change to Cancel
+        self.ladder_btn.config(state="normal", text="Cancel Ladder")
         
         try:
             # Get all the parameters FIRST
@@ -823,18 +872,41 @@ class MainWindow:
             max_retries = int(self.max_retries_var.get())
             stop_distance = float(self.stop_distance_var.get())
             guaranteed_stop = self.use_guaranteed_stops.get()
-            
+
+            # Check margin before placing
+            margin_ok, new_margin_ratio, required_margin = self.risk_manager.check_margin_for_order(
+                epic, order_size * num_orders, margin_limit=0.3
+            )
+
+            if not margin_ok and new_margin_ratio:
+                result = messagebox.askyesno(
+                    "Margin Warning",
+                    f"This order would use {new_margin_ratio:.1%} margin (limit: 30%)\n"
+                    f"Estimated required margin: £{required_margin:.2f}\n\n"
+                    f"Continue anyway?",
+                    icon="warning"
+                )
+                if not result:
+                    self.log("Order cancelled - would exceed margin limit")
+                    self.ladder_btn.config(state="normal", text="Place Ladder")
+                    return
+
             # Use the toggle switch state for limits
-            limit_distance = float(self.limit_distance_var.get()) if self.limit_toggle.get() else 0
-            
+            limit_distance = float(
+                self.limit_distance_var.get()) if self.limit_toggle.get() else 0
+
             # DEBUG - see what we're getting
-            print(f"DEBUG on_place_ladder: limit_toggle state = {self.limit_toggle.get()}")
-            print(f"DEBUG on_place_ladder: limit_distance_var = {self.limit_distance_var.get()}")
-            print(f"DEBUG on_place_ladder: calculated limit_distance = {limit_distance}")
+            print(
+                f"DEBUG on_place_ladder: limit_toggle state = {self.limit_toggle.get()}")
+            print(
+                f"DEBUG on_place_ladder: limit_distance_var = {self.limit_distance_var.get()}")
+            print(
+                f"DEBUG on_place_ladder: calculated limit_distance = {limit_distance}")
 
             # Optional risk check
             if self.use_risk_management.get():
-                can_trade, safety_checks = self.risk_manager.can_trade(order_size, epic)
+                can_trade, safety_checks = self.risk_manager.can_trade(
+                    order_size, epic)
                 if not can_trade:
                     self.log("TRADING BLOCKED - Risk limits exceeded:")
                     for check_name, passed, message in safety_checks:
@@ -845,29 +917,79 @@ class MainWindow:
                 else:
                     self.log("Risk check passed")
             else:
-                self.log("Risk management disabled - trading without safety checks")
-            
+                self.log(
+                    "Risk management disabled - trading without safety checks")
+
             # NOW log with the variables defined
-            self.log(f"Placing {num_orders} {direction} orders for {selected_market}")
+            self.log(
+                f"Placing {num_orders} {direction} orders for {selected_market}")
             if limit_distance > 0:
-                self.log(f"With limit orders at {limit_distance} points distance")
-            
+                self.log(
+                    f"With limit orders at {limit_distance} points distance")
+
             # Create wrapper to re-enable button when done
             def place_and_reenable():
                 try:
-                    self.ladder_strategy.place_ladder(epic, direction, start_offset, step_size, 
-                                                    num_orders, order_size, retry_jump, max_retries, 
-                                                    self.log, limit_distance, stop_distance, guaranteed_stop)
+                    self.ladder_strategy.place_ladder(epic, direction, start_offset, step_size,
+                                                      num_orders, order_size, retry_jump, max_retries,
+                                                      self.log, limit_distance, stop_distance, guaranteed_stop)
                 finally:
-                    self.root.after(0, lambda: self.ladder_btn.config(state="normal", text="Place Ladder"))
-            
+                    self.root.after(0, lambda: self.ladder_btn.config(
+                        state="normal", text="Place Ladder"))
+
             thread = threading.Thread(target=place_and_reenable)
             thread.daemon = True
             thread.start()
-            
+
         except ValueError as e:
             self.log(f"Invalid parameters: {str(e)}")
             self.ladder_btn.config(state="normal", text="Place Ladder")
+
+    def place_and_reenable():
+        try:
+            self.ladder_strategy.place_ladder(epic, direction, start_offset, step_size,
+                                              num_orders, order_size, retry_jump, max_retries,
+                                              self.log, limit_distance, stop_distance, guaranteed_stop)
+        finally:
+            # Re-enable button when done
+            self.root.after(0, lambda: self.ladder_btn.config(
+                state="normal", text="Place Ladder"))
+            self.ladder_strategy.cancel_requested = False  # Reset
+
+        thread = threading.Thread(target=place_and_reenable)
+        thread.start()
+
+    def update_margin_display(self):
+        """Update margin display in header"""
+        if not self.ig_client.logged_in:
+            self.margin_var.set("Margin: --")
+            return
+
+        try:
+            account_info = self.risk_manager.get_account_info()
+            if account_info:
+                balance = account_info['balance']
+                deposit = account_info['deposit']  # This is margin used
+
+                if balance > 0:
+                    margin_ratio = deposit / balance
+
+                    # Color code
+                    if margin_ratio >= 0.3:
+                        color = "#c55a5a"  # Red
+                    elif margin_ratio >= 0.2:
+                        color = "#d68a2e"  # Orange
+                    else:
+                        color = "#5a9d6d"  # Green
+
+                    self.margin_var.set(f"Margin: {margin_ratio:.1%}")
+                    self.margin_label.config(foreground=color)
+        except Exception as e:
+            self.margin_var.set("Margin: Error")
+
+        # Update every 30 seconds
+        if self.ig_client.logged_in:
+            self.root.after(30000, self.update_margin_display)
 
     def on_refresh_orders(self):
         """Handle refresh orders button"""
@@ -875,15 +997,19 @@ class MainWindow:
             self.log("Not connected")
             return
 
-        orders = self.ig_client.get_working_orders()
         positions = self.ig_client.get_open_positions()
+        orders = self.ig_client.get_working_orders()
 
         self.orders_text.delete(1.0, tk.END)
 
-        # Show positions
-        if positions:
-            self.orders_text.insert(tk.END, "=== OPEN POSITIONS ===\n", "header")
-            for pos in positions:
+        # Filter positions - exclude items that are actually still working orders
+        actual_positions = [
+            p for p in positions if 'workingOrderData' not in p]
+
+        if actual_positions:
+            self.orders_text.insert(
+                tk.END, "=== OPEN POSITIONS ===\n", "header")
+            for pos in actual_positions:
                 position_data = pos.get("position", {})
                 market = pos.get("market", {})
                 epic = market.get("epic", "Unknown")
@@ -896,32 +1022,37 @@ class MainWindow:
                 pos_info = f"Epic: {epic} ({instrument})\n"
                 pos_info += f"  Direction: {direction}, Size: {size}, Level: {level}, ID: {deal_id}\n\n"
                 self.orders_text.insert(tk.END, pos_info)
-            self.log(f"Found {len(positions)} open positions")
+            self.log(f"Found {len(actual_positions)} open positions")
         else:
-            self.orders_text.insert(tk.END, "=== OPEN POSITIONS ===\n", "header")
+            self.orders_text.insert(
+                tk.END, "=== OPEN POSITIONS ===\n", "header")
             self.orders_text.insert(tk.END, "No open positions\n\n")
 
-        # Show orders
+        # Show working orders (and extract epic properly)
         if orders:
-            self.orders_text.insert(tk.END, "=== WORKING ORDERS ===\n", "header")
+            self.orders_text.insert(
+                tk.END, "=== WORKING ORDERS ===\n", "header")
             for order in orders:
                 order_data = order.get("workingOrderData", {})
-                epic = order.get("epic", "Unknown")
+                market_data = order.get("marketData", {})
+
+                epic = market_data.get("epic", "Unknown")
+                instrument = market_data.get("instrumentName", "Unknown")
                 direction = order_data.get("direction", "?")
-                size = order_data.get("size", "?")
-                level = order_data.get("level", "?")
+                size = order_data.get("orderSize", "?")
+                level = order_data.get("orderLevel", "?")
                 deal_id = order_data.get("dealId", "?")
 
-                order_info = f"Epic: {epic}, Direction: {direction}, Size: {size}, Level: {level}, ID: {deal_id}\n"
+                order_info = f"Epic: {epic} ({instrument}), Direction: {direction}, Size: {size}, Level: {level}, ID: {deal_id}\n"
                 self.orders_text.insert(tk.END, order_info)
             self.log(f"Found {len(orders)} working orders")
         else:
-            self.orders_text.insert(tk.END, "=== WORKING ORDERS ===\n", "header")
+            self.orders_text.insert(
+                tk.END, "=== WORKING ORDERS ===\n", "header")
             self.orders_text.insert(tk.END, "No working orders\n")
 
-        self.orders_text.tag_config(
-            "header", font=("Consolas", 9, "bold"), foreground="#3498db"
-        )
+        self.orders_text.tag_config("header", font=(
+            "Consolas", 9, "bold"), foreground="#3498db")
 
     def on_cancel_all_orders(self):
         """Handle cancel all orders button"""
@@ -941,16 +1072,17 @@ class MainWindow:
                         if success:
                             cancelled_count += 1
 
-                self.log(f"Cancelled {cancelled_count} of {len(orders)} orders")
+                self.log(
+                    f"Cancelled {cancelled_count} of {len(orders)} orders")
                 self.on_refresh_orders()
             else:
                 self.log("No orders to cancel")
 
-                            # Clear the internal order list
+                # Clear the internal order list
             if hasattr(self.ladder_strategy, 'placed_orders'):
                 self.ladder_strategy.placed_orders = []
                 self.log("Internal order tracking cleared")
-            
+
             self.on_refresh_orders()
         else:
             self.log("No orders to cancel")
@@ -979,7 +1111,8 @@ class MainWindow:
                             closed_count += 1
                         time.sleep(0.5)
 
-                self.log(f"Closed {closed_count} of {len(positions)} positions")
+                self.log(
+                    f"Closed {closed_count} of {len(positions)} positions")
                 self.on_refresh_orders()
             else:
                 self.log("No positions to close")
@@ -1014,7 +1147,8 @@ class MainWindow:
 
                 self.log(f"Found {len(markets)} markets for '{search_term}'")
             else:
-                self.orders_text.insert(tk.END, f"No markets found for '{search_term}'")
+                self.orders_text.insert(
+                    tk.END, f"No markets found for '{search_term}'")
                 self.log(f"No markets found for '{search_term}'")
 
     def run(self):
