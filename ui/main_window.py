@@ -71,10 +71,18 @@ class MainWindow:
                 f"Limits: {'ON' if state else 'OFF'} - will apply to new orders")
 
     def on_trailing_toggled(self, state):
-        """Handle trailing toggle"""
+        """Handle trailing toggle with configuration"""
         if state:
-            self.log("Trailing enabled - entries will follow price")
-            self.ladder_strategy.start_trailing(self.log)
+            try:
+                # Get configuration values
+                min_move = float(self.trailing_min_move_var.get())
+                check_interval = int(self.trailing_check_interval_var.get())
+                
+                self.log(f"Trailing enabled - min move: {min_move} pts, check every {check_interval}s")
+                self.ladder_strategy.start_trailing(self.log, min_move, check_interval)
+            except ValueError as e:
+                self.log(f"Invalid trailing configuration: {e}")
+                self.trailing_toggle.set_state(False)
         else:
             self.log("Trailing stopped")
             self.ladder_strategy.stop_trailing()
@@ -445,33 +453,62 @@ class MainWindow:
         )
         self.ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
 
-        # Toggle switches section
-        toggles_frame = ttk.LabelFrame(
-            parent, text="Order Options", padding=10)
-        toggles_frame.pack(pady=8, padx=20, fill="x")
+        # Order Options section - just limits
+        options_frame = ttk.LabelFrame(parent, text="Order Options", padding=10)
+        options_frame.pack(pady=8, padx=20, fill="x")
 
-        toggle_row = tk.Frame(toggles_frame, bg='#f8f9fb')
-        toggle_row.pack(fill="x", pady=5)
+        options_row = tk.Frame(options_frame, bg='#f8f9fb')
+        options_row.pack(fill="x", pady=5)
 
         # Limit toggle
-        tk.Label(toggle_row, text="Limit Orders:", font=(
+        tk.Label(options_row, text="Limit Orders:", font=(
             'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
         self.limit_toggle = ToggleSwitch(
-            toggle_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
+            options_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
         self.limit_toggle.pack(side='left', padx=5)
 
-        tk.Label(toggle_row, text="Distance:", font=('Segoe UI', 8),
-                 bg='#f8f9fb').pack(side='left', padx=5)
-        # Use existing limit_distance_var
-        ttk.Entry(toggle_row, textvariable=self.limit_distance_var,
-                  width=6).pack(side='left', padx=2)
+        tk.Label(options_row, text="Distance:", font=('Segoe UI', 8),
+                bg='#f8f9fb').pack(side='left', padx=5)
+        ttk.Entry(options_row, textvariable=self.limit_distance_var,
+                width=6).pack(side='left', padx=2)
 
-        # Trailing toggle
-        tk.Label(toggle_row, text="Trailing:", font=('Segoe UI', 9),
-                 bg='#f8f9fb').pack(side='left', padx=20)
+        # NEW: Trailing Stop Entry Configuration section
+        trailing_frame = ttk.LabelFrame(parent, text="Trailing Stop Entry", padding=10)
+        trailing_frame.pack(pady=8, padx=20, fill="x")
+
+        # Row 1: Enable/disable toggle
+        trailing_row1 = tk.Frame(trailing_frame, bg='#f8f9fb')
+        trailing_row1.pack(fill="x", pady=5)
+
+        tk.Label(trailing_row1, text="Enable Trailing:", font=(
+            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
         self.trailing_toggle = ToggleSwitch(
-            toggle_row, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
+            trailing_row1, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
         self.trailing_toggle.pack(side='left', padx=5)
+
+        tk.Label(trailing_row1, text="  Follow price until orders trigger", 
+                font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
+
+        # Row 2: Configuration parameters
+        trailing_row2 = tk.Frame(trailing_frame, bg='#f8f9fb')
+        trailing_row2.pack(fill="x", pady=5)
+
+        # Initialize trailing config variables
+        self.trailing_min_move_var = tk.StringVar(value="0.5")
+        self.trailing_check_interval_var = tk.StringVar(value="30")
+
+        tk.Label(trailing_row2, text="Min Move (pts):", font=(
+            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
+        ttk.Entry(trailing_row2, textvariable=self.trailing_min_move_var,
+                width=6).pack(side='left', padx=2)
+
+        tk.Label(trailing_row2, text="Check Interval (sec):", font=(
+            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=15)
+        ttk.Entry(trailing_row2, textvariable=self.trailing_check_interval_var,
+                width=6).pack(side='left', padx=2)
+
+        tk.Label(trailing_row2, text="  BUY trails down | SELL trails up", 
+                font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
 
     def create_risk_tab(self, parent):
         """Create risk management tab"""

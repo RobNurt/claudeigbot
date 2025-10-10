@@ -65,37 +65,42 @@ class IGClient:
         self.session = requests.Session()
         self.base_url = ""
 
-    def update_working_order(self, deal_id, new_level):
-        """Update the level of a working order"""
-        try:
-            url = f"{self.base_url}/workingorders/otc/{deal_id}"
-            
-            update_data = {
-                "level": str(new_level),
-                "type": "STOP",
-                "timeInForce": "GOOD_TILL_CANCELLED"  # ADD THIS
-            }
-            
-            headers = self.session.headers.copy()
-            headers["version"] = "2"
-            headers["_method"] = "PUT"
-            
-            response = self.session.post(url, json=update_data, headers=headers)
-            
-            if response.status_code == 200:
-                deal_ref = response.json().get('dealReference')
-                if deal_ref:
-                    deal_status = self.check_deal_status(deal_ref)
-                    if deal_status.get('dealStatus') == 'ACCEPTED':
-                        return True, "Order updated"
-                    else:
-                        return False, deal_status.get('reason')
-            else:
-                return False, response.text
+    def update_working_order(self, deal_id, new_level, stop_distance=None, guaranteed_stop=False):
+            """Update the level of a working order, preserving stop loss if provided"""
+            try:
+                url = f"{self.base_url}/workingorders/otc/{deal_id}"
                 
-        except Exception as e:
-            return False, str(e)
-    
+                update_data = {
+                    "level": str(new_level),
+                    "type": "STOP",
+                    "timeInForce": "GOOD_TILL_CANCELLED"
+                }
+                
+                # Preserve stop loss if specified
+                if stop_distance is not None and stop_distance > 0:
+                    update_data["stopDistance"] = str(stop_distance)
+                    update_data["guaranteedStop"] = "true" if guaranteed_stop else "false"
+                
+                headers = self.session.headers.copy()
+                headers["version"] = "2"
+                headers["_method"] = "PUT"
+                
+                response = self.session.post(url, json=update_data, headers=headers)
+                
+                if response.status_code == 200:
+                    deal_ref = response.json().get('dealReference')
+                    if deal_ref:
+                        deal_status = self.check_deal_status(deal_ref)
+                        if deal_status.get('dealStatus') == 'ACCEPTED':
+                            return True, "Order updated"
+                        else:
+                            return False, deal_status.get('reason')
+                else:
+                    return False, response.text
+                    
+            except Exception as e:
+                return False, str(e)
+            
     def get_market_price(self, epic):
         """Get current market price for an epic"""
         try:
