@@ -510,6 +510,124 @@ class MainWindow:
         tk.Label(trailing_row2, text="  BUY trails down | SELL trails up", 
                 font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
 
+# Add this to create_trading_tab in main_window.py
+# After the Trailing Stop Entry section (around line 515)
+
+        # Stop Loss Management section
+        stop_mgmt_frame = ttk.LabelFrame(parent, text="Stop Loss Management", padding=10)
+        stop_mgmt_frame.pack(pady=8, padx=20, fill="x")
+
+        # Row 1: Bulk update stops on working orders
+        stop_row1 = tk.Frame(stop_mgmt_frame, bg='#f8f9fb')
+        stop_row1.pack(fill="x", pady=5)
+
+        tk.Label(stop_row1, text="Update All Working Order Stops:", font=(
+            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
+        
+        self.bulk_stop_distance_var = tk.StringVar(value="20")
+        ttk.Entry(stop_row1, textvariable=self.bulk_stop_distance_var,
+                  width=6).pack(side='left', padx=5)
+        
+        tk.Label(stop_row1, text="points", font=('Segoe UI', 8),
+                 bg='#f8f9fb').pack(side='left', padx=2)
+        
+        ttk.Button(stop_row1, text="Update All Stops", 
+                  command=self.on_bulk_update_stops,
+                  style='Primary.TButton').pack(side='left', padx=10, ipadx=10, ipady=3)
+
+        # Row 2: Auto-apply stops to positions
+        stop_row2 = tk.Frame(stop_mgmt_frame, bg='#f8f9fb')
+        stop_row2.pack(fill="x", pady=5)
+
+        tk.Label(stop_row2, text="Auto-apply stops to positions:", font=(
+            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
+        
+        self.auto_stop_toggle = ToggleSwitch(
+            stop_row2, initial_state=True, callback=self.on_auto_stop_toggled, bg='#f8f9fb')
+        self.auto_stop_toggle.pack(side='left', padx=5)
+
+        tk.Label(stop_row2, text="Distance:", font=('Segoe UI', 8),
+                 bg='#f8f9fb').pack(side='left', padx=10)
+        
+        self.auto_stop_distance_var = tk.StringVar(value="20")
+        ttk.Entry(stop_row2, textvariable=self.auto_stop_distance_var,
+                  width=6).pack(side='left', padx=2)
+        
+        tk.Label(stop_row2, text="  Automatically attach stops when orders trigger", 
+                 font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
+
+# Add these methods to the MainWindow class in main_window.py
+
+    def on_bulk_update_stops(self):
+        """Update stop losses on all working orders"""
+        if not self.ig_client.logged_in:
+            self.log("Not connected")
+            return
+        
+        try:
+            stop_distance = float(self.bulk_stop_distance_var.get())
+            
+            if stop_distance <= 0:
+                self.log("Stop distance must be greater than 0")
+                return
+            
+            self.log(f"Updating all working order stops to {stop_distance} points...")
+            
+            # Run in background thread
+            def update_stops():
+                working_orders = self.ig_client.get_working_orders()
+                
+                if not working_orders:
+                    self.log("No working orders to update")
+                    return
+                
+                updated = 0
+                failed = 0
+                
+                for order in working_orders:
+                    try:
+                        order_data = order.get('workingOrderData', {})
+                        deal_id = order_data.get('dealId')
+                        current_level = order_data.get('level')
+                        
+                        if deal_id and current_level:
+                            success, message = self.ig_client.update_working_order(
+                                deal_id, current_level, stop_distance=stop_distance
+                            )
+                            
+                            if success:
+                                updated += 1
+                            else:
+                                failed += 1
+                                self.log(f"Failed to update {deal_id}: {message}")
+                            
+                            time.sleep(0.3)  # Rate limiting
+                    except Exception as e:
+                        self.log(f"Error updating order: {str(e)}")
+                        failed += 1
+                
+                self.log(f"Stop update complete: {updated} updated, {failed} failed")
+                
+            thread = threading.Thread(target=update_stops, daemon=True)
+            thread.start()
+            
+        except ValueError:
+            self.log("Invalid stop distance value")
+
+    def on_auto_stop_toggled(self, state):
+        """Handle auto-stop toggle"""
+        if state:
+            try:
+                stop_distance = float(self.auto_stop_distance_var.get())
+                self.log(f"Auto-stop enabled - will attach {stop_distance}pt stops to new positions")
+                self.ladder_strategy.start_position_monitoring(self.log, stop_distance)
+            except ValueError:
+                self.log("Invalid auto-stop distance")
+                self.auto_stop_toggle.set_state(False)
+        else:
+            self.log("Auto-stop disabled")
+            self.ladder_strategy.stop_position_monitoring()
+
     def create_risk_tab(self, parent):
         """Create risk management tab"""
         # Account Overview Section

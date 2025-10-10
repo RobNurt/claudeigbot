@@ -139,6 +139,94 @@ class LadderStrategy:
 
 # Replace the start_trailing method in ladder_strategy.py
 
+# Add these methods to the LadderStrategy class in ladder_strategy.py
+
+    def __init__(self, ig_client):
+        self.ig_client = ig_client
+        self.placed_orders = []
+        self.trailing_active = False
+        self.cancel_requested = False
+        self.position_monitoring_active = False  # ADD THIS
+        self.monitored_positions = set()  # ADD THIS - track processed positions
+
+    def start_position_monitoring(self, log, stop_distance):
+        """
+        Monitor for new positions and auto-attach stops
+        
+        Args:
+            log: Logging callback
+            stop_distance: Stop distance in points to apply
+        """
+        import threading
+        import time
+        
+        self.position_monitoring_active = True
+        
+        def monitor_positions():
+            """Background thread to monitor positions and attach stops"""
+            
+            log(f"Position monitoring started - auto-applying {stop_distance}pt stops")
+            
+            while self.position_monitoring_active:
+                try:
+                    positions = self.ig_client.get_open_positions()
+                    
+                    for position in positions:
+                        try:
+                            pos_data = position.get('position', {})
+                            deal_id = pos_data.get('dealId')
+                            current_stop = pos_data.get('stopLevel')
+                            open_level = pos_data.get('openLevel')
+                            direction = pos_data.get('direction')
+                            epic = position.get('market', {}).get('epic', 'Unknown')
+                            
+                            # Skip if already processed
+                            if deal_id in self.monitored_positions:
+                                continue
+                            
+                            # Skip if already has a stop
+                            if current_stop is not None:
+                                self.monitored_positions.add(deal_id)
+                                log(f"{epic}: Position {deal_id} already has stop at {current_stop}")
+                                continue
+                            
+                            # Calculate stop level
+                            if direction == "BUY":
+                                stop_level = open_level - stop_distance
+                            else:  # SELL
+                                stop_level = open_level + stop_distance
+                            
+                            # Apply stop
+                            success, message = self.ig_client.update_position_stop(deal_id, stop_level)
+                            
+                            if success:
+                                log(f"{epic}: Auto-stop applied to position {deal_id} at {stop_level:.2f}")
+                                self.monitored_positions.add(deal_id)
+                            else:
+                                log(f"{epic}: Failed to apply stop - {message}")
+                            
+                            time.sleep(0.3)  # Rate limiting
+                            
+                        except Exception as e:
+                            log(f"Error processing position: {str(e)}")
+                            continue
+                    
+                except Exception as e:
+                    log(f"Position monitoring error: {str(e)}")
+                
+                time.sleep(5)  # Check every 5 seconds
+            
+            log("Position monitoring stopped")
+        
+        # Start monitoring thread
+        monitor_thread = threading.Thread(target=monitor_positions, daemon=True)
+        monitor_thread.start()
+    
+    def stop_position_monitoring(self):
+        """Stop position monitoring"""
+        self.position_monitoring_active = False
+        self.monitored_positions.clear()
+
     def start_trailing(self, log, min_move=0.5, check_interval=30):
             """
             Start trailing stops - maintains individual ladder spacing and preserves stop losses
