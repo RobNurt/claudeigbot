@@ -13,6 +13,8 @@ class LadderStrategy:
         self.placed_orders = []  # Track placed orders
         self.trailing_active = False
         self.cancel_requested = False
+        self.position_monitoring_active = False  # NEW
+        self.monitored_positions = set()  # NEW
 
     def place_ladder(self, epic, direction, start_offset, step_size, num_orders,
                         order_size, retry_jump=10, max_retries=3, log_callback=None,
