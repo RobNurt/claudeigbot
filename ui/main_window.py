@@ -1,25 +1,30 @@
 """
 Main GUI Window
-Tkinter-based interface for the IG trading bot with improved aesthetics
+CustomTkinter-based interface for the IG trading bot with modern UI
 """
 
 from concurrent.futures import thread
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, simpledialog
+import customtkinter as ctk
+from tkinter import scrolledtext, messagebox, simpledialog
+import tkinter as tk 
 import threading
 import time
 
+# Set appearance mode and color theme
+ctk.set_appearance_mode("dark")  # "dark" or "light"
+ctk.set_default_color_theme("blue")  # We'll override with Polaris colors
 
-class ToggleSwitch(tk.Canvas):
+
+class ToggleSwitch(ctk.CTkCanvas):
     """Toggle switch - Green=ON, Red=OFF"""
 
     def __init__(self, parent, initial_state=False, callback=None, **kwargs):
         super().__init__(parent, width=50, height=24,
-                         highlightthickness=0, bg=kwargs.get('bg', '#f8f9fb'))
+                         highlightthickness=0, bg=kwargs.get('bg', '#252a31'))
         self.callback = callback
         self.state = initial_state
-        self.color_on = '#4CAF50'
-        self.color_off = '#f44336'
+        self.color_on = '#00d084'  # Polaris success green
+        self.color_off = '#ed6347'  # Polaris danger red
 
         self.bg_rect = self.create_rectangle(
             0, 0, 50, 24, fill=self.color_off, outline='', tags='bg')
@@ -42,7 +47,6 @@ class ToggleSwitch(tk.Canvas):
 
     def get(self):
         return self.state
-
 
 class MainWindow:
     """Main GUI window for trading bot"""
@@ -88,476 +92,454 @@ class MainWindow:
             self.ladder_strategy.stop_trailing()
 
     def create_gui(self):
-        """Create the GUI with improved contrast and layout"""
-        self.root = tk.Tk()
-        self.root.title("IG Trading Bot")
-        self.root.geometry("1100x950")
+            """Create the GUI with CustomTkinter and Polaris theme"""
+            self.root = ctk.CTk()
+            self.root.title("IG Trading Bot")
+            self.root.geometry("1200x1050")
 
-        self.use_risk_management = tk.BooleanVar(value=False)
-        self.use_limit_orders = tk.BooleanVar(value=True)
-        self.use_auto_replace = tk.BooleanVar(value=False)
-        self.use_trailing_stops = tk.BooleanVar(value=False)
-        self.stop_distance_var = tk.StringVar(value="20")
-        self.use_guaranteed_stops = tk.BooleanVar(value=False)
+            # Variables
+            self.use_risk_management = ctk.BooleanVar(value=False)
+            self.use_limit_orders = ctk.BooleanVar(value=True)
+            self.use_auto_replace = ctk.BooleanVar(value=False)
+            self.use_trailing_stops = ctk.BooleanVar(value=False)
+            self.stop_distance_var = ctk.StringVar(value="20")
+            self.use_guaranteed_stops = ctk.BooleanVar(value=False)
 
-        # Better background color - pale blue
-        bg_color = "#dce6f0"
-        self.root.configure(bg=bg_color)
+            # Polaris UI Theme colors
+            bg_dark = "#1e2228"
+            card_bg = "#252a31"
+            accent_teal = "#5aa89a"
+            success_green = "#00d084"
+            danger_red = "#b76e5f"
+            text_white = "#f4f5f7"
+            text_gray = "#9fa6b2"
 
-        style = ttk.Style()
-        style.theme_use("clam")
+            # Configure main window
+            self.root.configure(fg_color=bg_dark)
 
-        # Stronger colors with better contrast
-        card_bg = "#f8f9fb"
-        accent_color = "#4a7ba7"  # Darker blue
-        success_color = "#5a9d6d"  # Darker green
-        danger_color = "#c55a5a"  # Darker red
-        text_dark = "#1a2332"
-        text_medium = "#4a5568"
+            # Header
+            header_frame = ctk.CTkFrame(self.root, fg_color=bg_dark, corner_radius=0)
+            header_frame.pack(fill="x", pady=10, padx=15)
 
-        style.configure(
-            "Title.TLabel",
-            font=("Segoe UI", 14, "bold"),
-            background=bg_color,
-            foreground=text_dark,
-        )
-        style.configure(
-            "Connected.TLabel",
-            font=("Segoe UI", 10, "bold"),
-            background=card_bg,
-            foreground=success_color,
-        )
-        style.configure(
-            "Disconnected.TLabel",
-            font=("Segoe UI", 10, "bold"),
-            background=card_bg,
-            foreground=text_medium,
-        )
-        style.configure(
-            "Success.TButton",
-            background=success_color,
-            foreground="white",
-            font=("Segoe UI", 9, "bold"),
-            borderwidth=0,
-        )
-        style.configure(
-            "Danger.TButton",
-            background=danger_color,
-            foreground="white",
-            font=("Segoe UI", 9, "bold"),
-            borderwidth=0,
-        )
-        style.configure(
-            "Emergency.TButton",
-            background="#b83232",
-            foreground="white",
-            font=("Segoe UI", 10, "bold"),
-            borderwidth=0,
-        )
-        style.configure(
-            "Primary.TButton",
-            background=accent_color,
-            foreground="white",
-            font=("Segoe UI", 9, "bold"),
-            borderwidth=0,
-        )
-        style.configure(
-            "Secondary.TButton",
-            background="#7a8a9a",
-            foreground="white",
-            font=("Segoe UI", 9, "bold"),
-            borderwidth=0,
-        )
-
-        style.configure("TLabelframe", background=card_bg,
-                        relief="flat", borderwidth=1)
-        style.configure(
-            "TLabelframe.Label",
-            background=card_bg,
-            foreground=text_dark,
-            font=("Segoe UI", 10, "bold"),
-        )
-
-        # Header
-        header_frame = tk.Frame(self.root, bg=bg_color)
-        header_frame.pack(fill="x", pady=10, padx=15)
-
-        title_label = ttk.Label(
-            header_frame, text="IG Trading Bot", style="Title.TLabel")
-        title_label.pack(side="left")
-
-        # Add margin display
-        self.margin_var = tk.StringVar(value="Margin: --")
-        self.margin_label = ttk.Label(header_frame, textvariable=self.margin_var,
-                                      font=("Segoe UI", 11), foreground="#4a7ba7")
-        self.margin_label.pack(side="left", padx=30)
-
-        self.panic_btn = ttk.Button(header_frame, text="⚠ EMERGENCY STOP",
-                                    command=self.on_panic, style="Emergency.TButton")
-        self.panic_btn.pack(side="right", ipadx=15, ipady=8)
-
-        # Notebook
-        style.configure("TNotebook", background=bg_color, borderwidth=0)
-        style.configure(
-            "TNotebook.Tab",
-            background="#c5d5e5",
-            foreground=text_dark,
-            padding=[20, 10],
-            font=("Segoe UI", 9, "bold"),
-        )
-        style.map(
-            "TNotebook.Tab",
-            background=[("selected", card_bg)],
-            foreground=[("selected", text_dark)],
-        )
-
-        notebook = ttk.Notebook(self.root)
-
-        conn_frame = tk.Frame(notebook, bg=bg_color)
-        notebook.add(conn_frame, text="Connection")
-        self.create_connection_tab(conn_frame)
-
-        trade_frame = tk.Frame(notebook, bg=bg_color)
-        notebook.add(trade_frame, text="Trading")
-        self.create_trading_tab(trade_frame)
-
-        risk_frame = tk.Frame(notebook, bg=bg_color)
-        notebook.add(risk_frame, text="Risk Management")
-        self.create_risk_tab(risk_frame)
-
-        config_frame = tk.Frame(notebook, bg=bg_color)
-        notebook.add(config_frame, text="Configuration")
-        self.create_config_tab(config_frame)
-
-        notebook.pack(expand=True, fill="both", padx=15, pady=5)
-
-        # Bottom section - split into two columns
-        bottom_frame = tk.Frame(self.root, bg=bg_color)
-        bottom_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
-
-        # Left column - Order Management
-        left_col = tk.Frame(bottom_frame, bg=bg_color, width=700)
-        left_col.pack(side="left", fill="both", expand=False, padx=(0, 7))
-        left_col.pack_propagate(False)
-
-        # Right column - Activity Log
-        right_col = tk.Frame(bottom_frame, bg=bg_color)
-        right_col.pack(side="right", fill="both", expand=True, padx=(7, 0))
-
-        # Activity Log (right column)
-        log_frame = ttk.LabelFrame(right_col, text="Activity Log", padding=10)
-        log_frame.pack(fill="both", expand=True)
-
-        self.log_text = scrolledtext.ScrolledText(
-            log_frame,
-            width=50,
-            height=15,
-            bg="#ffffff",
-            fg="#2d7a4f",
-            font=("Consolas", 9, "bold"),
-            relief="flat",
-            borderwidth=1,
-            highlightthickness=1,
-            highlightbackground="#b0c4de",
-        )
-        self.log_text.pack(fill="both", expand=True)
-
-        # Store left_col for use in trading tab
-        self.bottom_left_col = left_col
-
-        # Create Order Management in the left column
-        orders_frame = ttk.LabelFrame(
-            left_col, text="Order Management", padding=12)
-        orders_frame.pack(fill="both", expand=True, padx=5, pady=5)
-
-        btn_frame = tk.Frame(orders_frame, bg="#f8f9fb")
-        btn_frame.pack(fill="x", pady=5)
-
-        buttons = [
-            ("Refresh", self.on_refresh_orders, "Primary.TButton"),
-            ("Cancel Orders", self.on_cancel_all_orders, "Danger.TButton"),
-            ("Close Positions", self.on_close_positions, "Danger.TButton"),
-            ("Search Markets", self.on_search_markets, "Secondary.TButton"),
-            ("TEST Stop", self.test_stop_update, "Secondary.TButton"),
-        ]
-
-        for text, cmd, style in buttons:
-            ttk.Button(btn_frame, text=text, command=cmd, style=style).pack(
-                side="left", padx=4, ipadx=10, ipady=3
+            title_label = ctk.CTkLabel(
+                header_frame, 
+                text="IG Trading Bot",
+                font=("Segoe UI", 16, "bold"),
+                text_color=accent_teal
             )
+            title_label.pack(side="left", padx=10)
 
-        # Orders display area
-        self.orders_text = scrolledtext.ScrolledText(
-            orders_frame,
-            width=60,
-            height=15,
-            bg="#ffffff",
-            fg="#1a2332",
-            font=("Consolas", 9),
-            relief="flat",
-            borderwidth=1,
-            highlightthickness=1,
-            highlightbackground="#b0c4de",
-        )
-        self.orders_text.pack(fill="both", expand=True, pady=8)
+            # Margin display
+            self.margin_var = ctk.StringVar(value="Margin: --")
+            self.margin_label = ctk.CTkLabel(
+                header_frame, 
+                textvariable=self.margin_var,
+                font=("Segoe UI", 11),
+                text_color=accent_teal
+            )
+            self.margin_label.pack(side="left", padx=30)
 
+            # Emergency stop button
+            self.panic_btn = ctk.CTkButton(
+                header_frame,
+                text="⚠ EMERGENCY STOP",
+                command=self.on_panic,
+                fg_color="#de3618",
+                hover_color="#ee4626",
+                font=("Segoe UI", 11, "bold"),
+                corner_radius=8,
+                width=180,
+                height=40
+            )
+            self.panic_btn.pack(side="right", padx=10)
+
+            # Notebook (Tabview in CustomTkinter)
+            self.notebook = ctk.CTkTabview(self.root, fg_color=card_bg, corner_radius=10)
+            self.notebook.pack(expand=True, fill="both", padx=15, pady=5)
+
+            # Create tabs
+            self.notebook.add("Connection")
+            self.notebook.add("Trading")
+            self.notebook.add("Risk Management")
+            self.notebook.add("Configuration")
+
+            # Create tab contents
+            self.create_connection_tab(self.notebook.tab("Connection"))
+            self.create_trading_tab(self.notebook.tab("Trading"))
+            self.create_risk_tab(self.notebook.tab("Risk Management"))
+            self.create_config_tab(self.notebook.tab("Configuration"))
+
+            # Bottom section - split into two columns
+            bottom_frame = ctk.CTkFrame(self.root, fg_color=bg_dark, corner_radius=0)
+            bottom_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+
+            # Left column - Order Management
+            left_col = ctk.CTkFrame(bottom_frame, fg_color=bg_dark, width=700, corner_radius=0)
+            left_col.pack(side="left", fill="both", expand=False, padx=(0, 7))
+            left_col.pack_propagate(False)
+
+            # Right column - Activity Log
+            right_col = ctk.CTkFrame(bottom_frame, fg_color=bg_dark, corner_radius=0)
+            right_col.pack(side="right", fill="both", expand=True, padx=(7, 0))
+
+            # Activity Log (right column)
+            log_frame = ctk.CTkFrame(right_col, fg_color=card_bg, corner_radius=10)
+            log_frame.pack(fill="both", expand=True)
+            
+            log_title = ctk.CTkLabel(
+                log_frame, 
+                text="Activity Log",
+                font=("Segoe UI", 12, "bold"),
+                text_color=text_white
+            )
+            log_title.pack(pady=(10, 5), padx=10, anchor="w")
+
+            self.log_text = scrolledtext.ScrolledText(
+                log_frame,
+                width=50,
+                height=15,
+                bg=card_bg,
+                fg=text_white,
+                font=("Consolas", 9, "bold"),
+                relief="flat",
+                borderwidth=0,
+                insertbackground=accent_teal,
+            )
+            self.log_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+            # Store left_col for use in trading tab
+            self.bottom_left_col = left_col
+
+            # Create Order Management in the left column
+            orders_frame = ctk.CTkFrame(left_col, fg_color=card_bg, corner_radius=10)
+            orders_frame.pack(fill="both", expand=True, padx=5, pady=5)
+            
+            orders_title = ctk.CTkLabel(
+                orders_frame,
+                text="Order Management",
+                font=("Segoe UI", 12, "bold"),
+                text_color=text_white
+            )
+            orders_title.pack(pady=(10, 5), padx=10, anchor="w")
+
+            # Button frame
+            btn_frame = ctk.CTkFrame(orders_frame, fg_color=card_bg, corner_radius=0)
+            btn_frame.pack(fill="x", pady=5, padx=10)
+
+            buttons = [
+                ("Refresh", self.on_refresh_orders, accent_teal),
+                ("Cancel Orders", self.on_cancel_all_orders, danger_red),
+                ("Close Positions", self.on_close_positions, danger_red),
+                ("Search Markets", self.on_search_markets, text_gray),
+            ]
+
+            for text, cmd, color in buttons:
+                ctk.CTkButton(
+                    btn_frame, 
+                    text=text, 
+                    command=cmd,
+                    fg_color=color,
+                    hover_color=color,
+                    corner_radius=8,
+                    width=110,
+                    height=32,
+                    font=("Segoe UI", 9, "bold")
+                ).pack(side="left", padx=4)
+
+            # Orders display area
+            self.orders_text = scrolledtext.ScrolledText(
+                orders_frame,
+                width=60,
+                height=15,
+                bg=card_bg,
+                fg=text_white,
+                font=("Consolas", 9),
+                relief="flat",
+                borderwidth=0,
+                insertbackground=accent_teal,
+            )
+            self.orders_text.pack(fill="both", expand=True, padx=10, pady=(5, 10))
+            
     def create_connection_tab(self, parent):
-        """Create connection tab contents"""
-        center_frame = tk.Frame(parent, bg="#dce6f0")
-        center_frame.pack(expand=True)
+            """Create connection tab contents"""
+            # Polaris colors
+            card_bg = "#252a31"
+            accent_teal = "#5aa89a"
+            text_white = "#f4f5f8"
+            success_green = "#00d084"
+            
+            center_frame = ctk.CTkFrame(parent, fg_color="transparent")
+            center_frame.pack(expand=True)
 
-        status_frame = ttk.LabelFrame(
-            center_frame, text="Connection Status", padding=30
-        )
-        status_frame.pack(pady=20, padx=20)
+            status_frame = ctk.CTkFrame(center_frame, fg_color=card_bg, corner_radius=15)
+            status_frame.pack(pady=20, padx=20)
 
-        ttk.Label(status_frame, text="Account Type:", font=("Segoe UI", 10)).grid(
-            row=0, column=0, sticky="w", padx=10, pady=15
-        )
-        self.account_var = tk.StringVar(value="DEMO")
-
-        radio_frame = tk.Frame(status_frame, bg="#f8f9fb")
-        radio_frame.grid(row=0, column=1, columnspan=2, sticky="w", padx=15)
-
-        ttk.Radiobutton(
-            radio_frame, text="Demo Account", variable=self.account_var, value="DEMO"
-        ).pack(side="left", padx=15)
-        ttk.Radiobutton(
-            radio_frame, text="Live Account", variable=self.account_var, value="LIVE"
-        ).pack(side="left", padx=15)
-
-        self.connect_btn = ttk.Button(
-            status_frame,
-            text="Connect",
-            command=self.on_connect,
-            style="Primary.TButton",
-        )
-        self.connect_btn.grid(
-            row=1, column=0, columnspan=3, pady=25, ipadx=40, ipady=10
-        )
-
-        self.status_var = tk.StringVar(value="Disconnected")
-        self.status_label = ttk.Label(
-            status_frame,
-            textvariable=self.status_var,
-            style="Disconnected.TLabel",
-            font=("Segoe UI", 12),
-        )
-        self.status_label.grid(row=2, column=0, columnspan=3, pady=15)
-
-    def create_trading_tab(self, parent):
-        """Create trading tab with more compact layout"""
-        # Market selection
-        market_frame = ttk.LabelFrame(
-            parent, text="Market Selection", padding=10)
-        market_frame.pack(pady=8, padx=20, fill="x")
-
-        market_row = tk.Frame(market_frame, bg="#f8f9fb")
-        market_row.pack(fill="x", pady=3)
-
-        ttk.Label(market_row, text="Market:", font=("Segoe UI", 9, "bold")).pack(
-            side="left", padx=5
-        )
-        self.market_var = tk.StringVar(value="Gold Spot")
-        market_combo = ttk.Combobox(
-            market_row,
-            textvariable=self.market_var,
-            values=list(self.config.markets.keys()),
-            width=22,
-            font=("Segoe UI", 9),
-        )
-        market_combo.pack(side="left", padx=5)
-
-        price_btn = ttk.Button(
-            market_row,
-            text="Get Price",
-            command=self.on_get_price,
-            style="Secondary.TButton",
-        )
-        price_btn.pack(side="left", padx=5, ipadx=8, ipady=3)
-
-        self.price_var = tk.StringVar(value="Price: --")
-        price_label = ttk.Label(
-            market_row,
-            textvariable=self.price_var,
-            font=("Segoe UI", 10, "bold"),
-            foreground="#7b4397",
-        )
-        price_label.pack(side="left", padx=15)
-
-        # Ladder configuration - SINGLE ROW
-        ladder_frame = ttk.LabelFrame(
-            parent, text="Ladder Configuration", padding=10)
-        ladder_frame.pack(pady=8, padx=20, fill="x")
-
-        config_row = tk.Frame(ladder_frame, bg="#f8f9fb")
-        config_row.pack(fill="x", pady=3)
-
-        # Direction
-        ttk.Label(config_row, text="Dir:", font=("Segoe UI", 9, "bold")).pack(
-            side="left", padx=3
-        )
-        self.direction_var = tk.StringVar(value="BUY")
-        ttk.Radiobutton(
-            config_row, text="Buy", variable=self.direction_var, value="BUY"
-        ).pack(side="left", padx=2)
-        ttk.Radiobutton(
-            config_row, text="Sell", variable=self.direction_var, value="SELL"
-        ).pack(side="left", padx=2)
-
-        ttk.Separator(config_row, orient="vertical").pack(
-            side="left", fill="y", padx=8)
-
-        # Initialize variables
-        self.offset_var = tk.StringVar(value="5")
-        self.step_var = tk.StringVar(value="10")
-        self.num_orders_var = tk.StringVar(value="4")
-        self.size_var = tk.StringVar(value="0.5")
-        self.retry_jump_var = tk.StringVar(value="10")
-        self.max_retries_var = tk.StringVar(value="3")
-        self.limit_distance_var = tk.StringVar(value="5")
-        # stop_distance_var is already initialized in create_gui
-
-        # Parameters
-        params = [
-            ("Offset:", self.offset_var),
-            ("Step:", self.step_var),
-            ("Orders:", self.num_orders_var),
-            ("Size:", self.size_var),
-            ("Retry:", self.retry_jump_var),
-            ("MaxRetry:", self.max_retries_var),
-            ("Stop:", self.stop_distance_var),
-            ("Limit:", self.limit_distance_var),
-        ]
-
-        for label_text, var in params:
-            ttk.Label(config_row, text=label_text, font=("Segoe UI", 8)).pack(
-                side="left", padx=2
+            # Account Type selection
+            account_label = ctk.CTkLabel(
+                status_frame,
+                text="Account Type:",
+                font=("Segoe UI", 11, "bold"),
+                text_color=text_white
             )
-            ttk.Entry(config_row, textvariable=var,
-                      width=6).pack(side="left", padx=1)
+            account_label.grid(row=0, column=0, sticky="w", padx=20, pady=(20, 10))
 
-        ttk.Separator(config_row, orient="vertical").pack(
-            side="left", fill="y", padx=8)
+            self.account_var = ctk.StringVar(value="DEMO")
 
-        # Guaranteed stop checkbox (use_guaranteed_stops already initialized in create_gui)
-        ttk.Checkbutton(config_row, text="Guar.", variable=self.use_guaranteed_stops).pack(
-            side="left", padx=2
+            radio_frame = ctk.CTkFrame(status_frame, fg_color=card_bg)
+            radio_frame.grid(row=0, column=1, columnspan=2, sticky="w", padx=20, pady=(20, 10))
+
+            ctk.CTkRadioButton(
+                radio_frame,
+                text="Demo Account",
+                variable=self.account_var,
+                value="DEMO",
+                fg_color=accent_teal,
+                hover_color=accent_teal,
+                font=("Segoe UI", 10)
+            ).pack(side="left", padx=15)
+
+            ctk.CTkRadioButton(
+                radio_frame,
+                text="Live Account",
+                variable=self.account_var,
+                value="LIVE",
+                fg_color=accent_teal,
+                hover_color=accent_teal,
+                font=("Segoe UI", 10)
+            ).pack(side="left", padx=15)
+
+            # Connect button
+            self.connect_btn = ctk.CTkButton(
+                status_frame,
+                text="Connect",
+                command=self.on_connect,
+                fg_color=accent_teal,
+                hover_color="#5abba8",
+                font=("Segoe UI", 12, "bold"),
+                corner_radius=10,
+                width=200,
+                height=45
+            )
+            self.connect_btn.grid(row=1, column=0, columnspan=3, pady=25, padx=20)
+
+            # Status label
+            self.status_var = ctk.StringVar(value="Disconnected")
+            self.status_label = ctk.CTkLabel(
+                status_frame,
+                textvariable=self.status_var,
+                font=("Segoe UI", 13, "bold"),
+                text_color=text_white
+            )
+            self.status_label.grid(row=2, column=0, columnspan=3, pady=(0, 20), padx=20)
+            
+    def create_trading_tab(self, parent):
+        """Create compact trading tab with large text and no scrolling"""
+        # Color scheme
+        bg_dark = "#1a1d23"
+        card_bg = "#25292e"
+        accent_teal = "#5aa89a"
+        text_white = "#ddf6f9"
+        
+        # Main container - NO SCROLLING
+        main_container = ctk.CTkFrame(parent, fg_color=bg_dark)
+        main_container.pack(fill="x", expand=False, padx=10, pady=10, anchor="n")  # Changed: fill="x" only, expand=False
+                
+        # === ROW 1: Market & All Controls (EVERYTHING INLINE) ===
+        top_row = ctk.CTkFrame(main_container, fg_color=card_bg, corner_radius=8)
+        top_row.pack(fill="x", pady=(0, 8))
+        
+        # Left section - Market
+        ctk.CTkLabel(top_row, text="Market:", font=("Segoe UI", 12, "bold"),
+                    text_color=text_white).pack(side='left', padx=(10, 5))
+        
+        self.market_var = ctk.StringVar(value="Gold Spot")
+        market_dropdown = ctk.CTkComboBox(
+            top_row, variable=self.market_var,
+            values=list(self.config.markets.keys()),
+            command=lambda x: None,  # Optional callback
+            width=150, height=32,
+            fg_color=card_bg, button_color=accent_teal,
+            button_hover_color="#00f7ced7", border_color="#3e444d",
+            font=("Segoe UI", 11)
         )
-
-        self.ladder_btn = ttk.Button(
-            config_row,
-            text="Place Ladder",
-            command=self.on_place_ladder,
-            style="Success.TButton",
-        )
-        self.ladder_btn.pack(side="left", padx=5, ipadx=15, ipady=6)
-
-        # Order Options section - just limits
-        options_frame = ttk.LabelFrame(parent, text="Order Options", padding=10)
-        options_frame.pack(pady=8, padx=20, fill="x")
-
-        options_row = tk.Frame(options_frame, bg='#f8f9fb')
-        options_row.pack(fill="x", pady=5)
-
-        # Limit toggle
-        tk.Label(options_row, text="Limit Orders:", font=(
-            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
-        self.limit_toggle = ToggleSwitch(
-            options_row, initial_state=False, callback=self.on_limit_toggled, bg='#f8f9fb')
+        market_dropdown.pack(side='left', padx=5)
+        
+        # Get Price button
+        ctk.CTkButton(top_row, text="Price", command=self.on_get_price,
+                    fg_color="#3e444d", hover_color="#4a5159",
+                    corner_radius=8, width=70, height=32,
+                    font=("Segoe UI", 11)).pack(side='left', padx=5)
+        
+        self.price_var = ctk.StringVar(value="--")
+        ctk.CTkLabel(top_row, textvariable=self.price_var,
+                    font=("Segoe UI", 11, "bold"),
+                    text_color=accent_teal, width=80).pack(side='left', padx=5)
+        
+        # Separator
+        ctk.CTkLabel(top_row, text="|", text_color="#3e444d",
+                    font=("Segoe UI", 16)).pack(side='left', padx=8)
+        
+        # Direction
+        ctk.CTkLabel(top_row, text="Dir:", font=("Segoe UI", 11, "bold"),
+                    text_color=text_white).pack(side='left', padx=5)
+        
+        self.direction_var = ctk.StringVar(value="BUY")
+        ctk.CTkRadioButton(top_row, text="Buy", variable=self.direction_var,
+                        value="BUY", fg_color=accent_teal, hover_color="#00f7cc",
+                        font=("Segoe UI", 11)).pack(side='left', padx=3)
+        ctk.CTkRadioButton(top_row, text="Sell", variable=self.direction_var,
+                        value="SELL", fg_color=accent_teal, hover_color="#00f7cc",
+                        font=("Segoe UI", 11)).pack(side='left', padx=3)
+        
+        # Separator
+        ctk.CTkLabel(top_row, text="|", text_color="#3e444d",
+                    font=("Segoe UI", 16)).pack(side='left', padx=8)
+        
+        # Initialize all variables first
+        self.offset_var = ctk.StringVar(value="5")
+        self.step_var = ctk.StringVar(value="10")
+        self.num_orders_var = ctk.StringVar(value="4")
+        self.size_var = ctk.StringVar(value="0.5")
+        self.retry_jump_var = ctk.StringVar(value="10")
+        self.max_retries_var = ctk.StringVar(value="3")
+        self.limit_distance_var = ctk.StringVar(value="5")
+        
+        # Compact parameters
+        params = [
+            ("Off:", self.offset_var, 45),
+            ("Step:", self.step_var, 45),
+            ("Ords:", self.num_orders_var, 45),
+            ("Size:", self.size_var, 45),
+            ("Stop:", self.stop_distance_var, 45),
+        ]
+        
+        for label_text, var, width in params:
+            ctk.CTkLabel(top_row, text=label_text, font=("Segoe UI", 11),
+                        text_color=text_white).pack(side='left', padx=(8, 2))
+            ctk.CTkEntry(top_row, textvariable=var, width=width, height=32,
+                        fg_color=card_bg, border_color="#3e444d",
+                        font=("Segoe UI", 11)).pack(side='left', padx=2)
+        
+        # PLACE LADDER BUTTON - Always visible on right
+        self.ladder_btn = ctk.CTkButton(top_row, text="PLACE LADDER", command=self.on_place_ladder,
+        fg_color="#259d8d", hover_color="#22c55e",
+        text_color="#1a1d23",  # ADD THIS - dark text on green button
+        corner_radius=8, width=150, height=38,
+        font=("Segoe UI", 12, "bold"))
+        self.ladder_btn.pack(side="right", padx=10, pady=8)
+        
+        # === ROW 2: Order Options and Trailing (SIDE BY SIDE) ===
+        middle_row = ctk.CTkFrame(main_container, fg_color=bg_dark)
+        middle_row.pack(fill="x", pady=(0, 8))
+        
+        # LEFT: Order Options
+        order_card = ctk.CTkFrame(middle_row, fg_color=card_bg, corner_radius=8)
+        order_card.pack(side="left", fill="both", expand=True, padx=(0, 4))
+        
+        ctk.CTkLabel(order_card, text="Order Options",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(8, 5), padx=10, anchor="w")
+        
+        opt_row = ctk.CTkFrame(order_card, fg_color=card_bg)
+        opt_row.pack(fill="x", pady=(0, 8), padx=10)
+        
+        ctk.CTkLabel(opt_row, text="Limit Orders:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=5)
+        
+        self.limit_toggle = ToggleSwitch(opt_row, initial_state=False, 
+                                        callback=self.on_limit_toggled, bg=card_bg)
         self.limit_toggle.pack(side='left', padx=5)
-
-        tk.Label(options_row, text="Distance:", font=('Segoe UI', 8),
-                bg='#f8f9fb').pack(side='left', padx=5)
-        ttk.Entry(options_row, textvariable=self.limit_distance_var,
-                width=6).pack(side='left', padx=2)
-
-        # NEW: Trailing Stop Entry Configuration section
-        trailing_frame = ttk.LabelFrame(parent, text="Trailing Stop Entry", padding=10)
-        trailing_frame.pack(pady=8, padx=20, fill="x")
-
-        # Row 1: Enable/disable toggle
-        trailing_row1 = tk.Frame(trailing_frame, bg='#f8f9fb')
-        trailing_row1.pack(fill="x", pady=5)
-
-        tk.Label(trailing_row1, text="Enable Trailing:", font=(
-            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
-        self.trailing_toggle = ToggleSwitch(
-            trailing_row1, initial_state=False, callback=self.on_trailing_toggled, bg='#f8f9fb')
+        
+        ctk.CTkLabel(opt_row, text="Distance:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=(15, 5))
+        
+        ctk.CTkEntry(opt_row, textvariable=self.limit_distance_var, width=50, height=32,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+        
+        ctk.CTkLabel(opt_row, text="pts", font=("Segoe UI", 10),
+                    text_color="#9fa6b2").pack(side='left', padx=5)
+        
+        # RIGHT: Trailing Stop Entry
+        trail_card = ctk.CTkFrame(middle_row, fg_color=card_bg, corner_radius=8)
+        trail_card.pack(side="right", fill="both", expand=True, padx=(4, 0))
+        
+        ctk.CTkLabel(trail_card, text="Trailing Stop Entry",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(8, 5), padx=10, anchor="w")
+        
+        trail_row = ctk.CTkFrame(trail_card, fg_color=card_bg)
+        trail_row.pack(fill="x", pady=(0, 8), padx=10)
+        
+        ctk.CTkLabel(trail_row, text="Enable:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=5)
+        
+        self.trailing_toggle = ToggleSwitch(trail_row, initial_state=False,
+                                        callback=self.on_trailing_toggled, bg=card_bg)
         self.trailing_toggle.pack(side='left', padx=5)
-
-        tk.Label(trailing_row1, text="  Follow price until orders trigger", 
-                font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
-
-        # Row 2: Configuration parameters
-        trailing_row2 = tk.Frame(trailing_frame, bg='#f8f9fb')
-        trailing_row2.pack(fill="x", pady=5)
-
-        # Initialize trailing config variables
-        self.trailing_min_move_var = tk.StringVar(value="0.5")
-        self.trailing_check_interval_var = tk.StringVar(value="30")
-
-        tk.Label(trailing_row2, text="Min Move (pts):", font=(
-            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=5)
-        ttk.Entry(trailing_row2, textvariable=self.trailing_min_move_var,
-                width=6).pack(side='left', padx=2)
-
-        tk.Label(trailing_row2, text="Check Interval (sec):", font=(
-            'Segoe UI', 9), bg='#f8f9fb').pack(side='left', padx=15)
-        ttk.Entry(trailing_row2, textvariable=self.trailing_check_interval_var,
-                width=6).pack(side='left', padx=2)
-
-        tk.Label(trailing_row2, text="  BUY trails down | SELL trails up", 
-                font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
-
-# Add this to create_trading_tab in main_window.py
-# After the Trailing Stop Entry section (around line 515)
-
-        # Stop Loss Management section
-        stop_mgmt_frame = ttk.LabelFrame(parent, text="Stop Loss Management", padding=10)
-        stop_mgmt_frame.pack(pady=8, padx=20, fill="x")
-
-        # Row 1: Bulk update stops on working orders
-        stop_row1 = tk.Frame(stop_mgmt_frame, bg='#f8f9fb')
-        stop_row1.pack(fill="x", pady=5)
-
-        tk.Label(stop_row1, text="Update All Working Order Stops:", font=(
-            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
         
-        self.bulk_stop_distance_var = tk.StringVar(value="20")
-        ttk.Entry(stop_row1, textvariable=self.bulk_stop_distance_var,
-                  width=6).pack(side='left', padx=5)
+        # Initialize trailing variables
+        self.trailing_min_move_var = ctk.StringVar(value="0.5")
+        self.trailing_check_interval_var = ctk.StringVar(value="30")
         
-        tk.Label(stop_row1, text="points", font=('Segoe UI', 8),
-                 bg='#f8f9fb').pack(side='left', padx=2)
+        ctk.CTkLabel(trail_row, text="Min:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=(15, 2))
         
-        ttk.Button(stop_row1, text="Update All Stops", 
-                  command=self.on_bulk_update_stops,
-                  style='Primary.TButton').pack(side='left', padx=10, ipadx=10, ipady=3)
-
-        # Row 2: Auto-apply stops to positions
-        stop_row2 = tk.Frame(stop_mgmt_frame, bg='#f8f9fb')
-        stop_row2.pack(fill="x", pady=5)
-
-        tk.Label(stop_row2, text="Auto-apply stops to positions:", font=(
-            'Segoe UI', 9, 'bold'), bg='#f8f9fb').pack(side='left', padx=5)
+        ctk.CTkEntry(trail_row, textvariable=self.trailing_min_move_var, width=50, height=32,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+        
+        ctk.CTkLabel(trail_row, text="Check:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=(10, 2))
+        
+        ctk.CTkEntry(trail_row, textvariable=self.trailing_check_interval_var, width=50, height=32,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+        
+        ctk.CTkLabel(trail_row, text="sec", font=("Segoe UI", 10),
+                    text_color="#9fa6b2").pack(side='left', padx=2)
+        
+        # === ROW 3: Stop Management ===
+        stop_row = ctk.CTkFrame(main_container, fg_color=card_bg, corner_radius=8)
+        stop_row.pack(fill="x", pady=(0, 8))
+        
+        ctk.CTkLabel(stop_row, text="Stop Management",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(side='left', pady=8, padx=10)
+        
+        ctk.CTkLabel(stop_row, text="Update All:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=10)
+        
+        self.bulk_stop_distance_var = ctk.StringVar(value="20")
+        ctk.CTkEntry(stop_row, textvariable=self.bulk_stop_distance_var, width=50, height=32,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+        
+        ctk.CTkLabel(stop_row, text="pts", font=("Segoe UI", 10),
+                    text_color="#9fa6b2").pack(side='left', padx=5)
+        
+        ctk.CTkButton(stop_row, text="Update Stops",
+                    command=self.on_bulk_update_stops,
+                    fg_color=accent_teal, hover_color="#2be9c9",
+                    corner_radius=8, width=130, height=32,
+                    font=("Segoe UI", 11, "bold")).pack(side='left', padx=10)
+        
+        # Separator
+        ctk.CTkLabel(stop_row, text="|", text_color="#3e444d",
+                    font=("Segoe UI", 16)).pack(side='left', padx=15)
+        
+        ctk.CTkLabel(stop_row, text="Auto-apply:", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side='left', padx=5)
         
         self.auto_stop_toggle = ToggleSwitch(
-            stop_row2, initial_state=True, callback=self.on_auto_stop_toggled, bg='#f8f9fb')
+            stop_row, initial_state=True, callback=self.on_auto_stop_toggled, bg=card_bg)
         self.auto_stop_toggle.pack(side='left', padx=5)
-
-        tk.Label(stop_row2, text="Distance:", font=('Segoe UI', 8),
-                 bg='#f8f9fb').pack(side='left', padx=10)
         
-        self.auto_stop_distance_var = tk.StringVar(value="20")
-        ttk.Entry(stop_row2, textvariable=self.auto_stop_distance_var,
-                  width=6).pack(side='left', padx=2)
+        self.auto_stop_distance_var = ctk.StringVar(value="20")
+        ctk.CTkEntry(stop_row, textvariable=self.auto_stop_distance_var, width=50, height=32,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 11)).pack(side='left', padx=5)
         
-        tk.Label(stop_row2, text="  Automatically attach stops when orders trigger", 
-                 font=('Segoe UI', 8), bg='#f8f9fb', foreground='#666').pack(side='left', padx=10)
-
-# Add these methods to the MainWindow class in main_window.py
-
+        ctk.CTkLabel(stop_row, text="pts when triggered",
+                    font=("Segoe UI", 10), text_color="#9fa6b2").pack(side='left', padx=5)
+        
     def on_bulk_update_stops(self):
         """Update stop losses on all working orders"""
         if not self.ig_client.logged_in:
@@ -629,109 +611,57 @@ class MainWindow:
             self.ladder_strategy.stop_position_monitoring()
 
     def create_risk_tab(self, parent):
-        """Create risk management tab"""
-        # Account Overview Section
-        account_frame = ttk.LabelFrame(
-            parent, text="Account Overview", padding=15)
-        account_frame.pack(pady=10, padx=20, fill="x")
-
-        account_grid = tk.Frame(account_frame, bg="#f8f9fb")
-        account_grid.pack(fill="x")
-
-        # Account metrics - 2 columns
-        self.balance_var = tk.StringVar(value="Balance: --")
-        self.available_var = tk.StringVar(value="Available: --")
-        self.daily_pnl_var = tk.StringVar(value="Daily P&L: --")
-        self.unrealized_pnl_var = tk.StringVar(value="Unrealized P&L: --")
-
-        ttk.Label(
-            account_grid, textvariable=self.balance_var, font=(
-                "Segoe UI", 11, "bold")
-        ).grid(row=0, column=0, sticky="w", padx=20, pady=5)
-        ttk.Label(
-            account_grid, textvariable=self.available_var, font=(
-                "Segoe UI", 11)
-        ).grid(row=0, column=1, sticky="w", padx=20, pady=5)
-        ttk.Label(
-            account_grid, textvariable=self.daily_pnl_var, font=(
-                "Segoe UI", 11, "bold")
-        ).grid(row=1, column=0, sticky="w", padx=20, pady=5)
-        ttk.Label(
-            account_grid, textvariable=self.unrealized_pnl_var, font=(
-                "Segoe UI", 11)
-        ).grid(row=1, column=1, sticky="w", padx=20, pady=5)
-
-        # Risk Limits Section
-        limits_frame = ttk.LabelFrame(
-            parent, text="Risk Limits & Status", padding=15)
-        limits_frame.pack(pady=10, padx=20, fill="x")
-
-        limits_grid = tk.Frame(limits_frame, bg="#f8f9fb")
-        limits_grid.pack(fill="x")
-
-        self.positions_var = tk.StringVar(value="Positions: --")
-        self.daily_loss_var = tk.StringVar(value="Daily Loss Limit: --")
-        self.margin_usage_var = tk.StringVar(value="Margin Usage: --")
-        self.exposure_var = tk.StringVar(value="Total Exposure: --")
-
-        ttk.Label(
-            limits_grid, textvariable=self.positions_var, font=("Segoe UI", 10)
-        ).grid(row=0, column=0, sticky="w", padx=20, pady=3)
-        ttk.Label(
-            limits_grid, textvariable=self.daily_loss_var, font=(
-                "Segoe UI", 10)
-        ).grid(row=0, column=1, sticky="w", padx=20, pady=3)
-        ttk.Label(
-            limits_grid, textvariable=self.margin_usage_var, font=(
-                "Segoe UI", 10)
-        ).grid(row=1, column=0, sticky="w", padx=20, pady=3)
-        ttk.Label(
-            limits_grid, textvariable=self.exposure_var, font=("Segoe UI", 10)
-        ).grid(row=1, column=1, sticky="w", padx=20, pady=3)
-
-        # Risk Controls Section
-        controls_frame = ttk.LabelFrame(
-            parent, text="Risk Controls", padding=15)
-        controls_frame.pack(pady=10, padx=20, fill="x")
-
-        controls_row = tk.Frame(controls_frame, bg="#f8f9fb")
-        controls_row.pack(fill="x", pady=5)
+            """Create risk management tab - placeholder for now"""
+            card_bg = "#252a31"
+            text_white = "#f4f5f7"
+            
+            placeholder = ctk.CTkFrame(parent, fg_color=card_bg, corner_radius=10)
+            placeholder.pack(expand=True, padx=20, pady=20)
+            
+            ctk.CTkLabel(
+                placeholder,
+                text="Risk Management Features",
+                font=("Segoe UI", 14, "bold"),
+                text_color=text_white
+            ).pack(pady=20)
+            
+            ctk.CTkLabel(
+                placeholder,
+                text="Account overview and risk limits will appear here.\nFunctionality coming soon!",
+                font=("Segoe UI", 11),
+                text_color="#9fa6b2"
+            ).pack(pady=10)
 
     def create_config_tab(self, parent):
-        """Create configuration tab for optional features"""
+        """Create configuration tab - placeholder for now"""
+        card_bg = "#252a31"
+        text_white = "#f4f5f7"
+        accent_teal = "#00d9b1"
+        
         # Optional Features Section
-        features_frame = ttk.LabelFrame(
-            parent, text="Optional Features", padding=15)
+        features_frame = ctk.CTkFrame(parent, fg_color=card_bg, corner_radius=10)
         features_frame.pack(pady=10, padx=20, fill="x")
+        
+        ctk.CTkLabel(
+            features_frame,
+            text="Optional Features",
+            font=("Segoe UI", 12, "bold"),
+            text_color=text_white
+        ).pack(pady=(15, 10), padx=15, anchor="w")
 
-        ttk.Checkbutton(features_frame, text="Enable Risk Management",
-                        variable=self.use_risk_management).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Limit Orders",
-                        variable=self.use_limit_orders).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Auto-Replace Strategy",
-                        variable=self.use_auto_replace).pack(anchor="w", pady=3)
-        ttk.Checkbutton(features_frame, text="Enable Trailing Stops",
-                        variable=self.use_trailing_stops).pack(anchor="w", pady=3)
-
-        # Status display
-        status_frame = ttk.LabelFrame(
-            parent, text="Feature Status", padding=15)
-        status_frame.pack(pady=10, padx=20, fill="x")
-
-        self.feature_status_text = scrolledtext.ScrolledText(status_frame, width=80, height=8,
-                                                             bg='#ffffff', fg='#1a2332',
-                                                             font=(
-                                                                 'Consolas', 9),
-                                                             relief='flat', borderwidth=1)
-        self.feature_status_text.pack(fill="both", expand=True, pady=5)
-
-        # Update status initially
-        self.update_feature_status()
-
-        # Button to refresh status
-        ttk.Button(status_frame, text="Update Status", command=self.update_feature_status,
-                   style='Primary.TButton').pack(pady=5)
-
+        ctk.CTkCheckBox(features_frame, text="Enable Risk Management",
+                    variable=self.use_risk_management,
+                    fg_color=accent_teal, hover_color=accent_teal).pack(anchor="w", pady=5, padx=20)
+        ctk.CTkCheckBox(features_frame, text="Enable Limit Orders",
+                    variable=self.use_limit_orders,
+                    fg_color=accent_teal, hover_color=accent_teal).pack(anchor="w", pady=5, padx=20)
+        ctk.CTkCheckBox(features_frame, text="Enable Auto-Replace Strategy",
+                    variable=self.use_auto_replace,
+                    fg_color=accent_teal, hover_color=accent_teal).pack(anchor="w", pady=5, padx=20)
+        ctk.CTkCheckBox(features_frame, text="Enable Trailing Stops",
+                    variable=self.use_trailing_stops,
+                    fg_color=accent_teal, hover_color=accent_teal).pack(anchor="w", pady=(5, 15), padx=20)
+        
     def update_feature_status(self):
         """Update feature status display"""
         self.feature_status_text.delete(1.0, tk.END)
@@ -937,44 +867,43 @@ class MainWindow:
             if self.root and self.log_text:
                 def do_update():
                     try:
-                        self.log_text.insert(tk.END, log_message + "\n")
-                        self.log_text.see(tk.END)
-                    except:
-                        pass
+                        self.log_text.insert("end", log_message + "\n")  # Changed from tk.END
+                        self.log_text.see("end")  # Changed from tk.END
+                    except Exception as e:
+                        print(f"Log display error: {e}")
                 self.root.after(0, do_update)
-        except:
-            pass  # If there's any issue, at least we printed to console
+        except Exception as e:
+            print(f"Log error: {e}")
 
     def on_connect(self):
-        """Handle connect button"""
-        if not self.ig_client.logged_in:
-            account_type = self.account_var.get()
-            creds = self.config.get_credentials(account_type)
+            """Handle connect button"""
+            if not self.ig_client.logged_in:
+                account_type = self.account_var.get()
+                creds = self.config.get_credentials(account_type)
 
-            success, message = self.ig_client.connect(
-                creds["username"],
-                creds["password"],
-                creds["api_key"],
-                creds["base_url"],
-            )
+                success, message = self.ig_client.connect(
+                    creds["username"],
+                    creds["password"],
+                    creds["api_key"],
+                    creds["base_url"],
+                )
 
-            if success:
-                self.status_var.set(f"Connected to {account_type}")
-                self.status_label.config(style="Connected.TLabel")
-                self.connect_btn.config(
-                    text="Disconnect", style="Danger.TButton")
-                self.update_margin_display()  # Start margin updates
-                self.log(message)
+                if success:
+                    self.status_var.set(f"Connected to {account_type}")
+                    self.status_label.configure(text_color="#00d084")  # Success green
+                    self.connect_btn.configure(text="Disconnect", fg_color="#ed6347")  # Danger red
+                    self.update_margin_display()
+                    self.log(message)
+                else:
+                    self.status_var.set("Connection failed")
+                    self.status_label.configure(text_color="#9fa6b2")  # Gray
+                    self.log(message)
             else:
-                self.status_var.set("Connection failed")
-                self.status_label.config(style="Disconnected.TLabel")
-                self.log(message)
-        else:
-            self.ig_client.disconnect()
-            self.status_var.set("Disconnected")
-            self.status_label.config(style="Disconnected.TLabel")
-            self.connect_btn.config(text="Connect", style="Primary.TButton")
-            self.log("Disconnected from IG")
+                self.ig_client.disconnect()
+                self.status_var.set("Disconnected")
+                self.status_label.configure(text_color="#9fa6b2")  # Gray
+                self.connect_btn.configure(text="Connect", fg_color="#5aa89a")  # Teal
+                self.log("Disconnected from IG")
 
     def on_get_price(self):
         """Handle get price button"""
@@ -1012,7 +941,7 @@ class MainWindow:
             return
 
         # Disable button and change to Cancel
-        self.ladder_btn.config(state="normal", text="Cancel Ladder")
+        self.ladder_btn.configure(state="normal", text="Cancel Ladder")
         
         try:
             # Get all the parameters FIRST
@@ -1043,7 +972,7 @@ class MainWindow:
                 )
                 if not result:
                     self.log("Order cancelled - would exceed margin limit")
-                    self.ladder_btn.config(state="normal", text="Place Ladder")
+                    self.ladder_btn.configure(state="normal", text="Place Ladder")
                     return
 
             # Use the toggle switch state for limits
@@ -1067,7 +996,7 @@ class MainWindow:
                     for check_name, passed, message in safety_checks:
                         if not passed:
                             self.log(f"  {check_name}: {message}")
-                    self.ladder_btn.config(state="normal", text="Place Ladder")
+                    self.ladder_btn.configure(state="normal", text="Place Ladder")
                     return
                 else:
                     self.log("Risk check passed")
@@ -1089,7 +1018,7 @@ class MainWindow:
                                                       num_orders, order_size, retry_jump, max_retries,
                                                       self.log, limit_distance, stop_distance, guaranteed_stop)
                 finally:
-                    self.root.after(0, lambda: self.ladder_btn.config(
+                    self.root.after(0, lambda: self.ladder_btn.configure(
                         state="normal", text="Place Ladder"))
 
             thread = threading.Thread(target=place_and_reenable)
@@ -1098,7 +1027,7 @@ class MainWindow:
 
         except ValueError as e:
             self.log(f"Invalid parameters: {str(e)}")
-            self.ladder_btn.config(state="normal", text="Place Ladder")
+            self.ladder_btn.configure(state="normal", text="Place Ladder")
 
     def place_and_reenable():
         try:
@@ -1107,7 +1036,7 @@ class MainWindow:
                                               self.log, limit_distance, stop_distance, guaranteed_stop)
         finally:
             # Re-enable button when done
-            self.root.after(0, lambda: self.ladder_btn.config(
+            self.root.after(0, lambda: self.ladder_btn.configure(
                 state="normal", text="Place Ladder"))
             self.ladder_strategy.cancel_requested = False  # Reset
 
@@ -1138,11 +1067,13 @@ class MainWindow:
                         color = "#5a9d6d"  # Green
 
                     self.margin_var.set(f"Margin: {margin_ratio:.1%}")
-                    self.margin_label.config(foreground=color)
+                    self.margin_label.configure(text_color=color)  # Changed .config to .configure
         except Exception as e:
             self.margin_var.set("Margin: Error")
+            self.log(f"Margin error: {str(e)}")
+            print(f"DEBUG Margin error: {str(e)}")
 
-        # Update every 30 seconds
+        # Update every 30 seconds (moved outside try/except)
         if self.ig_client.logged_in:
             self.root.after(30000, self.update_margin_display)
 
