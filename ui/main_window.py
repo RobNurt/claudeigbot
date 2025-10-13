@@ -94,8 +94,9 @@ class MainWindow:
     def create_gui(self):
             """Create the GUI with CustomTkinter and Polaris theme"""
             self.root = ctk.CTk()
-            self.root.title("IG Trading Bot")
-            self.root.geometry("1200x1050")
+            self.root.title("Rob's Trading Bot")
+            self.root.geometry("1400x900")
+            self.root.minsize(1200, 700)   
 
             # Variables
             self.use_risk_management = ctk.BooleanVar(value=False)
@@ -123,7 +124,7 @@ class MainWindow:
 
             title_label = ctk.CTkLabel(
                 header_frame, 
-                text="IG Trading Bot",
+                text="Rob's Trading Bot",
                 font=("Segoe UI", 16, "bold"),
                 text_color=accent_teal
             )
@@ -243,7 +244,7 @@ class MainWindow:
                     corner_radius=8,
                     width=110,
                     height=32,
-                    font=("Segoe UI", 9, "bold")
+                    font=("Segoe UI", 12, "bold")
                 ).pack(side="left", padx=4)
 
             # Orders display area
@@ -333,69 +334,66 @@ class MainWindow:
             self.status_label.grid(row=2, column=0, columnspan=3, pady=(0, 20), padx=20)
             
     def create_trading_tab(self, parent):
-        """Create compact trading tab with large text and no scrolling"""
-        # Color scheme
+        """Ultra compact scrollable trading tab"""
         bg_dark = "#1a1d23"
         card_bg = "#25292e"
-        accent_teal = "#5aa89a"
-        text_white = "#ddf6f9"
+        accent_teal = "#3a9d8e"
+        text_white = "#e8eaed"
         
-        # Main container - NO SCROLLING
-        main_container = ctk.CTkFrame(parent, fg_color=bg_dark)
-        main_container.pack(fill="x", expand=False, padx=10, pady=10, anchor="n")  # Changed: fill="x" only, expand=False
-                
-        # === ROW 1: Market & All Controls (EVERYTHING INLINE) ===
-        top_row = ctk.CTkFrame(main_container, fg_color=card_bg, corner_radius=8)
+        # MAKE IT SCROLLABLE
+        scrollable_frame = ctk.CTkScrollableFrame(parent, fg_color=bg_dark)
+        scrollable_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # === ROW 1: Market & Parameters ===
+        top_row = ctk.CTkFrame(scrollable_frame, fg_color=card_bg, corner_radius=8)
         top_row.pack(fill="x", pady=(0, 8))
         
-        # Left section - Market
-        ctk.CTkLabel(top_row, text="Market:", font=("Segoe UI", 12, "bold"),
+        # Market
+        ctk.CTkLabel(top_row, text="Market:", font=("Segoe UI", 11, "bold"),
                     text_color=text_white).pack(side='left', padx=(10, 5))
         
         self.market_var = ctk.StringVar(value="Gold Spot")
-        market_dropdown = ctk.CTkComboBox(
+        ctk.CTkComboBox(
             top_row, variable=self.market_var,
             values=list(self.config.markets.keys()),
-            command=lambda x: None,  # Optional callback
-            width=150, height=32,
+            width=140, height=30,
             fg_color=card_bg, button_color=accent_teal,
-            button_hover_color="#00f7ced7", border_color="#3e444d",
-            font=("Segoe UI", 11)
-        )
-        market_dropdown.pack(side='left', padx=5)
+            font=("Segoe UI", 10)
+        ).pack(side='left', padx=3)
         
-        # Get Price button
+        # Get Price
         ctk.CTkButton(top_row, text="Price", command=self.on_get_price,
                     fg_color="#3e444d", hover_color="#4a5159",
-                    corner_radius=8, width=70, height=32,
-                    font=("Segoe UI", 11)).pack(side='left', padx=5)
+                    text_color=text_white,
+                    corner_radius=8, width=60, height=30,
+                    font=("Segoe UI", 10)).pack(side='left', padx=3)
         
         self.price_var = ctk.StringVar(value="--")
         ctk.CTkLabel(top_row, textvariable=self.price_var,
-                    font=("Segoe UI", 11, "bold"),
-                    text_color=accent_teal, width=80).pack(side='left', padx=5)
+                    font=("Segoe UI", 10, "bold"),
+                    text_color=accent_teal, width=70).pack(side='left', padx=3)
         
         # Separator
         ctk.CTkLabel(top_row, text="|", text_color="#3e444d",
-                    font=("Segoe UI", 16)).pack(side='left', padx=8)
+                    font=("Segoe UI", 14)).pack(side='left', padx=5)
         
         # Direction
-        ctk.CTkLabel(top_row, text="Dir:", font=("Segoe UI", 11, "bold"),
-                    text_color=text_white).pack(side='left', padx=5)
+        ctk.CTkLabel(top_row, text="Dir:", font=("Segoe UI", 10, "bold"),
+                    text_color=text_white).pack(side='left', padx=3)
         
         self.direction_var = ctk.StringVar(value="BUY")
         ctk.CTkRadioButton(top_row, text="Buy", variable=self.direction_var,
-                        value="BUY", fg_color=accent_teal, hover_color="#00f7cc",
-                        font=("Segoe UI", 11)).pack(side='left', padx=3)
+                        value="BUY", fg_color=accent_teal,
+                        font=("Segoe UI", 10)).pack(side='left', padx=2)
         ctk.CTkRadioButton(top_row, text="Sell", variable=self.direction_var,
-                        value="SELL", fg_color=accent_teal, hover_color="#00f7cc",
-                        font=("Segoe UI", 11)).pack(side='left', padx=3)
+                        value="SELL", fg_color=accent_teal,
+                        font=("Segoe UI", 10)).pack(side='left', padx=2)
         
         # Separator
         ctk.CTkLabel(top_row, text="|", text_color="#3e444d",
-                    font=("Segoe UI", 16)).pack(side='left', padx=8)
+                    font=("Segoe UI", 14)).pack(side='left', padx=5)
         
-        # Initialize all variables first
+        # Initialize variables
         self.offset_var = ctk.StringVar(value="5")
         self.step_var = ctk.StringVar(value="10")
         self.num_orders_var = ctk.StringVar(value="4")
@@ -404,141 +402,137 @@ class MainWindow:
         self.max_retries_var = ctk.StringVar(value="3")
         self.limit_distance_var = ctk.StringVar(value="5")
         
-        # Compact parameters
+        # Parameters - COMPACT
         params = [
-            ("Off:", self.offset_var, 45),
-            ("Step:", self.step_var, 45),
-            ("Ords:", self.num_orders_var, 45),
-            ("Size:", self.size_var, 45),
-            ("Stop:", self.stop_distance_var, 45),
+            ("Off:", self.offset_var),
+            ("Step:", self.step_var),
+            ("Ords:", self.num_orders_var),
+            ("Size:", self.size_var),
+            ("Stop:", self.stop_distance_var),
         ]
         
-        for label_text, var, width in params:
-            ctk.CTkLabel(top_row, text=label_text, font=("Segoe UI", 11),
-                        text_color=text_white).pack(side='left', padx=(8, 2))
-            ctk.CTkEntry(top_row, textvariable=var, width=width, height=32,
+        for label_text, var in params:
+            ctk.CTkLabel(top_row, text=label_text, font=("Segoe UI", 10),
+                        text_color=text_white).pack(side='left', padx=(5, 1))
+            ctk.CTkEntry(top_row, textvariable=var, width=40, height=30,
                         fg_color=card_bg, border_color="#3e444d",
-                        font=("Segoe UI", 11)).pack(side='left', padx=2)
+                        font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        # PLACE LADDER BUTTON - Always visible on right
-        self.ladder_btn = ctk.CTkButton(top_row, text="PLACE LADDER", command=self.on_place_ladder,
-        fg_color="#259d8d", hover_color="#22c55e",
-        text_color="#1a1d23",  # ADD THIS - dark text on green button
-        corner_radius=8, width=150, height=38,
-        font=("Segoe UI", 12, "bold"))
-        self.ladder_btn.pack(side="right", padx=10, pady=8)
+        # === ROW 2: PLACE LADDER BUTTON (Own row, centered) ===
+        button_row = ctk.CTkFrame(scrollable_frame, fg_color=bg_dark)
+        button_row.pack(fill="x", pady=(0, 8))
         
-        # === ROW 2: Order Options and Trailing (SIDE BY SIDE) ===
-        middle_row = ctk.CTkFrame(main_container, fg_color=bg_dark)
-        middle_row.pack(fill="x", pady=(0, 8))
+        self.ladder_btn = ctk.CTkButton(
+            button_row, text="PLACE LADDER", command=self.on_place_ladder,
+            fg_color="#3b9f6f", hover_color="#4ab080",
+            text_color="black",
+            corner_radius=8, width=200, height=40,
+            font=("Segoe UI", 12, "bold"))
+        self.ladder_btn.pack(pady=5)
         
-        # LEFT: Order Options
-        order_card = ctk.CTkFrame(middle_row, fg_color=card_bg, corner_radius=8)
-        order_card.pack(side="left", fill="both", expand=True, padx=(0, 4))
+        # === ROW 3: Trailing + Stop/Limit Management ===
+        bottom_row = ctk.CTkFrame(scrollable_frame, fg_color=bg_dark)
+        bottom_row.pack(fill="x", pady=(0, 8))
         
-        ctk.CTkLabel(order_card, text="Order Options",
-                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(8, 5), padx=10, anchor="w")
+        # LEFT: Trailing Stop Entry
+        trailing_card = ctk.CTkFrame(bottom_row, fg_color=card_bg, corner_radius=8)
+        trailing_card.pack(side="left", fill="both", expand=True, padx=(0, 4))
         
-        opt_row = ctk.CTkFrame(order_card, fg_color=card_bg)
-        opt_row.pack(fill="x", pady=(0, 8), padx=10)
+        ctk.CTkLabel(trailing_card, text="Trailing Stop Entry",
+                    font=("Segoe UI", 11, "bold"), text_color=text_white).pack(side='left', pady=8, padx=10)
         
-        ctk.CTkLabel(opt_row, text="Limit Orders:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=5)
+        ctk.CTkLabel(trailing_card, text="Enable:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=3)
         
-        self.limit_toggle = ToggleSwitch(opt_row, initial_state=False, 
-                                        callback=self.on_limit_toggled, bg=card_bg)
-        self.limit_toggle.pack(side='left', padx=5)
-        
-        ctk.CTkLabel(opt_row, text="Distance:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=(15, 5))
-        
-        ctk.CTkEntry(opt_row, textvariable=self.limit_distance_var, width=50, height=32,
-                    fg_color=card_bg, border_color="#3e444d",
-                    font=("Segoe UI", 11)).pack(side='left', padx=2)
-        
-        ctk.CTkLabel(opt_row, text="pts", font=("Segoe UI", 10),
-                    text_color="#9fa6b2").pack(side='left', padx=5)
-        
-        # RIGHT: Trailing Stop Entry
-        trail_card = ctk.CTkFrame(middle_row, fg_color=card_bg, corner_radius=8)
-        trail_card.pack(side="right", fill="both", expand=True, padx=(4, 0))
-        
-        ctk.CTkLabel(trail_card, text="Trailing Stop Entry",
-                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(8, 5), padx=10, anchor="w")
-        
-        trail_row = ctk.CTkFrame(trail_card, fg_color=card_bg)
-        trail_row.pack(fill="x", pady=(0, 8), padx=10)
-        
-        ctk.CTkLabel(trail_row, text="Enable:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=5)
-        
-        self.trailing_toggle = ToggleSwitch(trail_row, initial_state=False,
+        self.trailing_toggle = ToggleSwitch(trailing_card, initial_state=False,
                                         callback=self.on_trailing_toggled, bg=card_bg)
-        self.trailing_toggle.pack(side='left', padx=5)
+        self.trailing_toggle.pack(side='left', padx=3)
         
-        # Initialize trailing variables
         self.trailing_min_move_var = ctk.StringVar(value="0.5")
         self.trailing_check_interval_var = ctk.StringVar(value="30")
         
-        ctk.CTkLabel(trail_row, text="Min:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=(15, 2))
-        
-        ctk.CTkEntry(trail_row, textvariable=self.trailing_min_move_var, width=50, height=32,
+        ctk.CTkLabel(trailing_card, text="Min:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=(10, 1))
+        ctk.CTkEntry(trailing_card, textvariable=self.trailing_min_move_var, width=45, height=30,
                     fg_color=card_bg, border_color="#3e444d",
-                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+                    font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        ctk.CTkLabel(trail_row, text="Check:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=(10, 2))
-        
-        ctk.CTkEntry(trail_row, textvariable=self.trailing_check_interval_var, width=50, height=32,
+        ctk.CTkLabel(trailing_card, text="Check:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=(8, 1))
+        ctk.CTkEntry(trailing_card, textvariable=self.trailing_check_interval_var, width=45, height=30,
                     fg_color=card_bg, border_color="#3e444d",
-                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+                    font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        ctk.CTkLabel(trail_row, text="sec", font=("Segoe UI", 10),
+        ctk.CTkLabel(trailing_card, text="sec", font=("Segoe UI", 9),
                     text_color="#9fa6b2").pack(side='left', padx=2)
         
-        # === ROW 3: Stop Management ===
-        stop_row = ctk.CTkFrame(main_container, fg_color=card_bg, corner_radius=8)
-        stop_row.pack(fill="x", pady=(0, 8))
+        # RIGHT: Stop & Limit Management
+        mgmt_card = ctk.CTkFrame(bottom_row, fg_color=card_bg, corner_radius=8)
+        mgmt_card.pack(side="right", fill="both", expand=True, padx=(4, 0))
         
-        ctk.CTkLabel(stop_row, text="Stop Management",
-                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(side='left', pady=8, padx=10)
+        ctk.CTkLabel(mgmt_card, text="Stop & Limit Management",
+                    font=("Segoe UI", 11, "bold"), text_color=text_white).pack(side='left', pady=8, padx=10)
         
-        ctk.CTkLabel(stop_row, text="Update All:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=10)
+        # Orders
+        ctk.CTkLabel(mgmt_card, text="Orders:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=3)
         
         self.bulk_stop_distance_var = ctk.StringVar(value="20")
-        ctk.CTkEntry(stop_row, textvariable=self.bulk_stop_distance_var, width=50, height=32,
+        ctk.CTkEntry(mgmt_card, textvariable=self.bulk_stop_distance_var, width=40, height=30,
                     fg_color=card_bg, border_color="#3e444d",
-                    font=("Segoe UI", 11)).pack(side='left', padx=2)
+                    font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        ctk.CTkLabel(stop_row, text="pts", font=("Segoe UI", 10),
-                    text_color="#9fa6b2").pack(side='left', padx=5)
+        ctk.CTkLabel(mgmt_card, text="pts", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left', padx=1)
         
-        ctk.CTkButton(stop_row, text="Update Stops",
+        # GSLO checkbox
+        ctk.CTkCheckBox(mgmt_card, text="GSLO", variable=self.use_guaranteed_stops,
+                    fg_color=accent_teal, width=55, height=26,
+                    font=("Segoe UI", 9)).pack(side='left', padx=3)
+        
+        ctk.CTkButton(mgmt_card, text="Update",
                     command=self.on_bulk_update_stops,
-                    fg_color=accent_teal, hover_color="#2be9c9",
-                    corner_radius=8, width=130, height=32,
-                    font=("Segoe UI", 11, "bold")).pack(side='left', padx=10)
+                    fg_color=accent_teal, hover_color="#4ab39f",
+                    text_color="black",
+                    corner_radius=8, width=70, height=30,
+                    font=("Segoe UI", 10, "bold")).pack(side='left', padx=3)
         
         # Separator
-        ctk.CTkLabel(stop_row, text="|", text_color="#3e444d",
-                    font=("Segoe UI", 16)).pack(side='left', padx=15)
+        ctk.CTkLabel(mgmt_card, text="|", text_color="#3e444d",
+                    font=("Segoe UI", 14)).pack(side='left', padx=8)
         
-        ctk.CTkLabel(stop_row, text="Auto-apply:", font=("Segoe UI", 11),
-                    text_color=text_white).pack(side='left', padx=5)
+        # On Trigger
+        ctk.CTkLabel(mgmt_card, text="Trigger:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=3)
+        
+        # Auto-stops
+        ctk.CTkLabel(mgmt_card, text="Stop:", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left', padx=1)
         
         self.auto_stop_toggle = ToggleSwitch(
-            stop_row, initial_state=True, callback=self.on_auto_stop_toggled, bg=card_bg)
-        self.auto_stop_toggle.pack(side='left', padx=5)
+            mgmt_card, initial_state=True, callback=self.on_auto_stop_toggled, bg=card_bg)
+        self.auto_stop_toggle.pack(side='left', padx=2)
         
         self.auto_stop_distance_var = ctk.StringVar(value="20")
-        ctk.CTkEntry(stop_row, textvariable=self.auto_stop_distance_var, width=50, height=32,
+        ctk.CTkEntry(mgmt_card, textvariable=self.auto_stop_distance_var, width=35, height=30,
                     fg_color=card_bg, border_color="#3e444d",
-                    font=("Segoe UI", 11)).pack(side='left', padx=5)
+                    font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        ctk.CTkLabel(stop_row, text="pts when triggered",
-                    font=("Segoe UI", 10), text_color="#9fa6b2").pack(side='left', padx=5)
+        # Auto-limits
+        ctk.CTkLabel(mgmt_card, text="Lim:", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left', padx=(6, 1))
+        
+        self.auto_limit_toggle = ToggleSwitch(
+            mgmt_card, initial_state=False, callback=self.on_auto_limit_toggled, bg=card_bg)
+        self.auto_limit_toggle.pack(side='left', padx=2)
+        
+        self.auto_limit_distance_var = ctk.StringVar(value="5")
+        ctk.CTkEntry(mgmt_card, textvariable=self.auto_limit_distance_var, width=35, height=30,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=("Segoe UI", 10)).pack(side='left', padx=1)
+        
+        ctk.CTkLabel(mgmt_card, text="pts", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left', padx=2)    
         
     def on_bulk_update_stops(self):
         """Update stop losses on all working orders"""
@@ -609,6 +603,18 @@ class MainWindow:
         else:
             self.log("Auto-stop disabled")
             self.ladder_strategy.stop_position_monitoring()
+            
+    def on_auto_limit_toggled(self, state):
+        """Handle auto-limit toggle"""
+        if state:
+            try:
+                limit_distance = float(self.auto_limit_distance_var.get())
+                self.log(f"Auto-limits enabled - will attach {limit_distance}pt profit targets to new positions")
+            except ValueError:
+                self.log("Invalid auto-limit distance")
+                self.auto_limit_toggle.set_state(False)
+        else:
+            self.log("Auto-limits disabled")
 
     def create_risk_tab(self, parent):
             """Create risk management tab - placeholder for now"""
