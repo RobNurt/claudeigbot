@@ -105,28 +105,46 @@ class IGClient:
         """Get current market price for an epic"""
         try:
             url = f"{self.base_url}/markets/{epic}"
-            response = self.session.get(url)
+            
+            # Add proper headers with version
+            headers = self.session.headers.copy()
+            headers['Version'] = '3'
+            
+            print(f"DEBUG get_market_price: Fetching {url}")
+            print(f"DEBUG get_market_price: Headers = {headers}")
+            
+            response = self.session.get(url, headers=headers)
+            
+            print(f"DEBUG get_market_price: Status = {response.status_code}")
             
             if response.status_code == 200:
                 data = response.json()
+                print(f"DEBUG get_market_price: Response keys = {data.keys()}")
+                
                 snapshot = data.get('snapshot', {})
                 bid = snapshot.get('bid')
                 offer = snapshot.get('offer')
                 mid = (bid + offer) / 2 if bid and offer else None
                 
-                return {
+                result = {
                     'bid': bid,
                     'offer': offer,
                     'mid': mid,
                     'market_status': snapshot.get('marketStatus')
                 }
-            else:
-                return None
                 
+                print(f"DEBUG get_market_price: Result = {result}")
+                return result
+            else:
+                print(f"DEBUG get_market_price: Error - {response.status_code}: {response.text}")
+                return None
+            
         except Exception as e:
-            print(f"Price error: {str(e)}")
+            print(f"DEBUG get_market_price: Exception - {str(e)}")
+            import traceback
+            print(traceback.format_exc())
             return None
-    
+        
     def place_order(self, epic, direction, size, level, order_type="STOP", stop_distance=0, guaranteed_stop=False, limit_distance=0):
         """Place a single working order with optional stop loss and limit"""
         url = f"{self.base_url}/workingorders/otc"
@@ -361,9 +379,291 @@ class IGClient:
                 return response.json().get('markets', [])
             else:
                 return []
-            
-            
-                
+        
         except Exception as e:
             print(f"Search error: {str(e)}")
             return []
+
+    def get_market_details(self, epic):
+        """Get detailed market information including min/max deal sizes"""
+        if not self.logged_in:
+            return None
+        
+        try:
+            url = f"{self.base_url}/markets/{epic}"
+            
+            print(f"DEBUG market_details: Fetching {url}")
+            print(f"DEBUG market_details: Headers = {self.session.headers}")
+            
+            response = self.session.get(url, headers=self.session.headers)
+            
+            print(f"DEBUG market_details: Status = {response.status_code}")
+            
+            if response.status_code == 200:
+                print(f"DEBUG market_details: Full Response = {response.text}")
+                data = response.json()
+                
+                # Extract dealing rules
+                dealing_rules = data.get('dealingRules', {})
+                market_data = data.get('instrument', {})
+                
+                return {
+                    'epic': epic,
+                    'name': market_data.get('name', 'Unknown'),
+                    'type': market_data.get('type', 'Unknown'),
+                    'min_deal_size': float(dealing_rules.get('minDealSize', {}).get('value', 0)),
+                    'max_deal_size': float(dealing_rules.get('maxDealSize', {}).get('value', 0)),  # ✅ CORRECT!
+                    'deal_size_unit': dealing_rules.get('minDealSize', {}).get('unit', 'AMOUNT'),
+                    'min_stop_distance': float(dealing_rules.get('minNormalStopOrLimitDistance', {}).get('value', 0)),
+                    'min_gslo_distance': float(dealing_rules.get('minControlledRiskStopDistance', {}).get('value', 0)),
+                }
+            else:
+                print(f"DEBUG market_details: Error = {response.text}")
+                print(f"Failed to get market details: {response.status_code}")
+                return None
+                
+        except Exception as e:
+            print(f"Error getting market details: {str(e)}")
+            return None
+            
+    def get_historical_prices(self, epic, resolution='DAY', num_points=365):
+        """
+        Get historical price data for an epic
+        
+        resolution: 'MINUTE', 'MINUTE_5', 'MINUTE_15', 'MINUTE_30', 
+                    'HOUR', 'HOUR_4', 'DAY', 'WEEK', 'MONTH'
+        num_points: Number of data points to retrieve
+        """
+        if not self.logged_in:
+            print(f"DEBUG historical: Not logged in")
+            return None
+        
+        try:
+            url = f"{self.base_url}/prices/{epic}"
+            
+            params = {
+                'resolution': resolution,
+                'max': num_points
+            }
+            
+            headers = self.session.headers.copy()
+            headers['Version'] = '3'
+            
+            print(f"DEBUG historical: Fetching {url}")
+            print(f"DEBUG historical: Params = resolution:{resolution}, max:{num_points}")
+            print(f"DEBUG historical: Headers = {headers}")
+            
+            response = self.session.get(url, params=params, headers=headers)
+            
+            print(f"DEBUG historical: Status = {response.status_code}")
+            
+            if response.status_code != 200:
+                print(f"DEBUG historical: Error response = {response.text}")
+                print(f"Historical data error: {response.status_code} - {response.text}")
+                return None
+            
+            data = response.json()
+            print(f"DEBUG historical: Response keys = {data.keys()}")
+            
+            prices = data.get('prices', [])
+            print(f"DEBUG historical: Got {len(prices)} candles")
+            
+            if not prices:
+                print(f"DEBUG historical: prices array is empty")
+                return None
+            
+            # Extract high/low from candles
+            all_highs = []
+            all_lows = []
+            
+            for idx, price in enumerate(prices):
+                snapshot = price.get('snapshot', {})
+                high = snapshot.get('high')
+                low = snapshot.get('low')
+                
+                if idx < 3:  # Print first 3 candles for debugging
+                    print(f"DEBUG historical: Candle {idx}: high={high}, low={low}")
+                
+                if high is not None:
+                    all_highs.append(high)
+                if low is not None:
+                    all_lows.append(low)
+            
+            print(f"DEBUG historical: Collected {len(all_highs)} highs, {len(all_lows)} lows")
+            
+            if all_highs and all_lows:
+                result = {
+                    'high': max(all_highs),
+                    'low': min(all_lows),
+                    'num_candles': len(prices)
+                }
+                print(f"DEBUG historical: Success! High={result['high']}, Low={result['low']}, Candles={result['num_candles']}")
+                return result
+            else:
+                print(f"DEBUG historical: No high/low data found in candles")
+                return None
+                
+        except Exception as e:
+            print(f"DEBUG historical: Exception = {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return None
+
+    
+# ===== UPDATE in ig_client.py - get_all_markets_by_type method =====
+
+    def get_all_markets_by_type(self, market_type):
+        """
+        Get all SPOT markets of a specific type (filters out futures)
+        market_type: 'COMMODITIES', 'INDICES', etc.
+        """
+        if not self.logged_in:
+            return []
+        
+        try:
+            all_markets = []
+            
+            # For commodities, search common terms
+            if market_type == "COMMODITIES":
+                search_terms = ["gold", "silver", "oil", "copper", "gas", "platinum", 
+                            "palladium", "wheat", "corn", "sugar", "coffee", "cotton",
+                            "cocoa", "soybean", "lumber", "crude", "brent", "natural gas"]
+            # For indices, search common terms
+            elif market_type == "INDICES":
+                search_terms = ["index", "dow", "nasdaq", "s&p", "ftse", "dax", "nikkei",
+                            "cac", "asx", "hang seng", "russell", "stoxx", "ibex"]
+            else:
+                search_terms = [""]
+            
+            seen_epics = set()
+            
+            for term in search_terms:
+                try:
+                    url = f"{self.base_url}/markets"
+                    params = {"searchTerm": term}
+                    response = self.session.get(url, params=params)
+                    
+                    if response.status_code == 200:
+                        markets = response.json().get('markets', [])
+                        
+                        # Filter by type and remove duplicates
+                        for market in markets:
+                            epic = market.get('epic')
+                            instrument_type = market.get('instrumentType', '')
+                            instrument_name = market.get('instrumentName', '')
+                            expiry = market.get('expiry', '')
+                            
+                            # Skip if wrong type or duplicate
+                            if epic in seen_epics or instrument_type != market_type:
+                                continue
+                            
+                            # ===== SPOT FILTER - Only include DFB or - expiry =====
+                            if expiry not in ['DFB', '-']:
+                                continue  # Skip futures/monthly contracts
+                            
+                            # Skip mini/micro contracts and weekly/monthly options
+                            skip_terms = ['mini', 'micro', 'weekly', 'monthly', 'month1', 'month2', 'month3']
+                            if any(skip in instrument_name.lower() for skip in skip_terms):
+                                continue
+                            
+                            all_markets.append(market)
+                            seen_epics.add(epic)
+                    
+                    time.sleep(0.2)  # Rate limiting
+                    
+                except Exception as e:
+                    print(f"Error searching term '{term}': {str(e)}")
+                    continue
+            
+            return all_markets
+            
+        except Exception as e:
+            print(f"Error getting markets by type: {str(e)}")
+            return []
+        
+        # ===== ADD TO ig_client.py =====
+
+    def get_historical_prices(self, epic, resolution='DAY', num_points=365):
+        """
+        Get historical price data for an epic
+        
+        resolution: 'MINUTE', 'MINUTE_5', 'MINUTE_15', 'MINUTE_30', 
+                    'HOUR', 'HOUR_4', 'DAY', 'WEEK', 'MONTH'
+        num_points: Number of data points to retrieve (max depends on resolution)
+        """
+        if not self.logged_in:
+            return None
+        
+        try:
+            url = f"{self.base_url}/prices/{epic}"
+            
+            params = {
+                'resolution': resolution,
+                'max': num_points
+            }
+            
+            headers = self.session.headers.copy()
+            headers['Version'] = '3'
+            
+            response = self.session.get(url, params=params, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                prices = data.get('prices', [])
+                
+                if not prices:
+                    return None
+                
+                # Extract high/low from candles
+                all_highs = []
+                all_lows = []
+                
+                for price in prices:
+                    snapshot = price.get('snapshot', {})
+                    high = snapshot.get('high')
+                    low = snapshot.get('low')
+                    
+                    if high is not None:
+                        all_highs.append(high)
+                    if low is not None:
+                        all_lows.append(low)
+                
+                if all_highs and all_lows:
+                    return {
+                        'high': max(all_highs),
+                        'low': min(all_lows),
+                        'num_candles': len(prices)
+                    }
+                else:
+                    return None
+            else:
+                print(f"Historical data error: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"Error getting historical prices: {str(e)}")
+            return None
+
+
+    # ===== HELPER FUNCTION =====
+
+def get_timeframe_params(timeframe):
+    """
+    Get resolution and num_points for different timeframes
+    
+    timeframe: 'Daily', 'Weekly', 'Monthly', 'Annual', 'All-Time'
+    Returns: dict with 'resolution' and 'num_points'
+    """
+    params = {
+        'Daily': {'resolution': 'HOUR', 'num_points': 24},
+        'Weekly': {'resolution': 'HOUR_4', 'num_points': 42},
+        'Monthly': {'resolution': 'DAY', 'num_points': 30},
+        'Quarterly': {'resolution': 'DAY', 'num_points': 90},
+        '6-Month': {'resolution': 'DAY', 'num_points': 180},
+        'Annual': {'resolution': 'DAY', 'num_points': 365},
+        '2-Year': {'resolution': 'WEEK', 'num_points': 104},
+        '5-Year': {'resolution': 'WEEK', 'num_points': 260},
+        'All-Time': {'resolution': 'MONTH', 'num_points': 1200},
+    }
+    
+    return params.get(timeframe, params['Annual'])

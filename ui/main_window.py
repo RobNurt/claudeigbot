@@ -4,6 +4,7 @@ CustomTkinter-based interface for the IG trading bot with modern UI
 """
 
 from concurrent.futures import thread
+from api.market_scanner import CachedMarketScanner
 import customtkinter as ctk
 from tkinter import scrolledtext, messagebox, simpledialog
 import tkinter as tk 
@@ -33,6 +34,7 @@ class ToggleSwitch(ctk.CTkCanvas):
 
         self.bind('<Button-1>', lambda e: self.toggle())
         self.set_state(initial_state)
+        self.market_details_cache = {}
 
     def toggle(self):
         self.set_state(not self.state)
@@ -50,15 +52,16 @@ class ToggleSwitch(ctk.CTkCanvas):
 
 class MainWindow:
     """Main GUI window for trading bot"""
-
     def __init__(self, config, ig_client, ladder_strategy, auto_strategy, risk_manager):
         self.config = config
         self.ig_client = ig_client
+        self.cached_scanner = CachedMarketScanner(ig_client)
         self.ladder_strategy = ladder_strategy
         self.auto_strategy = auto_strategy
         self.risk_manager = risk_manager
         self.root = None
         self.auto_trading = False
+        self.market_details_cache = {} 
 
     def on_limit_toggled(self, state):
         """Handle limit toggle"""
@@ -163,12 +166,14 @@ class MainWindow:
             self.notebook.add("Trading")
             self.notebook.add("Risk Management")
             self.notebook.add("Configuration")
+            self.notebook.add("Market Research")
 
             # Create tab contents
             self.create_connection_tab(self.notebook.tab("Connection"))
             self.create_trading_tab(self.notebook.tab("Trading"))
             self.create_risk_tab(self.notebook.tab("Risk Management"))
             self.create_config_tab(self.notebook.tab("Configuration"))
+            self.create_market_research_tab(self.notebook.tab("Market Research"))
 
             # Bottom section - split into two columns
             bottom_frame = ctk.CTkFrame(self.root, fg_color=bg_dark, corner_radius=0)
@@ -397,7 +402,7 @@ class MainWindow:
         self.offset_var = ctk.StringVar(value="5")
         self.step_var = ctk.StringVar(value="10")
         self.num_orders_var = ctk.StringVar(value="4")
-        self.size_var = ctk.StringVar(value="0.5")
+        self.size_var = ctk.StringVar(value="0.01")
         self.retry_jump_var = ctk.StringVar(value="10")
         self.max_retries_var = ctk.StringVar(value="3")
         self.limit_distance_var = ctk.StringVar(value="5")
@@ -485,10 +490,19 @@ class MainWindow:
         ctk.CTkLabel(mgmt_card, text="pts", font=("Segoe UI", 9),
                     text_color="#9fa6b2").pack(side='left', padx=1)
         
-        # GSLO checkbox
-        ctk.CTkCheckBox(mgmt_card, text="GSLO", variable=self.use_guaranteed_stops,
-                    fg_color=accent_teal, width=55, height=26,
-                    font=("Segoe UI", 9)).pack(side='left', padx=3)
+        # GSLO checkbox - properly bound to BooleanVar
+        ctk.CTkLabel(top_row, text="GSLO:", font=("Segoe UI", 10),
+                    text_color=text_white).pack(side='left', padx=(8, 2))
+
+        self.gslo_checkbox = ctk.CTkCheckBox(
+            top_row, text="", 
+            variable=self.use_guaranteed_stops,
+            command=lambda: self.log(f"GSLO {'ON' if self.use_guaranteed_stops.get() else 'OFF'} - will apply to next ladder"),
+            fg_color=accent_teal, 
+            width=20, height=26,
+            font=("Segoe UI", 9)
+        )
+        self.gslo_checkbox.pack(side='left', padx=1)
         
         ctk.CTkButton(mgmt_card, text="Update",
                     command=self.on_bulk_update_stops,
@@ -535,7 +549,7 @@ class MainWindow:
                     text_color="#9fa6b2").pack(side='left', padx=2)    
         
     def on_bulk_update_stops(self):
-        """Update stop losses on all working orders"""
+        """Update stop losses on all working orders - preserving GSLO if present"""
         if not self.ig_client.logged_in:
             self.log("Not connected")
             return
@@ -547,7 +561,16 @@ class MainWindow:
                 self.log("Stop distance must be greater than 0")
                 return
             
+            # Ask if user wants to preserve GSLO on orders that have it
+            preserve_gslo = messagebox.askyesno(
+                "Preserve GSLO?",
+                "Do you want to keep Guaranteed stops on orders that already have them?\n\n"
+                "YES = Keep GSLO on orders that have it\n"
+                "NO = Change all to regular stops"
+            )
+            
             self.log(f"Updating all working order stops to {stop_distance} points...")
+            self.log(f"GSLO preservation: {'ENABLED' if preserve_gslo else 'DISABLED'}")
             
             # Run in background thread
             def update_stops():
@@ -564,18 +587,27 @@ class MainWindow:
                     try:
                         order_data = order.get('workingOrderData', {})
                         deal_id = order_data.get('dealId')
-                        current_level = order_data.get('level')
+                        current_level = order_data.get('orderLevel')  # Note: orderLevel not level
+                        current_gslo = order_data.get('guaranteedStop', False)
+                        
+                        # Decide GSLO for this order
+                        use_gslo = current_gslo if preserve_gslo else False
                         
                         if deal_id and current_level:
                             success, message = self.ig_client.update_working_order(
-                                deal_id, current_level, stop_distance=stop_distance
+                                deal_id, 
+                                current_level, 
+                                stop_distance=stop_distance,
+                                guaranteed_stop=use_gslo  # Pass GSLO flag
                             )
                             
                             if success:
                                 updated += 1
+                                gslo_status = "GSLO" if use_gslo else "Regular"
+                                self.log(f"✓ Updated {deal_id}: {stop_distance}pts ({gslo_status})")
                             else:
                                 failed += 1
-                                self.log(f"Failed to update {deal_id}: {message}")
+                                self.log(f"✗ Failed {deal_id}: {message}")
                             
                             time.sleep(0.3)  # Rate limiting
                     except Exception as e:
@@ -589,7 +621,7 @@ class MainWindow:
             
         except ValueError:
             self.log("Invalid stop distance value")
-
+            
     def on_auto_stop_toggled(self, state):
         """Handle auto-stop toggle"""
         if state:
@@ -617,26 +649,770 @@ class MainWindow:
             self.log("Auto-limits disabled")
 
     def create_risk_tab(self, parent):
-            """Create risk management tab - placeholder for now"""
-            card_bg = "#252a31"
-            text_white = "#f4f5f7"
+        """Create comprehensive risk management tab"""
+        card_bg = "#252a31"
+        text_white = "#f4f5f7"
+        accent_teal = "#3a9d8e"
+        bg_dark = "#1e2228"
+        
+        # Make scrollable
+        scrollable = ctk.CTkScrollableFrame(parent, fg_color=bg_dark)
+        scrollable.pack(fill="both", expand=True, padx=20, pady=10)
+        
+        # === ENABLE/DISABLE RISK MANAGEMENT ===
+        enable_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        enable_frame.pack(fill="x", pady=(0, 10))
+        
+        self.enable_risk_var = ctk.BooleanVar(value=True)
+        
+        header_row = ctk.CTkFrame(enable_frame, fg_color=card_bg)
+        header_row.pack(fill="x", padx=15, pady=15)
+        
+        ctk.CTkLabel(header_row, text="Risk Management",
+                    font=("Segoe UI", 14, "bold"), text_color=text_white).pack(side="left")
+        
+        ctk.CTkSwitch(header_row, text="Enabled", variable=self.enable_risk_var,
+                    command=self.on_risk_toggle,
+                    fg_color=accent_teal, progress_color=accent_teal,
+                    font=("Segoe UI", 11, "bold")).pack(side="right")
+        
+        # === MARGIN LIMITS ===
+        self.margin_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        self.margin_frame.pack(fill="x", pady=(0, 10))
+        
+        ctk.CTkLabel(self.margin_frame, text="Margin Limits",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(10, 5), padx=15, anchor="w")
+        
+        # Margin warning
+        margin_row1 = ctk.CTkFrame(self.margin_frame, fg_color=card_bg)
+        margin_row1.pack(fill="x", padx=15, pady=5)
+        
+        self.margin_warning_var = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(margin_row1, text="Warn when margin exceeds:",
+                    variable=self.margin_warning_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.margin_warning_percent = ctk.StringVar(value="30")
+        ctk.CTkEntry(margin_row1, textvariable=self.margin_warning_percent,
+                    width=50, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(margin_row1, text="%", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left")
+        
+        # Block trading at margin limit
+        margin_row2 = ctk.CTkFrame(self.margin_frame, fg_color=card_bg)
+        margin_row2.pack(fill="x", padx=15, pady=(0, 10))
+        
+        self.margin_block_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(margin_row2, text="Block trading when margin exceeds:",
+                    variable=self.margin_block_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.margin_block_percent = ctk.StringVar(value="50")
+        ctk.CTkEntry(margin_row2, textvariable=self.margin_block_percent,
+                    width=50, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(margin_row2, text="%", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left")
+        
+        # === DAILY LIMITS ===
+        self.daily_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        self.daily_frame.pack(fill="x", pady=(0, 10))
+        
+        ctk.CTkLabel(self.daily_frame, text="Daily Limits",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(10, 5), padx=15, anchor="w")
+        
+        # Max loss per day
+        loss_row = ctk.CTkFrame(self.daily_frame, fg_color=card_bg)
+        loss_row.pack(fill="x", padx=15, pady=5)
+        
+        self.daily_loss_limit_var = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(loss_row, text="Maximum daily loss:",
+                    variable=self.daily_loss_limit_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(loss_row, text="£", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left", padx=2)
+        
+        self.daily_loss_amount = ctk.StringVar(value="500")
+        ctk.CTkEntry(loss_row, textvariable=self.daily_loss_amount,
+                    width=80, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        # Max profit target
+        profit_row = ctk.CTkFrame(self.daily_frame, fg_color=card_bg)
+        profit_row.pack(fill="x", padx=15, pady=5)
+        
+        self.daily_profit_target_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(profit_row, text="Stop trading after profit:",
+                    variable=self.daily_profit_target_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(profit_row, text="£", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left", padx=2)
+        
+        self.daily_profit_amount = ctk.StringVar(value="1000")
+        ctk.CTkEntry(profit_row, textvariable=self.daily_profit_amount,
+                    width=80, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        # Max trades per day
+        trades_row = ctk.CTkFrame(self.daily_frame, fg_color=card_bg)
+        trades_row.pack(fill="x", padx=15, pady=(0, 10))
+        
+        self.max_trades_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(trades_row, text="Maximum trades per day:",
+                    variable=self.max_trades_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.max_trades_amount = ctk.StringVar(value="20")
+        ctk.CTkEntry(trades_row, textvariable=self.max_trades_amount,
+                    width=60, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        # === POSITION LIMITS ===
+        self.position_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        self.position_frame.pack(fill="x", pady=(0, 10))
+        
+        ctk.CTkLabel(self.position_frame, text="Position Limits",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(10, 5), padx=15, anchor="w")
+        
+        # Max open positions
+        pos_row = ctk.CTkFrame(self.position_frame, fg_color=card_bg)
+        pos_row.pack(fill="x", padx=15, pady=5)
+        
+        self.max_positions_var = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(pos_row, text="Maximum open positions:",
+                    variable=self.max_positions_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.max_positions_amount = ctk.StringVar(value="5")
+        ctk.CTkEntry(pos_row, textvariable=self.max_positions_amount,
+                    width=60, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        # Max position size
+        size_row = ctk.CTkFrame(self.position_frame, fg_color=card_bg)
+        size_row.pack(fill="x", padx=15, pady=(0, 10))
+        
+        self.max_size_var = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(size_row, text="Maximum position size:",
+                    variable=self.max_size_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.max_size_amount = ctk.StringVar(value="2.0")
+        ctk.CTkEntry(size_row, textvariable=self.max_size_amount,
+                    width=60, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(size_row, text="contracts", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left", padx=5)
+        
+        # === RISK/REWARD RATIOS ===
+        self.ratio_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        self.ratio_frame.pack(fill="x", pady=(0, 10))
+        
+        ctk.CTkLabel(self.ratio_frame, text="Risk/Reward",
+                    font=("Segoe UI", 12, "bold"), text_color=text_white).pack(pady=(10, 5), padx=15, anchor="w")
+        
+        ratio_row = ctk.CTkFrame(self.ratio_frame, fg_color=card_bg)
+        ratio_row.pack(fill="x", padx=15, pady=(0, 10))
+        
+        self.min_rr_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(ratio_row, text="Minimum risk/reward ratio:",
+                    variable=self.min_rr_var,
+                    fg_color=accent_teal, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        self.min_rr_amount = ctk.StringVar(value="1.5")
+        ctk.CTkEntry(ratio_row, textvariable=self.min_rr_amount,
+                    width=60, height=30, font=("Segoe UI", 11)).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(ratio_row, text=":1", font=("Segoe UI", 11),
+                    text_color=text_white).pack(side="left")
+
+    def on_risk_toggle(self):
+        """Enable/disable all risk management controls"""
+        enabled = self.enable_risk_var.get()
+        
+        if enabled:
+            self.log("Risk management ENABLED")
+            # Enable all frames
+            for frame in [self.margin_frame, self.daily_frame, self.position_frame, self.ratio_frame]:
+                for child in frame.winfo_children():
+                    self._enable_widget(child)
+        else:
+            self.log("Risk management DISABLED - Trading without safety checks")
+            # Gray out all frames
+            for frame in [self.margin_frame, self.daily_frame, self.position_frame, self.ratio_frame]:
+                for child in frame.winfo_children():
+                    self._disable_widget(child)
+
+    def _enable_widget(self, widget):
+        """Recursively enable a widget and its children"""
+        try:
+            if isinstance(widget, (ctk.CTkFrame, ctk.CTkScrollableFrame)):
+                for child in widget.winfo_children():
+                    self._enable_widget(child)
+            else:
+                widget.configure(state="normal")
+        except:
+            pass
+
+    def _disable_widget(self, widget):
+        """Recursively disable a widget and its children"""
+        try:
+            if isinstance(widget, (ctk.CTkFrame, ctk.CTkScrollableFrame)):
+                for child in widget.winfo_children():
+                    self._disable_widget(child)
+            else:
+                widget.configure(state="disabled")
+        except:
+            pass
+
+    
+    def create_market_research_tab(self, parent):
+        card_bg = "#252a31"
+        text_white = "#f4f5f7"
+        accent_teal = "#5aa89a"
+        bg_dark = "#1e2228"
+        text_gray = "#9fa6b2"
+
+        # --- Market Scanner Section ---
+        scanner_frame = ctk.CTkFrame(parent, fg_color=card_bg, corner_radius=10)
+        scanner_frame.pack(fill="both", expand=True, pady=(0, 10))
+
+        ctk.CTkLabel(
+            scanner_frame, text="Market Scanner",
+            font=("Segoe UI", 14, "bold"), text_color=text_white
+        ).pack(pady=(15, 10), padx=15, anchor="w")
+
+        # --- FIX: Create control_row BEFORE using it ---
+        control_row = ctk.CTkFrame(scanner_frame, fg_color=card_bg)
+        control_row.pack(fill="x", padx=15, pady=(0, 10))
+
+        # Now add widgets to control_row
+        ctk.CTkLabel(control_row, text="Filter:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
+        self.scanner_filter_var = ctk.StringVar(value="All")
+        filter_combo = ctk.CTkComboBox(
+            control_row,
+            variable=self.scanner_filter_var,
+            values=["All", "Commodities", "Indices"],
+            width=130, height=35,
+            fg_color=card_bg, button_color=accent_teal,
+            font=("Segoe UI", 11)
+        )
+        filter_combo.pack(side="left", padx=5)
+
+        # ... (other controls, e.g. timeframe, mode, limit, sort, etc.)
+
+        ctk.CTkLabel(control_row, text="Mode:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        self.scan_mode_var = ctk.StringVar(value="yahoo_only")
+        ctk.CTkRadioButton(
+            control_row, text="Yahoo Only (Fast)",
+            variable=self.scan_mode_var, value="yahoo_only",
+            fg_color=accent_teal, font=("Segoe UI", 10)
+        ).pack(side="left", padx=2)
+        ctk.CTkRadioButton(
+            control_row, text="Yahoo + IG Prices",
+            variable=self.scan_mode_var, value="full",
+            fg_color=accent_teal, font=("Segoe UI", 10)
+        ).pack(side="left", padx=2)
+
+    def create_market_research_tab(self, parent):
+        # --- Color and style setup ---
+        card_bg = "#252a31"
+        text_white = "#f4f5f7"
+        accent_teal = "#5aa89a"
+        bg_dark = "#1e2228"
+        text_gray = "#9fa6b2"
+
+        # --- Make scrollable area first ---
+        scrollable = ctk.CTkScrollableFrame(parent, fg_color=bg_dark)
+        scrollable.pack(fill="both", expand=True, padx=20, pady=10)
+
+        # === MARKET SCANNER ===
+        scanner_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        scanner_frame.pack(fill="both", expand=True, pady=(0, 10))
+
+        ctk.CTkLabel(
+            scanner_frame, text="Market Scanner",
+            font=("Segoe UI", 14, "bold"), text_color=text_white
+        ).pack(pady=(15, 10), padx=15, anchor="w")
+
+        # --- Scanner controls row ---
+        control_row = ctk.CTkFrame(scanner_frame, fg_color=card_bg)
+        control_row.pack(fill="x", padx=15, pady=(0, 10))
+
+        ctk.CTkLabel(control_row, text="Filter:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
+        self.scanner_filter_var = ctk.StringVar(value="All")
+        filter_combo = ctk.CTkComboBox(
+            control_row,
+            variable=self.scanner_filter_var,
+            values=["All", "Commodities", "Indices"],
+            width=130, height=35,
+            fg_color=card_bg, button_color=accent_teal,
+            font=("Segoe UI", 11)
+        )
+        filter_combo.pack(side="left", padx=5)
+
+        ctk.CTkLabel(control_row, text="Timeframe:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        self.scanner_timeframe_var = ctk.StringVar(value="Annual")
+        timeframe_combo = ctk.CTkComboBox(
+            control_row,
+            variable=self.scanner_timeframe_var,
+            values=["Daily", "Weekly", "Monthly", "Quarterly", "6-Month", "Annual", "2-Year", "5-Year", "All-Time"],
+            width=130, height=35,
+            fg_color=card_bg, button_color=accent_teal,
+            font=("Segoe UI", 11)
+        )
+        timeframe_combo.pack(side="left", padx=5)
+
+        # --- Scan mode selection ---
+        ctk.CTkLabel(control_row, text="Mode:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        self.scan_mode_var = ctk.StringVar(value="yahoo_only")
+        ctk.CTkRadioButton(
+            control_row, text="Yahoo Only (Fast)",
+            variable=self.scan_mode_var, value="yahoo_only",
+            fg_color=accent_teal, font=("Segoe UI", 10)
+        ).pack(side="left", padx=2)
+        ctk.CTkRadioButton(
+            control_row, text="Yahoo + IG Prices",
+            variable=self.scan_mode_var, value="full",
+            fg_color=accent_teal, font=("Segoe UI", 10)
+        ).pack(side="left", padx=2)
+
+        # --- Market limit control ---
+        ctk.CTkLabel(control_row, text="Limit:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        self.scanner_limit_var = ctk.StringVar(value="5")
+        limit_entry = ctk.CTkEntry(
+            control_row,
+            textvariable=self.scanner_limit_var,
+            width=50, height=35,
+            font=("Segoe UI", 11),
+            placeholder_text="0=All"
+        )
+        limit_entry.pack(side="left", padx=5)
+        ctk.CTkLabel(control_row, text="markets",
+                    font=("Segoe UI", 10), text_color=text_gray).pack(side="left", padx=2)
+
+        ctk.CTkLabel(control_row, text="Sort by:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        self.scanner_sort_var = ctk.StringVar(value="Position %")
+        sort_combo = ctk.CTkComboBox(
+            control_row,
+            variable=self.scanner_sort_var,
+            values=["Position %", "Name", "Price"],
+            width=130, height=35,
+            fg_color=card_bg, button_color=accent_teal,
+            font=("Segoe UI", 11)
+        )
+        sort_combo.pack(side="left", padx=5)
+
+        # --- Include closed markets checkbox ---
+        self.include_closed_var = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            control_row,
+            text="Include Closed",
+            variable=self.include_closed_var,
+            fg_color=accent_teal,
+            font=("Segoe UI", 10)
+        ).pack(side="left", padx=(15, 5))
+
+        # --- Scan button ---
+        ctk.CTkButton(control_row, text="🔄 Scan Markets",
+                    command=self.on_scan_markets,
+                    fg_color=accent_teal, hover_color="#6abaa8",
+                    font=("Segoe UI", 11, "bold"),
+                    width=150, height=35).pack(side="left", padx=10)
+
+        # --- Scanner results display ---
+        from tkinter import scrolledtext
+        self.scanner_results = scrolledtext.ScrolledText(
+            scanner_frame,
+            width=100,
+            height=20,
+            bg=card_bg,
+            fg=text_white,
+            font=("Consolas", 9),
+            relief="flat",
+            borderwidth=0,
+            insertbackground=accent_teal,
+        )
+        self.scanner_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        # ... configure tags and insert initial messages as in your original code ...
+
+        # === MARKET SEARCH ===
+        search_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        search_frame.pack(fill="both", expand=True, pady=(0, 10))
+
+        ctk.CTkLabel(search_frame, text="Market Search",
+                    font=("Segoe UI", 14, "bold"), text_color=text_white
+        ).pack(pady=(15, 10), padx=15, anchor="w")
+
+        # --- Search input row ---
+        search_row = ctk.CTkFrame(search_frame, fg_color=card_bg)
+        search_row.pack(fill="x", padx=15, pady=(0, 10))
+        ctk.CTkLabel(search_row, text="Search Term:",
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
+        self.market_search_var = ctk.StringVar()
+        search_entry = ctk.CTkEntry(search_row, textvariable=self.market_search_var,
+                                    width=250, height=35, font=("Segoe UI", 11),
+                                    placeholder_text="e.g. Russell, Gold, DAX, FTSE...")
+        search_entry.pack(side="left", padx=5)
+        ctk.CTkButton(search_row, text="🔍 Search",
+                    command=self.on_search_markets_tab,
+                    fg_color=accent_teal, hover_color="#6abaa8",
+                    font=("Segoe UI", 11, "bold"),
+                    width=120, height=35).pack(side="left", padx=5)
+
+        # --- Quick search buttons ---
+        quick_frame = ctk.CTkFrame(search_frame, fg_color=card_bg)
+        quick_frame.pack(fill="x", padx=15, pady=(0, 10))
+        ctk.CTkLabel(quick_frame, text="Quick Search:",
+                    font=("Segoe UI", 10), text_color=text_white).pack(side="left", padx=5)
+        quick_searches = ["Gold", "Silver", "Oil", "Russell", "S&P 500", "FTSE", "DAX"]
+        for term in quick_searches:
+            ctk.CTkButton(quick_frame, text=term,
+                        command=lambda t=term: self.quick_search(t),
+                        fg_color="#3e444d", hover_color="#4a5159",
+                        width=70, height=28,
+                        font=("Segoe UI", 9)).pack(side="left", padx=2)
+
+        # --- Search results display ---
+        self.market_search_results = scrolledtext.ScrolledText(
+            search_frame,
+            width=100,
+            height=15,
+            bg=card_bg,
+            fg=text_white,
+            font=("Consolas", 9),
+            relief="flat",
+            borderwidth=0,
+            insertbackground=accent_teal,
+        )
+        self.market_search_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+
+        
+        # Configure tags for formatting
+        self.scanner_results.tag_config("header", foreground=accent_teal, font=("Consolas", 10, "bold"))
+        self.scanner_results.tag_config("low", foreground="#00d084", font=("Consolas", 9, "bold"))  # Green
+        self.scanner_results.tag_config("mid", foreground="#e8b339", font=("Consolas", 9))  # Yellow
+        self.scanner_results.tag_config("high", foreground="#ed6347", font=("Consolas", 9, "bold"))  # Red
+        self.scanner_results.tag_config("neutral", foreground="#9fa6b2")
+        
+        # Initial message
+        self.scanner_results.insert("1.0", "📊 Market Scanner\n\n", "header")
+        self.scanner_results.insert("end", "Click 'Scan Markets' to analyze commodities and indices\n\n", "neutral")
+        self.scanner_results.insert("end", "Features:\n", "header")
+        self.scanner_results.insert("end", "• Filter by Commodities, Indices, or All\n", "neutral")
+        self.scanner_results.insert("end", "• Choose timeframe (Daily to All-Time)\n", "neutral")
+        self.scanner_results.insert("end", "• Real historical data from IG API\n", "neutral")
+        self.scanner_results.insert("end", "• Works even when markets are closed\n", "neutral")
+        self.scanner_results.insert("end", "• Identifies trading opportunities\n\n", "neutral")
+        self.scanner_results.insert("end", "🟢 Green = Near lows (potential BUY)\n", "low")
+        self.scanner_results.insert("end", "🟡 Yellow = Mid-range\n", "mid")
+        self.scanner_results.insert("end", "🔴 Red = Near highs (potential SELL)\n", "high")
+        
+        # === MARKET SEARCH ===
+        search_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
+        search_frame.pack(fill="both", expand=True, pady=(0, 10))
+        
+        ctk.CTkLabel(search_frame, text="Market Search",
+                    font=("Segoe UI", 14, "bold"), text_color=text_white).pack(pady=(15, 10), padx=15, anchor="w")
+        
+        # Search input row
+        search_row = ctk.CTkFrame(search_frame, fg_color=card_bg)
+        search_row.pack(fill="x", padx=15, pady=(0, 10))
+        
+        ctk.CTkLabel(search_row, text="Search Term:", 
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
+        
+        self.market_search_var = ctk.StringVar()
+        search_entry = ctk.CTkEntry(search_row, textvariable=self.market_search_var,
+                                    width=250, height=35, font=("Segoe UI", 11),
+                                    placeholder_text="e.g. Russell, Gold, DAX, FTSE...")
+        search_entry.pack(side="left", padx=5)
+        
+        # Search button
+        ctk.CTkButton(search_row, text="🔍 Search", 
+                    command=self.on_search_markets_tab,
+                    fg_color=accent_teal, hover_color="#6abaa8",
+                    font=("Segoe UI", 11, "bold"),
+                    width=120, height=35).pack(side="left", padx=5)
+        
+        # Quick search buttons
+        quick_frame = ctk.CTkFrame(search_frame, fg_color=card_bg)
+        quick_frame.pack(fill="x", padx=15, pady=(0, 10))
+        
+        ctk.CTkLabel(quick_frame, text="Quick Search:", 
+                    font=("Segoe UI", 10), text_color=text_white).pack(side="left", padx=5)
+        
+        quick_searches = ["Gold", "Silver", "Oil", "Russell", "S&P 500", "FTSE", "DAX"]
+        for term in quick_searches:
+            ctk.CTkButton(quick_frame, text=term,
+                        command=lambda t=term: self.quick_search(t),
+                        fg_color="#3e444d", hover_color="#4a5159",
+                        width=70, height=28,
+                        font=("Segoe UI", 9)).pack(side="left", padx=2)
+        
+        # Search results display
+        self.market_search_results = scrolledtext.ScrolledText(
+            search_frame,
+            width=100,
+            height=15,
+            bg=card_bg,
+            fg=text_white,
+            font=("Consolas", 9),
+            relief="flat",
+            borderwidth=0,
+            insertbackground=accent_teal,
+        )
+        self.market_search_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        
+        # Configure tags for search results
+        self.market_search_results.tag_config("header", foreground=accent_teal, font=("Consolas", 10, "bold"))
+        self.market_search_results.tag_config("epic", foreground="#e8b339", font=("Consolas", 9, "bold"))
+        self.market_search_results.tag_config("name", foreground=text_white)
+        self.market_search_results.tag_config("type", foreground="#9fa6b2")
+        
+    def get_cached_market_details(self, epic):
+        """Get market details with caching"""
+        if epic not in self.market_details_cache:
+            self.log(f"Fetching market details for {epic}...")
+            details = self.ig_client.get_market_details(epic)
+            if details:
+                self.market_details_cache[epic] = details
+                self.log(f"Min size: {details['min_deal_size']}, Max size: {details['max_deal_size']}")
+            return details
+        return self.market_details_cache[epic]
+
+    def on_search_markets_tab(self):
+        """Handle market search from the research tab"""
+        if not self.ig_client.logged_in:
+            self.log("Not connected")
+            self.market_search_results.delete(1.0, tk.END)
+            self.market_search_results.insert(tk.END, "⚠️ Please connect to IG first\n\n")
+            return
+        
+        search_term = self.market_search_var.get().strip()
+        
+        if not search_term:
+            self.market_search_results.delete(1.0, tk.END)
+            self.market_search_results.insert(tk.END, "Please enter a search term\n")
+            return
+        
+        self.log(f"Searching for '{search_term}'...")
+        self.market_search_results.delete(1.0, tk.END)
+        self.market_search_results.insert(tk.END, f"Searching for '{search_term}'...\n\n")
+        
+        # Run search in background
+        def do_search():
+            markets = self.ig_client.search_markets(search_term)
             
-            placeholder = ctk.CTkFrame(parent, fg_color=card_bg, corner_radius=10)
-            placeholder.pack(expand=True, padx=20, pady=20)
+            def update_results():
+                self.market_search_results.delete(1.0, tk.END)
+                
+                if markets:
+                    self.market_search_results.insert(tk.END, 
+                        f"Found {len(markets)} results for '{search_term}'\n", "header")
+                    self.market_search_results.insert(tk.END, "="*80 + "\n\n")
+                    
+                    for i, market in enumerate(markets[:20], 1):  # Show top 20
+                        epic = market.get("epic", "N/A")
+                        instrument_name = market.get("instrumentName", "N/A")
+                        instrument_type = market.get("instrumentType", "N/A")
+                        expiry = market.get("expiry", "N/A")
+                        
+                        self.market_search_results.insert(tk.END, f"{i}. ", "header")
+                        self.market_search_results.insert(tk.END, f"{epic}\n", "epic")
+                        self.market_search_results.insert(tk.END, f"   Name: {instrument_name}\n", "name")
+                        self.market_search_results.insert(tk.END, f"   Type: {instrument_type}", "type")
+                        if expiry != "N/A" and expiry != "-":
+                            self.market_search_results.insert(tk.END, f" | Expiry: {expiry}", "type")
+                        self.market_search_results.insert(tk.END, "\n\n")
+                    
+                    if len(markets) > 20:
+                        self.market_search_results.insert(tk.END, 
+                            f"\n(Showing top 20 of {len(markets)} results)\n", "type")
+                    
+                    self.log(f"Found {len(markets)} markets for '{search_term}'")
+                else:
+                    self.market_search_results.insert(tk.END, 
+                        f"No markets found for '{search_term}'\n\n", "name")
+                    self.market_search_results.insert(tk.END, 
+                        "Try different keywords or check spelling", "type")
+                    self.log(f"No results for '{search_term}'")
             
-            ctk.CTkLabel(
-                placeholder,
-                text="Risk Management Features",
-                font=("Segoe UI", 14, "bold"),
-                text_color=text_white
-            ).pack(pady=20)
+            self.root.after(0, update_results)
+        
+        thread = threading.Thread(target=do_search, daemon=True)
+        thread.start()
+
+    def quick_search(self, term):
+        """Quick search for common markets"""
+        self.market_search_var.set(term)
+        self.on_search_markets_tab()
+
+    def on_scan_markets(self):
+        """Scan with intelligent caching"""
+        if not self.ig_client.logged_in:
+            self.log("Not connected")
+            self.scanner_results.delete(1.0, tk.END)
+            self.scanner_results.insert(tk.END, "⚠️ Please connect to IG first\n\n")
+            return
+        
+        filter_type = self.scanner_filter_var.get()
+        timeframe = self.scanner_timeframe_var.get()
+        include_closed = self.include_closed_var.get()
+
+        
+    
+        
+        scan_mode = self.scan_mode_var.get()
+        if scan_mode == "yahoo_only":
+
+            self.log("Scanning with Yahoo Finance only (zero IG quota)")
+                
+            def do_yahoo_scan():
+                scan_results, stats = self.cached_scanner.scan_markets_yahoo_only(
+                    filter_type, timeframe, include_closed, market_limit, self.log
+                )
+                
+                # Store results for later price fetching
+                self.current_scan_results = scan_results
+                
+                # Display results WITHOUT prices
+                self.display_yahoo_only_results(scan_results, stats, timeframe)
+                
+                # Show "Get Prices" button
+                self.root.after(0, lambda: self.get_prices_btn.pack(side="left", padx=5))
             
-            ctk.CTkLabel(
-                placeholder,
-                text="Account overview and risk limits will appear here.\nFunctionality coming soon!",
-                font=("Segoe UI", 11),
-                text_color="#9fa6b2"
-            ).pack(pady=10)
+            thread = threading.Thread(target=do_yahoo_scan, daemon=True)
+            thread.start()
+
+        try:
+            market_limit = int(self.scanner_limit_var.get())
+            if market_limit == 0:
+                market_limit = None  # No limit
+        except:
+            market_limit = 5  # Default
+        
+        # Get cache status
+        cache_summary = self.cached_scanner.get_cache_summary()
+        
+        self.log(f"Scanning {filter_type} ({timeframe})")
+        self.log(f"Cache status: {cache_summary}")
+        
+        self.scanner_results.delete(1.0, tk.END)
+        self.scanner_results.insert(tk.END, f"🔄 Scanning {filter_type} ({timeframe})...\n\n", "header")
+        self.scanner_results.insert(tk.END, f"💾 Cache: {cache_summary}\n", "neutral")
+        self.scanner_results.insert(tk.END, "⚡ Fast mode: Only fetching current prices for cached markets\n\n", "neutral")
+        
+        def do_scan():
+            try:
+                # Use cached scanner
+                scan_results, stats = self.cached_scanner.scan_markets(
+                    filter_type, timeframe, include_closed, market_limit, self.log
+                )
+                
+                # Log statistics
+                self.log(f"Scan complete: {len(scan_results)} markets")
+                self.log(f"  Cached: {stats['cached']}, Fresh: {stats['fetched']}")
+                self.log(f"  Failed: {stats['failed']}, Skipped: {stats['skipped']}")
+                
+                # Display results
+                def update_display():
+                    self.scanner_results.delete(1.0, tk.END)
+                    
+                    if scan_results:
+                        self.scanner_results.insert(tk.END, 
+                            f"✓ Market Scanner - {filter_type} ({timeframe})\n\n", "header")
+                        self.scanner_results.insert(tk.END, 
+                            f"Successfully scanned {len(scan_results)} markets\n", "neutral")
+                        self.scanner_results.insert(tk.END, 
+                            f"💾 Cached: {stats['cached']} | 📡 Fresh: {stats['fetched']} | ✗ Failed: {stats['failed']}\n", "neutral")
+                        self.scanner_results.insert(tk.END, "="*110 + "\n\n", "header")
+                        
+                        # Sort results
+                        sort_by = self.scanner_sort_var.get()
+                        if sort_by == "Position %":
+                            scan_results.sort(key=lambda x: x['position_pct'])
+                        elif sort_by == "Name":
+                            scan_results.sort(key=lambda x: x['name'])
+                        elif sort_by == "Price":
+                            scan_results.sort(key=lambda x: x['price'], reverse=True)
+                        
+                        # Header
+                        header = f"{'Market':<35} {'Status':>10} {'Price':>12} {'Position':>15} {'Signal':>10}\n"
+                        self.scanner_results.insert(tk.END, header, "header")
+                        self.scanner_results.insert(tk.END, "-"*110 + "\n", "neutral")
+                        
+                        # Display each market
+                        for result in scan_results:
+                            if result['position_pct'] < 30:
+                                tag = "low"
+                                signal = "🟢 LOW"
+                            elif result['position_pct'] > 70:
+                                tag = "high"
+                                signal = "🔴 HIGH"
+                            else:
+                                tag = "mid"
+                                signal = "🟡 MID"
+                            
+                            name = result['name'][:34]
+                            status = "CLOSED" if result['is_closed'] else "OPEN"
+                            price = f"{result['price']:,.2f}"
+                            position = f"{result['position_pct']:.1f}%"
+                            
+                            bar_length = 10
+                            filled = int((result['position_pct'] / 100) * bar_length)
+                            bar = "█" * filled + "░" * (bar_length - filled)
+                            
+                            row = f"{name:<35} {status:>10} {price:>12} {bar} {position:>4} "
+                            self.scanner_results.insert(tk.END, row)  # Insert row without tag
+                        
+                        # Summary
+                        near_low = [r for r in scan_results if r['position_pct'] < 30]
+                        near_high = [r for r in scan_results if r['position_pct'] > 70]
+                        
+                        self.scanner_results.insert(tk.END, f"{signal:>10}\n", tag)  # Only tag the signal
+                        
+                        if near_low:
+                            self.scanner_results.insert(tk.END, 
+                                f"🟢 NEAR LOW ({len(near_low)} markets):\n", "low")
+                            for m in sorted(near_low, key=lambda x: x['position_pct'])[:3]:
+                                marker = " 🔒" if m['is_closed'] else ""
+                                self.scanner_results.insert(tk.END, 
+                                    f"   • {m['name'][:28]:<30} {m['position_pct']:>5.1f}%{marker}\n", "low")
+                        
+                        if near_high:
+                            self.scanner_results.insert(tk.END, 
+                                f"\n🔴 NEAR HIGH ({len(near_high)} markets):\n", "high")
+                            for m in sorted(near_high, key=lambda x: x['position_pct'], reverse=True)[:3]:
+                                marker = " 🔒" if m['is_closed'] else ""
+                                self.scanner_results.insert(tk.END, 
+                                    f"   • {m['name'][:28]:<30} {m['position_pct']:>5.1f}%{marker}\n", "high")
+                        
+                        # Cache info
+                        self.scanner_results.insert(tk.END, "\n\n")
+                        self.scanner_results.insert(tk.END, 
+                            f"💾 Cache: Historical data cached for 24 hours\n", "neutral")
+                        self.scanner_results.insert(tk.END, 
+                            f"   Next scan will be MUCH faster (only price updates)\n", "neutral")
+                        
+                    else:
+                        self.scanner_results.insert(tk.END, "No markets scanned\n")
+                
+                self.root.after(0, update_display)
+                
+            except Exception as e:
+                self.log(f"Scan error: {str(e)}")
+                import traceback
+                self.log(traceback.format_exc())
+        
+        thread = threading.Thread(target=do_scan, daemon=True)
+        thread.start()
 
     def create_config_tab(self, parent):
         """Create configuration tab - placeholder for now"""
@@ -933,26 +1709,42 @@ class MainWindow:
                 self.log("Failed to get price")
 
     def on_place_ladder(self):
-        """Handle place ladder button with optional feature checks"""
+        """Handle place ladder button with automatic size checking"""
         
-        # CHECK FOR CANCEL FIRST - before anything else
-        if self.ladder_btn.cget("text") == "Cancel Ladder":
+        # Check for cancel
+        if self.ladder_btn.cget("text") == "CANCEL LADDER":
             self.ladder_strategy.cancel_requested = True
             self.log("Cancelling ladder placement...")
             return
         
-        # NOW check if connected
+        # Check connection
         if not self.ig_client.logged_in:
             self.log("Not connected")
             return
 
-        # Disable button and change to Cancel
-        self.ladder_btn.configure(state="normal", text="Cancel Ladder")
+        # Change button to cancel mode
+        self.ladder_btn.configure(
+            state="normal", 
+            text="CANCEL LADDER",
+            fg_color="#ed6347",
+            hover_color="#ee4626"
+        )
         
         try:
-            # Get all the parameters FIRST
+            # Get parameters
             selected_market = self.market_var.get()
             epic = self.config.markets.get(selected_market)
+            
+            if not epic:
+                self.log(f"ERROR: Market '{selected_market}' not found in config")
+                self.ladder_btn.configure(
+                    state="normal", 
+                    text="PLACE LADDER",
+                    fg_color="#3b9f6f",
+                    hover_color="#4ab080"
+                )
+                return
+            
             direction = self.direction_var.get()
             start_offset = float(self.offset_var.get())
             step_size = float(self.step_var.get())
@@ -962,11 +1754,168 @@ class MainWindow:
             max_retries = int(self.max_retries_var.get())
             stop_distance = float(self.stop_distance_var.get())
             guaranteed_stop = self.use_guaranteed_stops.get()
+            
+            # ===== CHECK MINIMUM SIZE =====
+            market_details = self.get_cached_market_details(epic)
+            
+            if market_details is None:
+                messagebox.showerror(
+                    "API Rate Limit",
+                    f"⚠️ Cannot place orders - API rate limit exceeded\n\n"
+                    f"IG has temporarily blocked API requests.\n\n"
+                    f"Please wait 5-10 minutes and try again.\n\n"
+                    f"Tip: Use LIVE account for higher limits."
+                )
+                self.log("ERROR: Rate limited - cannot fetch market details")
+                self.ladder_btn.configure(
+                    state="normal", 
+                    text="PLACE LADDER",
+                    fg_color="#3b9f6f",
+                    hover_color="#4ab080"
+                )
+                return
 
-            # Check margin before placing
-            margin_ok, new_margin_ratio, required_margin = self.risk_manager.check_margin_for_order(
-                epic, order_size * num_orders, margin_limit=0.3
-            )
+            if market_details:
+                min_size = market_details['min_deal_size']
+                max_size = market_details['max_deal_size']
+            
+            # Check if max_size is 0 (missing from API - skip max validation)
+            if max_size == 0:
+                self.log(f"⚠️ No max size available for {selected_market} - skipping max check")
+                # Don't check max, just proceed
+            else:
+                # Only check max if it exists
+                if order_size > max_size:
+                    result = messagebox.askyesno(
+                        "Order Size Too Large",
+                        f"⚠️ Maximum size for {selected_market} is {max_size}\n\n"
+                        f"Your order size: {order_size}\n"
+                        f"Maximum allowed: {max_size}\n\n"
+                        f"Place orders at maximum size of {max_size} instead?",
+                        icon="warning"
+                    )
+                    
+                    if result:
+                        self.size_var.set(str(max_size))
+                        order_size = max_size
+                        self.log(f"✓ Order size adjusted to maximum: {max_size}")
+                    else:
+                        self.log("Order cancelled - size above maximum")
+                        self.ladder_btn.configure(...)
+                        return
+
+            if market_details:
+                min_size = market_details['min_deal_size']
+                max_size = market_details['max_deal_size']
+                
+                # Check if size is too small
+                if order_size < min_size:
+                    result = messagebox.askyesno(
+                        "Order Size Too Small",
+                        f"⚠️ Minimum size for {selected_market} is {min_size}\n\n"
+                        f"Your order size: {order_size}\n"
+                        f"Minimum required: {min_size}\n\n"
+                        f"Place orders at minimum size of {min_size} instead?",
+                        icon="warning"
+                    )
+                    
+                    if result:
+                        # Update the size variable and log it
+                        self.size_var.set(str(min_size))
+                        order_size = min_size
+                        self.log(f"✓ Order size adjusted to minimum: {min_size}")
+                    else:
+                        self.log("Order cancelled - size below minimum")
+                        self.ladder_btn.configure(
+                            state="normal", 
+                            text="PLACE LADDER",
+                            fg_color="#3b9f6f",
+                            hover_color="#4ab080"
+                        )
+                        return
+                
+                # Check if size is too large
+                elif order_size > max_size:
+                    result = messagebox.askyesno(
+                        "Order Size Too Large",
+                        f"⚠️ Maximum size for {selected_market} is {max_size}\n\n"
+                        f"Your order size: {order_size}\n"
+                        f"Maximum allowed: {max_size}\n\n"
+                        f"Place orders at maximum size of {max_size} instead?",
+                        icon="warning"
+                    )
+                    
+                    if result:
+                        self.size_var.set(str(max_size))
+                        order_size = max_size
+                        self.log(f"✓ Order size adjusted to maximum: {max_size}")
+                    else:
+                        self.log("Order cancelled - size above maximum")
+                        self.ladder_btn.configure(
+                            state="normal", 
+                            text="PLACE LADDER",
+                            fg_color="#3b9f6f",
+                            hover_color="#4ab080"
+                        )
+                        return
+                
+                # Check stop distance for GSLO
+                if guaranteed_stop:
+                    min_gslo_distance = market_details['min_gslo_distance']
+                    if stop_distance < min_gslo_distance:
+                        messagebox.showerror(
+                            "GSLO Stop Too Close",
+                            f"❌ Guaranteed stop distance too close!\n\n"
+                            f"Your stop: {stop_distance} points\n"
+                            f"Minimum GSLO distance: {min_gslo_distance} points\n\n"
+                            f"Please increase stop distance to at least {min_gslo_distance}"
+                        )
+                        self.log(f"ERROR: GSLO stop too close (min: {min_gslo_distance})")
+                        self.ladder_btn.configure(
+                            state="normal", 
+                            text="PLACE LADDER",
+                            fg_color="#3b9f6f",
+                            hover_color="#4ab080"
+                        )
+                        return
+                else:
+                    # Check regular stop distance
+                    min_stop_distance = market_details['min_stop_distance']
+                    if stop_distance < min_stop_distance:
+                        result = messagebox.askyesno(
+                            "Stop Distance Too Close",
+                            f"⚠️ Minimum stop distance for {selected_market} is {min_stop_distance}\n\n"
+                            f"Your stop: {stop_distance} points\n"
+                            f"Minimum required: {min_stop_distance} points\n\n"
+                            f"Use minimum stop distance of {min_stop_distance} instead?",
+                            icon="warning"
+                        )
+                        
+                        if result:
+                            self.stop_distance_var.set(str(min_stop_distance))
+                            stop_distance = min_stop_distance
+                            self.log(f"✓ Stop distance adjusted to minimum: {min_stop_distance}")
+                        else:
+                            self.log("Order cancelled - stop distance too small")
+                            self.ladder_btn.configure(
+                                state="normal", 
+                                text="PLACE LADDER",
+                                fg_color="#3b9f6f",
+                                hover_color="#4ab080"
+                            )
+                            return
+            else:
+                self.log("WARNING: Could not verify market limits - proceeding anyway")
+
+            # Check margin
+            try:
+                margin_ok, new_margin_ratio, required_margin = self.risk_manager.check_margin_for_order(
+                    epic, order_size * num_orders, margin_limit=0.3
+                )
+            except Exception as e:
+                self.log(f"Margin check skipped: {str(e)}")
+                margin_ok = True
+                new_margin_ratio = None
 
             if not margin_ok and new_margin_ratio:
                 result = messagebox.askyesno(
@@ -978,62 +1927,80 @@ class MainWindow:
                 )
                 if not result:
                     self.log("Order cancelled - would exceed margin limit")
-                    self.ladder_btn.configure(state="normal", text="Place Ladder")
+                    self.ladder_btn.configure(
+                        state="normal", 
+                        text="PLACE LADDER",
+                        fg_color="#3b9f6f",
+                        hover_color="#4ab080"
+                    )
                     return
 
-            # Use the toggle switch state for limits
-            limit_distance = float(
-                self.limit_distance_var.get()) if self.limit_toggle.get() else 0
+            # No limits for now
+            limit_distance = 0
 
-            # DEBUG - see what we're getting
-            print(
-                f"DEBUG on_place_ladder: limit_toggle state = {self.limit_toggle.get()}")
-            print(
-                f"DEBUG on_place_ladder: limit_distance_var = {self.limit_distance_var.get()}")
-            print(
-                f"DEBUG on_place_ladder: calculated limit_distance = {limit_distance}")
+            # Risk check
+            try:
+                if self.use_risk_management.get():
+                    can_trade, safety_checks = self.risk_manager.can_trade(order_size, epic)
+                    if not can_trade:
+                        self.log("TRADING BLOCKED - Risk limits exceeded:")
+                        for check_name, passed, message in safety_checks:
+                            if not passed:
+                                self.log(f"  {check_name}: {message}")
+                        self.ladder_btn.configure(
+                            state="normal", 
+                            text="PLACE LADDER",
+                            fg_color="#3b9f6f",
+                            hover_color="#4ab080"
+                        )
+                        return
+            except Exception as e:
+                self.log(f"Risk check skipped: {str(e)}")
 
-            # Optional risk check
-            if self.use_risk_management.get():
-                can_trade, safety_checks = self.risk_manager.can_trade(
-                    order_size, epic)
-                if not can_trade:
-                    self.log("TRADING BLOCKED - Risk limits exceeded:")
-                    for check_name, passed, message in safety_checks:
-                        if not passed:
-                            self.log(f"  {check_name}: {message}")
-                    self.ladder_btn.configure(state="normal", text="Place Ladder")
-                    return
-                else:
-                    self.log("Risk check passed")
-            else:
-                self.log(
-                    "Risk management disabled - trading without safety checks")
+            # Log action
+            gslo_text = "with GSLO" if guaranteed_stop else "with regular stops"
+            self.log(f"Placing {num_orders} {direction} orders for {selected_market} {gslo_text}")
 
-            # NOW log with the variables defined
-            self.log(
-                f"Placing {num_orders} {direction} orders for {selected_market}")
-            if limit_distance > 0:
-                self.log(
-                    f"With limit orders at {limit_distance} points distance")
-
-            # Create wrapper to re-enable button when done
+            # Background thread
             def place_and_reenable():
                 try:
-                    self.ladder_strategy.place_ladder(epic, direction, start_offset, step_size,
-                                                      num_orders, order_size, retry_jump, max_retries,
-                                                      self.log, limit_distance, stop_distance, guaranteed_stop)
+                    self.ladder_strategy.place_ladder(
+                        epic, direction, start_offset, step_size,
+                        num_orders, order_size, retry_jump, max_retries,
+                        self.log, limit_distance, stop_distance, guaranteed_stop
+                    )
+                except Exception as e:
+                    self.log(f"ERROR placing ladder: {str(e)}")
                 finally:
+                    # Reset button
                     self.root.after(0, lambda: self.ladder_btn.configure(
-                        state="normal", text="Place Ladder"))
+                        state="normal", 
+                        text="PLACE LADDER",
+                        fg_color="#3b9f6f",
+                        hover_color="#4ab080"
+                    ))
+                    self.ladder_strategy.cancel_requested = False
 
-            thread = threading.Thread(target=place_and_reenable)
-            thread.daemon = True
+            # Start thread
+            thread = threading.Thread(target=place_and_reenable, daemon=True)
             thread.start()
 
         except ValueError as e:
             self.log(f"Invalid parameters: {str(e)}")
-            self.ladder_btn.configure(state="normal", text="Place Ladder")
+            self.ladder_btn.configure(
+                state="normal", 
+                text="PLACE LADDER",
+                fg_color="#3b9f6f",
+                hover_color="#4ab080"
+            )
+        except Exception as e:
+            self.log(f"ERROR: {str(e)}")
+            self.ladder_btn.configure(
+                state="normal", 
+                text="PLACE LADDER",
+                fg_color="#3b9f6f",
+                hover_color="#4ab080"
+            )
 
     def place_and_reenable():
         try:

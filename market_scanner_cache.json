@@ -1,0 +1,52 @@
+{
+  "CC.D.CL.USS.IP": {
+    "epic": "CC.D.CL.USS.IP",
+    "name": "Oil - US Crude",
+    "high": 80.7699966430664,
+    "low": 55.119998931884766,
+    "source": "yahoo",
+    "num_candles": 253,
+    "timestamp": "2025-10-15T22:46:22.856257",
+    "age_hours": 0
+  },
+  "CC.D.LCO.USS.IP": {
+    "epic": "CC.D.LCO.USS.IP",
+    "name": "Oil - Brent Crude",
+    "high": 82.62999725341797,
+    "low": 58.38999938964844,
+    "source": "yahoo",
+    "num_candles": 253,
+    "timestamp": "2025-10-15T22:46:25.004960",
+    "age_hours": 0
+  },
+  "CC.D.NG.USS.IP": {
+    "epic": "CC.D.NG.USS.IP",
+    "name": "Natural Gas",
+    "high": 4.901000022888184,
+    "low": 2.200000047683716,
+    "source": "yahoo",
+    "num_candles": 253,
+    "timestamp": "2025-10-15T22:46:27.172865",
+    "age_hours": 0
+  },
+  "IX.D.FTSE.DAILY.IP": {
+    "epic": "IX.D.FTSE.DAILY.IP",
+    "name": "FTSE 100",
+    "high": 9577.099609375,
+    "low": 7544.7998046875,
+    "source": "yahoo",
+    "num_candles": 254,
+    "timestamp": "2025-10-15T22:46:29.354086",
+    "age_hours": 0
+  },
+  "IX.D.DAX.DAILY.IP": {
+    "epic": "IX.D.DAX.DAILY.IP",
+    "name": "Germany 40",
+    "high": 24771.33984375,
+    "low": 18489.91015625,
+    "source": "yahoo",
+    "num_candles": 254,
+    "timestamp": "2025-10-15T22:46:31.506987",
+    "age_hours": 0
+  }
+}
