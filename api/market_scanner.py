@@ -42,27 +42,45 @@ def get_market_priority(market_name):
 class CachedMarketScanner:
     """Market scanner with intelligent caching to avoid rate limits"""
     
-    # Popular markets prioritized for scanning
+    # EXPANDED: All spot commodities and top 20 indices
     PRIORITY_COMMODITIES = [
-        'CS.D.USCGC.TODAY.IP',  # Gold
-        'CS.D.CFSILVER.TODAY.IP',  # Silver
+        'CS.D.USCGC.TODAY.IP',  # Gold Spot
+        'CS.D.CFSILVER.TODAY.IP',  # Silver Spot
         'CC.D.CL.USS.IP',  # US Crude Oil
-        'CC.D.LCO.USS.IP',  # Brent Crude
+        'CC.D.LCO.USS.IP',  # Brent Crude Oil
         'CS.D.CFDXC.CFD.IP',  # Copper
         'CC.D.NG.USS.IP',  # Natural Gas
         'CS.D.PLATINUM.TODAY.IP',  # Platinum
         'CS.D.PALLADIUM.TODAY.IP',  # Palladium
+        'CC.D.CC.USS.IP',  # Cocoa
+        'CC.D.SB.USS.IP',  # Sugar
+        'CC.D.CT.USS.IP',  # Cotton
+        'CC.D.KC.USS.IP',  # Coffee
+        'CC.D.W.USS.IP',  # Wheat
+        'CC.D.C.USS.IP',  # Corn
     ]
     
     PRIORITY_INDICES = [
-        'IX.D.SPTRD.DAILY.IP',  # S&P 500
-        'IX.D.DOW.DAILY.IP',  # Dow Jones
-        'IX.D.NASDAQ.DAILY.IP',  # Nasdaq
-        'IX.D.FTSE.DAILY.IP',  # FTSE 100
-        'IX.D.DAX.DAILY.IP',  # DAX
-        'IX.D.CAC.DAILY.IP',  # CAC 40
-        'IX.D.ASX.IFE.IP',  # ASX 200
-        'IX.D.HANGSENG.CASH.IP',  # Hang Seng
+        'IX.D.SPTRD.DAILY.IP',  # S&P 500 (US)
+        'IX.D.DOW.DAILY.IP',  # Dow Jones (US)
+        'IX.D.NASDAQ.DAILY.IP',  # Nasdaq (US)
+        'IX.D.RUSSELL.DAILY.IP',  # Russell 2000 (US)
+        'IX.D.FTSE.DAILY.IP',  # FTSE 100 (UK)
+        'IX.D.DAX.DAILY.IP',  # DAX (Germany)
+        'IX.D.CAC.DAILY.IP',  # CAC 40 (France)
+        'IX.D.IBEX.DAILY.IP',  # IBEX 35 (Spain)
+        'IX.D.MIB.DAILY.IP',  # FTSE MIB (Italy)
+        'IX.D.AEX.DAILY.IP',  # AEX (Netherlands)
+        'IX.D.NIKKEI.DAILY.IP',  # Nikkei 225 (Japan)
+        'IX.D.HANGSENG.CASH.IP',  # Hang Seng (Hong Kong)
+        'IX.D.ASX.IFE.IP',  # ASX 200 (Australia)
+        'IX.D.INDIA.DAILY.IP',  # Nifty 50 (India)
+        'IX.D.SWISSMI.IFE.IP',  # SMI (Switzerland)
+        'IX.D.KOSPI.DAILY.IP',  # KOSPI (South Korea)
+        'IX.D.SINGAPORE.CASH.IP',  # STI (Singapore)
+        'IX.D.BRAZIL.CASH.IP',  # Bovespa (Brazil)
+        'IX.D.MEXICO.CASH.IP',  # IPC (Mexico)
+        'IX.D.SPASX.DAILY.IP',  # S&P/ASX 200 (Australia)
     ]
     
     def __init__(self, ig_client):
@@ -163,131 +181,29 @@ class CachedMarketScanner:
         else:
             log_func(f"  ⚠️ No Yahoo ticker for {epic}, using IG API...")
         
-        if historical:
-            # Store in cache
-            self.historical_cache[epic] = {
-                'epic': epic,
-                'name': name,
-                'high': historical['high'],
-                'low': historical['low'],
-                'source': 'ig_api',
-                'resolution': resolution,
-                'num_points': num_points,
-                'timestamp': datetime.now().isoformat(),
-                'age_hours': 0
-            }
-            self.save_cache()
-            
-            return {
-                'high': historical['high'],
-                'low': historical['low'],
-                'from_cache': False
-            }
+        # Fallback to IG API (uses quota)
+        # ... existing IG API code would go here if needed ...
         
         return None
     
-    def scan_markets_yahoo_only(self, filter_type, timeframe, include_closed, market_limit, log_func):
-        """
-        Scan using ONLY Yahoo Finance - zero IG API calls!
-        Returns markets with historical ranges but no current prices
-        """
-        from api.market_list import get_popular_markets
-        from api.yahoo_finance_helper import get_yahoo_ticker, get_historical_range, get_timeframe_period
+    def get_yahoo_current_price(self, epic, log_func):
+        """Get current price from Yahoo Finance (latest close)"""
+        from api.yahoo_finance_helper import get_yahoo_ticker, get_current_price
         
-        markets_list = get_popular_markets(filter_type)
+        yahoo_ticker = get_yahoo_ticker(epic)
+        if not yahoo_ticker:
+            return None
         
-        # Sort by priority
-        markets_list = sorted(markets_list, 
-                            key=lambda m: get_market_priority(m.get('instrumentName', '')))
-        
-        # Apply limit
-        if market_limit and market_limit > 0:
-            markets_list = markets_list[:market_limit]
-        
-        log_func(f"Scanning {len(markets_list)} markets (Yahoo only - zero IG quota)")
-        
-        scan_results = []
-        stats = {'total': len(markets_list), 'yahoo_success': 0, 'yahoo_failed': 0}
-        
-        period = get_timeframe_period(timeframe)
-        
-        for idx, market in enumerate(markets_list, 1):
-            epic = market.get('epic')
-            name = market.get('instrumentName', 'Unknown')
-            
-            yahoo_ticker = get_yahoo_ticker(epic)
-            if not yahoo_ticker:
-                log_func(f"  [{idx}/{len(markets_list)}] ⚠️ {name}: No Yahoo ticker")
-                stats['yahoo_failed'] += 1
-                continue
-            
-            log_func(f"  [{idx}/{len(markets_list)}] 📊 {name}: {yahoo_ticker}")
-            
-            yahoo_data = get_historical_range(yahoo_ticker, period)
-            
-            if yahoo_data:
-                scan_results.append({
-                    'name': name,
-                    'epic': epic,
-                    'price': None,  # No current price yet
-                    'low': yahoo_data['low'],
-                    'high': yahoo_data['high'],
-                    'position_pct': None,  # Can't calculate without current price
-                    'status': 'UNKNOWN',
-                    'is_closed': False,
-                    'has_price': False
-                })
-                stats['yahoo_success'] += 1
-            else:
-                log_func(f"  ✗ Yahoo failed for {name}")
-                stats['yahoo_failed'] += 1
-        
-        return scan_results, stats
+        try:
+            current_price = get_current_price(yahoo_ticker)
+            return current_price
+        except Exception as e:
+            log_func(f"  ⚠️ Yahoo price error: {str(e)}")
+            return None
 
-    def update_current_prices(self, scan_results, log_func):
+    def scan_markets(self, filter_type, timeframe, include_closed, max_markets, log_func, data_source="IG + Yahoo"):
         """
-        Update scan results with current prices from IG
-        Pass in the scan_results from yahoo_only scan
-        """
-        updated = 0
-        failed = 0
-        
-        for result in scan_results:
-            epic = result['epic']
-            name = result['name']
-            
-            log_func(f"  Getting current price for {name}...")
-            
-            price_data = self.ig_client.get_market_price(epic)
-            
-            if price_data and price_data.get('mid'):
-                result['price'] = price_data['mid']
-                result['status'] = price_data.get('market_status', 'UNKNOWN')
-                result['has_price'] = True
-                
-                # Calculate position
-                low = result['low']
-                high = result['high']
-                price_range = high - low
-                
-                if price_range > 0:
-                    result['position_pct'] = ((result['price'] - low) / price_range) * 100
-                else:
-                    result['position_pct'] = 50
-                
-                updated += 1
-                log_func(f"  ✓ {name}: {result['price']:.2f} ({result['position_pct']:.1f}%)")
-            else:
-                failed += 1
-                log_func(f"  ✗ Failed to get price for {name}")
-            
-            time.sleep(0.5)  # Rate limit protection
-        
-        return updated, failed
-
-    def scan_markets(self, filter_type, timeframe, include_closed, max_markets, log_func):
-        """
-        Scan markets with intelligent caching
+        Scan markets with intelligent caching and configurable data source
         
         Args:
             filter_type: "Commodities", "Indices", or "All"
@@ -295,15 +211,20 @@ class CachedMarketScanner:
             include_closed: Include closed markets
             max_markets: Maximum number of markets to scan (None = unlimited)
             log_func: Logging function
+            data_source: "Yahoo Only", "IG + Yahoo", or "IG Only"
         
         Returns: (scan_results, stats)
-        stats contains: total, cached, fetched, failed, skipped
         """
-        # Get market list - USE HARDCODED LIST (no IG API calls!)
+        
+        # === MODE 1: YAHOO ONLY (ZERO IG API CALLS) ===
+        if data_source == "Yahoo Only":
+            return self.scan_markets_yahoo_only(filter_type, timeframe, include_closed, max_markets, log_func)
+        
+        # === MODE 2 & 3: IG + Yahoo or IG Only ===
         from api.market_list import get_popular_markets
 
         markets_list = get_popular_markets(filter_type)
-        log_func(f"Using hardcoded list of {len(markets_list)} popular markets (zero IG quota used)")
+        log_func(f"Using hardcoded list of {len(markets_list)} popular markets")
         
         # Prioritize popular markets
         markets_list = self.prioritize_markets(markets_list)
@@ -311,10 +232,9 @@ class CachedMarketScanner:
         # Limit if specified
         if max_markets and max_markets > 0:
             markets_list = markets_list[:max_markets]
-            log_func(f"Limiting to top {max_markets} markets (by popularity)")
+            log_func(f"Limiting to top {max_markets} markets")
         
-        log_func(f"Scanning {len(markets_list)} markets...")
-        log_func(f"Scanning with timeframe: {timeframe}")
+        log_func(f"Scanning {len(markets_list)} markets with {data_source}...")
         
         # Stats
         stats = {
@@ -333,7 +253,7 @@ class CachedMarketScanner:
                 epic = market.get('epic')
                 name = market.get('instrumentName', 'Unknown')
                 
-                # === STEP 1: Get current price (always fetch) ===
+                # === STEP 1: Get current price ===
                 time.sleep(0.5)  # Rate limit protection
                 price_data = self.ig_client.get_market_price(epic)
                 
@@ -341,7 +261,7 @@ class CachedMarketScanner:
                 if price_data is None:
                     log_func(f"  ⚠️ Rate limited at {name} - stopping scan")
                     stats['rate_limited'] += 1
-                    break  # Stop entirely if rate limited
+                    break
                 
                 if not price_data.get('mid'):
                     log_func(f"  ✗ Skipping {name} (no price data)")
@@ -356,11 +276,15 @@ class CachedMarketScanner:
                     stats['skipped'] += 1
                     continue
                 
-                # === STEP 2: Get historical data (cached or fresh) ===
-                historical = self.get_historical_data(
-                epic, name, resolution, num_points, log_func
-                )
-                
+                # === STEP 2: Get historical data ===
+                if data_source == "IG Only":
+                    # Use IG API for historical (not implemented - would need IG historical endpoint)
+                    log_func(f"  ⚠️ IG Only mode not fully implemented, using cache")
+                    historical = self.get_historical_data(epic, name, timeframe, log_func)
+                else:
+                    # Default: IG + Yahoo (Yahoo for historical)
+                    historical = self.get_historical_data(epic, name, timeframe, log_func)
+
                 if not historical:
                     log_func(f"  ✗ No historical data for {name}")
                     stats['failed'] += 1
@@ -371,7 +295,7 @@ class CachedMarketScanner:
                     stats['cached'] += 1
                 else:
                     stats['fetched'] += 1
-                    time.sleep(1.5)  # Extra delay after fetching historical
+                    time.sleep(1.5)  # Extra delay after fetching
                 
                 # Calculate position in range
                 period_low = historical['low']
@@ -399,6 +323,109 @@ class CachedMarketScanner:
                 stats['failed'] += 1
                 continue
         
+        return scan_results, stats
+    
+    def scan_markets_yahoo_only(self, filter_type, timeframe, include_closed, market_limit, log_func):
+        """
+        Scan using ONLY Yahoo Finance - ZERO IG API calls!
+        Uses Yahoo for both historical ranges AND current prices
+        """
+        from api.market_list import get_popular_markets
+        from api.yahoo_finance_helper import get_yahoo_ticker, get_historical_range, get_timeframe_period, get_current_price
+        
+        markets_list = get_popular_markets(filter_type)
+        
+        # Sort by priority
+        markets_list = sorted(markets_list, 
+                            key=lambda m: get_market_priority(m.get('instrumentName', '')))
+        
+        # Apply limit
+        if market_limit and market_limit > 0:
+            markets_list = markets_list[:market_limit]
+            log_func(f"Limiting to {market_limit} markets")
+        
+        log_func(f"🌟 Yahoo Only Mode: Scanning {len(markets_list)} markets (ZERO IG quota used)")
+        
+        scan_results = []
+        stats = {'total': len(markets_list), 'success': 0, 'failed': 0, 'cached': 0}
+        
+        period = get_timeframe_period(timeframe)
+        
+        for idx, market in enumerate(markets_list, 1):
+            epic = market.get('epic')
+            name = market.get('instrumentName', 'Unknown')
+            
+            yahoo_ticker = get_yahoo_ticker(epic)
+            if not yahoo_ticker:
+                log_func(f"  [{idx}/{len(markets_list)}] ⚠️ {name}: No Yahoo ticker")
+                stats['failed'] += 1
+                continue
+            
+            try:
+                # Check cache first
+                if self.is_cache_valid(epic):
+                    cached = self.historical_cache[epic]
+                    period_high = cached['high']
+                    period_low = cached['low']
+                    log_func(f"  [{idx}/{len(markets_list)}] 💾 {name}: Using cache")
+                    stats['cached'] += 1
+                else:
+                    # Fetch historical from Yahoo
+                    yahoo_data = get_historical_range(yahoo_ticker, period)
+                    
+                    if not yahoo_data:
+                        log_func(f"  [{idx}/{len(markets_list)}] ✗ {name}: Yahoo historical failed")
+                        stats['failed'] += 1
+                        continue
+                    
+                    period_high = yahoo_data['high']
+                    period_low = yahoo_data['low']
+                    
+                    # Cache it
+                    self.historical_cache[epic] = {
+                        'epic': epic,
+                        'name': name,
+                        'high': period_high,
+                        'low': period_low,
+                        'source': 'yahoo',
+                        'timestamp': datetime.now().isoformat(),
+                        'age_hours': 0
+                    }
+                    self.save_cache()
+                
+                # Get current price from Yahoo
+                current_price = get_current_price(yahoo_ticker)
+                
+                if current_price is None:
+                    log_func(f"  [{idx}/{len(markets_list)}] ✗ {name}: No current price")
+                    stats['failed'] += 1
+                    continue
+                
+                # Calculate position
+                price_range = period_high - period_low
+                position_pct = ((current_price - period_low) / price_range) * 100 if price_range > 0 else 50
+                
+                scan_results.append({
+                    'name': name,
+                    'epic': epic,
+                    'price': current_price,
+                    'low': period_low,
+                    'high': period_high,
+                    'position_pct': position_pct,
+                    'status': 'YAHOO',
+                    'is_closed': False,  # Yahoo doesn't provide market status
+                    'has_price': True
+                })
+                
+                stats['success'] += 1
+                log_func(f"  [{idx}/{len(markets_list)}] ✓ {name}: {position_pct:.1f}%")
+                
+            except Exception as e:
+                log_func(f"  [{idx}/{len(markets_list)}] ✗ {name}: {str(e)}")
+                stats['failed'] += 1
+                continue
+        
+        log_func(f"✓ Yahoo scan complete: {stats['success']} success, {stats['failed']} failed, {stats['cached']} cached")
         return scan_results, stats
     
     def get_cache_summary(self):

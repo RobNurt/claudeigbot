@@ -6,8 +6,8 @@
     "low": 55.119998931884766,
     "source": "yahoo",
     "num_candles": 253,
-    "timestamp": "2025-10-15T22:46:22.856257",
-    "age_hours": 0
+    "timestamp": "2025-10-17T20:22:35.231151",
+    "age_hours": 19.860877530000003
   },
   "CC.D.LCO.USS.IP": {
     "epic": "CC.D.LCO.USS.IP",
@@ -16,8 +16,8 @@
     "low": 58.38999938964844,
     "source": "yahoo",
     "num_candles": 253,
-    "timestamp": "2025-10-15T22:46:25.004960",
-    "age_hours": 0
+    "timestamp": "2025-10-17T20:22:40.164573",
+    "age_hours": 19.859507135
   },
   "CC.D.NG.USS.IP": {
     "epic": "CC.D.NG.USS.IP",
@@ -26,8 +26,8 @@
     "low": 2.200000047683716,
     "source": "yahoo",
     "num_candles": 253,
-    "timestamp": "2025-10-15T22:46:27.172865",
-    "age_hours": 0
+    "timestamp": "2025-10-17T20:22:45.686008",
+    "age_hours": 19.857973403055556
   },
   "IX.D.FTSE.DAILY.IP": {
     "epic": "IX.D.FTSE.DAILY.IP",
@@ -35,9 +35,8 @@
     "high": 9577.099609375,
     "low": 7544.7998046875,
     "source": "yahoo",
-    "num_candles": 254,
-    "timestamp": "2025-10-15T22:46:29.354086",
-    "age_hours": 0
+    "timestamp": "2025-10-17T21:48:25.567478",
+    "age_hours": 18.430228550277775
   },
   "IX.D.DAX.DAILY.IP": {
     "epic": "IX.D.DAX.DAILY.IP",
@@ -45,8 +44,117 @@
     "high": 24771.33984375,
     "low": 18489.91015625,
     "source": "yahoo",
-    "num_candles": 254,
-    "timestamp": "2025-10-15T22:46:31.506987",
+    "timestamp": "2025-10-17T21:48:33.015436",
+    "age_hours": 18.428159673055557
+  },
+  "CS.D.USCGC.TODAY.IP": {
+    "epic": "CS.D.USCGC.TODAY.IP",
+    "name": "Spot Gold",
+    "high": 4392.0,
+    "low": 2554.199951171875,
+    "source": "yahoo",
+    "num_candles": 253,
+    "timestamp": "2025-10-17T20:22:29.093079",
+    "age_hours": 19.86258255
+  },
+  "IX.D.SPTRD.DAILY.IP": {
+    "epic": "IX.D.SPTRD.DAILY.IP",
+    "name": "US 500",
+    "high": 6764.580078125,
+    "low": 4835.0400390625,
+    "source": "yahoo",
+    "num_candles": 251,
+    "timestamp": "2025-10-17T20:22:51.808620",
+    "age_hours": 19.856272677499998
+  },
+  "IX.D.DOW.DAILY.IP": {
+    "epic": "IX.D.DOW.DAILY.IP",
+    "name": "Wall Street",
+    "high": 47049.640625,
+    "low": 36611.78125,
+    "source": "yahoo",
+    "timestamp": "2025-10-17T21:48:37.537877",
+    "age_hours": 18.426903439444445
+  },
+  "IX.D.RUSSELL.DAILY.IP": {
+    "epic": "IX.D.RUSSELL.DAILY.IP",
+    "name": "Russell 2000",
+    "high": 2541.669921875,
+    "low": 1732.989990234375,
+    "source": "yahoo",
+    "timestamp": "2025-10-17T21:49:18.392100",
+    "age_hours": 18.415555044166666
+  },
+  "IX.D.NIKKEI.DAILY.IP": {
+    "epic": "IX.D.NIKKEI.DAILY.IP",
+    "name": "Japan 225",
+    "high": 48597.078125,
+    "low": 30792.740234375,
+    "source": "yahoo",
+    "timestamp": "2025-10-17T21:49:24.091495",
+    "age_hours": 18.41397187888889
+  },
+  "IX.D.CAC.DAILY.IP": {
+    "epic": "IX.D.CAC.DAILY.IP",
+    "name": "France 40",
+    "high": 8257.8798828125,
+    "low": 6763.759765625,
+    "source": "yahoo",
+    "timestamp": "2025-10-17T21:49:28.222251",
+    "age_hours": 18.412824446666665
+  },
+  "CS.D.CFSILVER.TODAY.IP": {
+    "epic": "CS.D.CFSILVER.TODAY.IP",
+    "name": "Spot Silver",
+    "high": 53.34000015258789,
+    "low": 28.309999465942383,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:23.012303",
+    "age_hours": 0
+  },
+  "CS.D.CFDXC.CFD.IP": {
+    "epic": "CS.D.CFDXC.CFD.IP",
+    "name": "Copper",
+    "high": 5.894999980926514,
+    "low": 3.9744999408721924,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:23.905457",
+    "age_hours": 0
+  },
+  "CS.D.PLATINUM.TODAY.IP": {
+    "epic": "CS.D.PLATINUM.TODAY.IP",
+    "name": "Platinum",
+    "high": 1741.199951171875,
+    "low": 884.5,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:24.390277",
+    "age_hours": 0
+  },
+  "CS.D.PALLADIUM.TODAY.IP": {
+    "epic": "CS.D.PALLADIUM.TODAY.IP",
+    "name": "Palladium",
+    "high": 1655.0,
+    "low": 876.5999755859375,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:24.657784",
+    "age_hours": 0
+  },
+  "CC.D.CC.USS.IP": {
+    "epic": "CC.D.CC.USS.IP",
+    "name": "Cocoa",
+    "high": 12931.0,
+    "low": 5631.0,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:25.159906",
+    "age_hours": 0
+  },
+  "CC.D.SB.USS.IP": {
+    "epic": "CC.D.SB.USS.IP",
+    "name": "Sugar",
+    "high": 23.0,
+    "low": 14.680000305175781,
+    "source": "yahoo",
+    "timestamp": "2025-10-18T16:14:25.552730",
     "age_hours": 0
   }
 }

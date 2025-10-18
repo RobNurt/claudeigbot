@@ -864,170 +864,107 @@ class MainWindow:
         except:
             pass
 
-    
     def create_market_research_tab(self, parent):
+        """Create market research and analysis tab with scanner"""
         card_bg = "#252a31"
         text_white = "#f4f5f7"
         accent_teal = "#5aa89a"
         bg_dark = "#1e2228"
         text_gray = "#9fa6b2"
-
-        # --- Market Scanner Section ---
-        scanner_frame = ctk.CTkFrame(parent, fg_color=card_bg, corner_radius=10)
-        scanner_frame.pack(fill="both", expand=True, pady=(0, 10))
-
-        ctk.CTkLabel(
-            scanner_frame, text="Market Scanner",
-            font=("Segoe UI", 14, "bold"), text_color=text_white
-        ).pack(pady=(15, 10), padx=15, anchor="w")
-
-        # --- FIX: Create control_row BEFORE using it ---
-        control_row = ctk.CTkFrame(scanner_frame, fg_color=card_bg)
-        control_row.pack(fill="x", padx=15, pady=(0, 10))
-
-        # Now add widgets to control_row
-        ctk.CTkLabel(control_row, text="Filter:",
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
-        self.scanner_filter_var = ctk.StringVar(value="All")
-        filter_combo = ctk.CTkComboBox(
-            control_row,
-            variable=self.scanner_filter_var,
-            values=["All", "Commodities", "Indices"],
-            width=130, height=35,
-            fg_color=card_bg, button_color=accent_teal,
-            font=("Segoe UI", 11)
-        )
-        filter_combo.pack(side="left", padx=5)
-
-        # ... (other controls, e.g. timeframe, mode, limit, sort, etc.)
-
-        ctk.CTkLabel(control_row, text="Mode:",
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
-        self.scan_mode_var = ctk.StringVar(value="yahoo_only")
-        ctk.CTkRadioButton(
-            control_row, text="Yahoo Only (Fast)",
-            variable=self.scan_mode_var, value="yahoo_only",
-            fg_color=accent_teal, font=("Segoe UI", 10)
-        ).pack(side="left", padx=2)
-        ctk.CTkRadioButton(
-            control_row, text="Yahoo + IG Prices",
-            variable=self.scan_mode_var, value="full",
-            fg_color=accent_teal, font=("Segoe UI", 10)
-        ).pack(side="left", padx=2)
-
-    def create_market_research_tab(self, parent):
-        # --- Color and style setup ---
-        card_bg = "#252a31"
-        text_white = "#f4f5f7"
-        accent_teal = "#5aa89a"
-        bg_dark = "#1e2228"
-        text_gray = "#9fa6b2"
-
-        # --- Make scrollable area first ---
+        
+        # Make scrollable
         scrollable = ctk.CTkScrollableFrame(parent, fg_color=bg_dark)
         scrollable.pack(fill="both", expand=True, padx=20, pady=10)
-
+        
         # === MARKET SCANNER ===
         scanner_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
         scanner_frame.pack(fill="both", expand=True, pady=(0, 10))
-
-        ctk.CTkLabel(
-            scanner_frame, text="Market Scanner",
-            font=("Segoe UI", 14, "bold"), text_color=text_white
-        ).pack(pady=(15, 10), padx=15, anchor="w")
-
-        # --- Scanner controls row ---
+        
+        ctk.CTkLabel(scanner_frame, text="Market Scanner",
+                    font=("Segoe UI", 14, "bold"), text_color=text_white).pack(pady=(15, 10), padx=15, anchor="w")
+        
+        # Scanner controls
         control_row = ctk.CTkFrame(scanner_frame, fg_color=card_bg)
         control_row.pack(fill="x", padx=15, pady=(0, 10))
-
-        ctk.CTkLabel(control_row, text="Filter:",
+        
+        # Filter
+        ctk.CTkLabel(control_row, text="Filter:", 
                     font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
+        
         self.scanner_filter_var = ctk.StringVar(value="All")
-        filter_combo = ctk.CTkComboBox(
-            control_row,
+        ctk.CTkComboBox(
+            control_row, 
             variable=self.scanner_filter_var,
             values=["All", "Commodities", "Indices"],
             width=130, height=35,
             fg_color=card_bg, button_color=accent_teal,
             font=("Segoe UI", 11)
-        )
-        filter_combo.pack(side="left", padx=5)
-
-        ctk.CTkLabel(control_row, text="Timeframe:",
+        ).pack(side="left", padx=5)
+        
+        # Timeframe
+        ctk.CTkLabel(control_row, text="Timeframe:", 
                     font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        
         self.scanner_timeframe_var = ctk.StringVar(value="Annual")
-        timeframe_combo = ctk.CTkComboBox(
+        ctk.CTkComboBox(
             control_row,
             variable=self.scanner_timeframe_var,
             values=["Daily", "Weekly", "Monthly", "Quarterly", "6-Month", "Annual", "2-Year", "5-Year", "All-Time"],
             width=130, height=35,
             fg_color=card_bg, button_color=accent_teal,
             font=("Segoe UI", 11)
-        )
-        timeframe_combo.pack(side="left", padx=5)
-
-        # --- Scan mode selection ---
-        ctk.CTkLabel(control_row, text="Mode:",
+        ).pack(side="left", padx=5)
+        
+        # Limit
+        ctk.CTkLabel(control_row, text="Limit:", 
                     font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
-        self.scan_mode_var = ctk.StringVar(value="yahoo_only")
-        ctk.CTkRadioButton(
-            control_row, text="Yahoo Only (Fast)",
-            variable=self.scan_mode_var, value="yahoo_only",
-            fg_color=accent_teal, font=("Segoe UI", 10)
-        ).pack(side="left", padx=2)
-        ctk.CTkRadioButton(
-            control_row, text="Yahoo + IG Prices",
-            variable=self.scan_mode_var, value="full",
-            fg_color=accent_teal, font=("Segoe UI", 10)
-        ).pack(side="left", padx=2)
-
-        # --- Market limit control ---
-        ctk.CTkLabel(control_row, text="Limit:",
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
+        
         self.scanner_limit_var = ctk.StringVar(value="5")
-        limit_entry = ctk.CTkEntry(
+        ctk.CTkEntry(
             control_row,
             textvariable=self.scanner_limit_var,
             width=50, height=35,
             font=("Segoe UI", 11),
             placeholder_text="0=All"
-        )
-        limit_entry.pack(side="left", padx=5)
-        ctk.CTkLabel(control_row, text="markets",
+        ).pack(side="left", padx=5)
+        
+        ctk.CTkLabel(control_row, text="markets", 
                     font=("Segoe UI", 10), text_color=text_gray).pack(side="left", padx=2)
-
-        ctk.CTkLabel(control_row, text="Sort by:",
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
-        self.scanner_sort_var = ctk.StringVar(value="Position %")
-        sort_combo = ctk.CTkComboBox(
-            control_row,
-            variable=self.scanner_sort_var,
-            values=["Position %", "Name", "Price"],
-            width=130, height=35,
-            fg_color=card_bg, button_color=accent_teal,
-            font=("Segoe UI", 11)
-        )
-        sort_combo.pack(side="left", padx=5)
-
-        # --- Include closed markets checkbox ---
+                
         self.include_closed_var = ctk.BooleanVar(value=True)
         ctk.CTkCheckBox(
-            control_row,
-            text="Include Closed",
+            control_row, 
+            text="Include Closed", 
             variable=self.include_closed_var,
             fg_color=accent_teal,
             font=("Segoe UI", 10)
         ).pack(side="left", padx=(15, 5))
+        
+        # Data Source Checkbox 
+        
+        ctk.CTkLabel(control_row, text="Source:", 
+                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=(15, 5))
 
-        # --- Scan button ---
-        ctk.CTkButton(control_row, text="🔄 Scan Markets",
+        self.data_source_var = ctk.StringVar(value="Yahoo Only")
+        ctk.CTkComboBox(
+            control_row,
+            variable=self.data_source_var,
+            values=["Yahoo Only", "IG + Yahoo", "IG Only"],
+            width=120, height=35,
+            fg_color=card_bg, button_color=accent_teal,
+            font=("Segoe UI", 11)
+        ).pack(side="left", padx=5)
+        
+        # Scan button
+        ctk.CTkButton(control_row, text="🔄 Scan Markets", 
                     command=self.on_scan_markets,
-                    fg_color=accent_teal, hover_color="#6abaa8",
-                    font=("Segoe UI", 11, "bold"),
-                    width=150, height=35).pack(side="left", padx=10)
-
-        # --- Scanner results display ---
-        from tkinter import scrolledtext
+                    fg_color=accent_teal,
+                    hover_color="#00f7cc",
+                    width=120,
+                    height=32,
+                    font=("Segoe UI", 10, "bold")).pack(side="left", padx=5)
+        
+        # Scanner results display
         self.scanner_results = scrolledtext.ScrolledText(
             scanner_frame,
             width=100,
@@ -1040,142 +977,18 @@ class MainWindow:
             insertbackground=accent_teal,
         )
         self.scanner_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
-        # ... configure tags and insert initial messages as in your original code ...
-
-        # === MARKET SEARCH ===
-        search_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
-        search_frame.pack(fill="both", expand=True, pady=(0, 10))
-
-        ctk.CTkLabel(search_frame, text="Market Search",
-                    font=("Segoe UI", 14, "bold"), text_color=text_white
-        ).pack(pady=(15, 10), padx=15, anchor="w")
-
-        # --- Search input row ---
-        search_row = ctk.CTkFrame(search_frame, fg_color=card_bg)
-        search_row.pack(fill="x", padx=15, pady=(0, 10))
-        ctk.CTkLabel(search_row, text="Search Term:",
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
-        self.market_search_var = ctk.StringVar()
-        search_entry = ctk.CTkEntry(search_row, textvariable=self.market_search_var,
-                                    width=250, height=35, font=("Segoe UI", 11),
-                                    placeholder_text="e.g. Russell, Gold, DAX, FTSE...")
-        search_entry.pack(side="left", padx=5)
-        ctk.CTkButton(search_row, text="🔍 Search",
-                    command=self.on_search_markets_tab,
-                    fg_color=accent_teal, hover_color="#6abaa8",
-                    font=("Segoe UI", 11, "bold"),
-                    width=120, height=35).pack(side="left", padx=5)
-
-        # --- Quick search buttons ---
-        quick_frame = ctk.CTkFrame(search_frame, fg_color=card_bg)
-        quick_frame.pack(fill="x", padx=15, pady=(0, 10))
-        ctk.CTkLabel(quick_frame, text="Quick Search:",
-                    font=("Segoe UI", 10), text_color=text_white).pack(side="left", padx=5)
-        quick_searches = ["Gold", "Silver", "Oil", "Russell", "S&P 500", "FTSE", "DAX"]
-        for term in quick_searches:
-            ctk.CTkButton(quick_frame, text=term,
-                        command=lambda t=term: self.quick_search(t),
-                        fg_color="#3e444d", hover_color="#4a5159",
-                        width=70, height=28,
-                        font=("Segoe UI", 9)).pack(side="left", padx=2)
-
-        # --- Search results display ---
-        self.market_search_results = scrolledtext.ScrolledText(
-            search_frame,
-            width=100,
-            height=15,
-            bg=card_bg,
-            fg=text_white,
-            font=("Consolas", 9),
-            relief="flat",
-            borderwidth=0,
-            insertbackground=accent_teal,
-        )
-        self.market_search_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
-
         
-        # Configure tags for formatting
+        # Configure tags
         self.scanner_results.tag_config("header", foreground=accent_teal, font=("Consolas", 10, "bold"))
-        self.scanner_results.tag_config("low", foreground="#00d084", font=("Consolas", 9, "bold"))  # Green
-        self.scanner_results.tag_config("mid", foreground="#e8b339", font=("Consolas", 9))  # Yellow
-        self.scanner_results.tag_config("high", foreground="#ed6347", font=("Consolas", 9, "bold"))  # Red
+        self.scanner_results.tag_config("low", foreground="#00d084", font=("Consolas", 9, "bold"))
+        self.scanner_results.tag_config("mid", foreground="#e8b339", font=("Consolas", 9))
+        self.scanner_results.tag_config("high", foreground="#ed6347", font=("Consolas", 9, "bold"))
         self.scanner_results.tag_config("neutral", foreground="#9fa6b2")
         
         # Initial message
         self.scanner_results.insert("1.0", "📊 Market Scanner\n\n", "header")
-        self.scanner_results.insert("end", "Click 'Scan Markets' to analyze commodities and indices\n\n", "neutral")
-        self.scanner_results.insert("end", "Features:\n", "header")
-        self.scanner_results.insert("end", "• Filter by Commodities, Indices, or All\n", "neutral")
-        self.scanner_results.insert("end", "• Choose timeframe (Daily to All-Time)\n", "neutral")
-        self.scanner_results.insert("end", "• Real historical data from IG API\n", "neutral")
-        self.scanner_results.insert("end", "• Works even when markets are closed\n", "neutral")
-        self.scanner_results.insert("end", "• Identifies trading opportunities\n\n", "neutral")
-        self.scanner_results.insert("end", "🟢 Green = Near lows (potential BUY)\n", "low")
-        self.scanner_results.insert("end", "🟡 Yellow = Mid-range\n", "mid")
-        self.scanner_results.insert("end", "🔴 Red = Near highs (potential SELL)\n", "high")
-        
-        # === MARKET SEARCH ===
-        search_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
-        search_frame.pack(fill="both", expand=True, pady=(0, 10))
-        
-        ctk.CTkLabel(search_frame, text="Market Search",
-                    font=("Segoe UI", 14, "bold"), text_color=text_white).pack(pady=(15, 10), padx=15, anchor="w")
-        
-        # Search input row
-        search_row = ctk.CTkFrame(search_frame, fg_color=card_bg)
-        search_row.pack(fill="x", padx=15, pady=(0, 10))
-        
-        ctk.CTkLabel(search_row, text="Search Term:", 
-                    font=("Segoe UI", 11), text_color=text_white).pack(side="left", padx=5)
-        
-        self.market_search_var = ctk.StringVar()
-        search_entry = ctk.CTkEntry(search_row, textvariable=self.market_search_var,
-                                    width=250, height=35, font=("Segoe UI", 11),
-                                    placeholder_text="e.g. Russell, Gold, DAX, FTSE...")
-        search_entry.pack(side="left", padx=5)
-        
-        # Search button
-        ctk.CTkButton(search_row, text="🔍 Search", 
-                    command=self.on_search_markets_tab,
-                    fg_color=accent_teal, hover_color="#6abaa8",
-                    font=("Segoe UI", 11, "bold"),
-                    width=120, height=35).pack(side="left", padx=5)
-        
-        # Quick search buttons
-        quick_frame = ctk.CTkFrame(search_frame, fg_color=card_bg)
-        quick_frame.pack(fill="x", padx=15, pady=(0, 10))
-        
-        ctk.CTkLabel(quick_frame, text="Quick Search:", 
-                    font=("Segoe UI", 10), text_color=text_white).pack(side="left", padx=5)
-        
-        quick_searches = ["Gold", "Silver", "Oil", "Russell", "S&P 500", "FTSE", "DAX"]
-        for term in quick_searches:
-            ctk.CTkButton(quick_frame, text=term,
-                        command=lambda t=term: self.quick_search(t),
-                        fg_color="#3e444d", hover_color="#4a5159",
-                        width=70, height=28,
-                        font=("Segoe UI", 9)).pack(side="left", padx=2)
-        
-        # Search results display
-        self.market_search_results = scrolledtext.ScrolledText(
-            search_frame,
-            width=100,
-            height=15,
-            bg=card_bg,
-            fg=text_white,
-            font=("Consolas", 9),
-            relief="flat",
-            borderwidth=0,
-            insertbackground=accent_teal,
-        )
-        self.market_search_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
-        
-        # Configure tags for search results
-        self.market_search_results.tag_config("header", foreground=accent_teal, font=("Consolas", 10, "bold"))
-        self.market_search_results.tag_config("epic", foreground="#e8b339", font=("Consolas", 9, "bold"))
-        self.market_search_results.tag_config("name", foreground=text_white)
-        self.market_search_results.tag_config("type", foreground="#9fa6b2")
-        
+        self.scanner_results.insert("end", "Click 'Scan Markets' to analyze\n", "neutral")
+
     def get_cached_market_details(self, epic):
         """Get market details with caching"""
         if epic not in self.market_details_cache:
@@ -1265,61 +1078,37 @@ class MainWindow:
         filter_type = self.scanner_filter_var.get()
         timeframe = self.scanner_timeframe_var.get()
         include_closed = self.include_closed_var.get()
-
+        data_source = self.data_source_var.get()  # ADD THIS
         
-    
-        
-        scan_mode = self.scan_mode_var.get()
-        if scan_mode == "yahoo_only":
-
-            self.log("Scanning with Yahoo Finance only (zero IG quota)")
-                
-            def do_yahoo_scan():
-                scan_results, stats = self.cached_scanner.scan_markets_yahoo_only(
-                    filter_type, timeframe, include_closed, market_limit, self.log
-                )
-                
-                # Store results for later price fetching
-                self.current_scan_results = scan_results
-                
-                # Display results WITHOUT prices
-                self.display_yahoo_only_results(scan_results, stats, timeframe)
-                
-                # Show "Get Prices" button
-                self.root.after(0, lambda: self.get_prices_btn.pack(side="left", padx=5))
-            
-            thread = threading.Thread(target=do_yahoo_scan, daemon=True)
-            thread.start()
-
         try:
             market_limit = int(self.scanner_limit_var.get())
             if market_limit == 0:
                 market_limit = None  # No limit
         except:
-            market_limit = 5  # Default
+            market_limit = None
+        
+        # Show helpful message about rate limits
+        if data_source == "Yahoo Only":
+            self.log("Using Yahoo Only - no IG rate limits!")
+        elif data_source == "IG Only":
+            self.log("⚠️ Using IG API only - watch for rate limits")
+        else:
+            self.log("Using IG + Yahoo - moderate API usage")
         
         # Get cache status
         cache_summary = self.cached_scanner.get_cache_summary()
-        
-        self.log(f"Scanning {filter_type} ({timeframe})")
         self.log(f"Cache status: {cache_summary}")
         
         self.scanner_results.delete(1.0, tk.END)
         self.scanner_results.insert(tk.END, f"🔄 Scanning {filter_type} ({timeframe})...\n\n", "header")
-        self.scanner_results.insert(tk.END, f"💾 Cache: {cache_summary}\n", "neutral")
-        self.scanner_results.insert(tk.END, "⚡ Fast mode: Only fetching current prices for cached markets\n\n", "neutral")
         
         def do_scan():
             try:
-                # Use cached scanner
                 scan_results, stats = self.cached_scanner.scan_markets(
-                    filter_type, timeframe, include_closed, market_limit, self.log
+                    filter_type, timeframe, include_closed, market_limit, self.log, data_source  # ADD data_source
                 )
                 
-                # Log statistics
                 self.log(f"Scan complete: {len(scan_results)} markets")
-                self.log(f"  Cached: {stats['cached']}, Fresh: {stats['fetched']}")
-                self.log(f"  Failed: {stats['failed']}, Skipped: {stats['skipped']}")
                 
                 # Display results
                 def update_display():
@@ -1327,28 +1116,8 @@ class MainWindow:
                     
                     if scan_results:
                         self.scanner_results.insert(tk.END, 
-                            f"✓ Market Scanner - {filter_type} ({timeframe})\n\n", "header")
-                        self.scanner_results.insert(tk.END, 
-                            f"Successfully scanned {len(scan_results)} markets\n", "neutral")
-                        self.scanner_results.insert(tk.END, 
-                            f"💾 Cached: {stats['cached']} | 📡 Fresh: {stats['fetched']} | ✗ Failed: {stats['failed']}\n", "neutral")
-                        self.scanner_results.insert(tk.END, "="*110 + "\n\n", "header")
+                            f"✓ Scanned {len(scan_results)} markets\n\n", "header")
                         
-                        # Sort results
-                        sort_by = self.scanner_sort_var.get()
-                        if sort_by == "Position %":
-                            scan_results.sort(key=lambda x: x['position_pct'])
-                        elif sort_by == "Name":
-                            scan_results.sort(key=lambda x: x['name'])
-                        elif sort_by == "Price":
-                            scan_results.sort(key=lambda x: x['price'], reverse=True)
-                        
-                        # Header
-                        header = f"{'Market':<35} {'Status':>10} {'Price':>12} {'Position':>15} {'Signal':>10}\n"
-                        self.scanner_results.insert(tk.END, header, "header")
-                        self.scanner_results.insert(tk.END, "-"*110 + "\n", "neutral")
-                        
-                        # Display each market
                         for result in scan_results:
                             if result['position_pct'] < 30:
                                 tag = "low"
@@ -1360,60 +1129,24 @@ class MainWindow:
                                 tag = "mid"
                                 signal = "🟡 MID"
                             
-                            name = result['name'][:34]
-                            status = "CLOSED" if result['is_closed'] else "OPEN"
-                            price = f"{result['price']:,.2f}"
+                            name = result['name'][:30]
                             position = f"{result['position_pct']:.1f}%"
                             
-                            bar_length = 10
-                            filled = int((result['position_pct'] / 100) * bar_length)
-                            bar = "█" * filled + "░" * (bar_length - filled)
-                            
-                            row = f"{name:<35} {status:>10} {price:>12} {bar} {position:>4} "
-                            self.scanner_results.insert(tk.END, row)  # Insert row without tag
-                        
-                        # Summary
-                        near_low = [r for r in scan_results if r['position_pct'] < 30]
-                        near_high = [r for r in scan_results if r['position_pct'] > 70]
-                        
-                        self.scanner_results.insert(tk.END, f"{signal:>10}\n", tag)  # Only tag the signal
-                        
-                        if near_low:
-                            self.scanner_results.insert(tk.END, 
-                                f"🟢 NEAR LOW ({len(near_low)} markets):\n", "low")
-                            for m in sorted(near_low, key=lambda x: x['position_pct'])[:3]:
-                                marker = " 🔒" if m['is_closed'] else ""
-                                self.scanner_results.insert(tk.END, 
-                                    f"   • {m['name'][:28]:<30} {m['position_pct']:>5.1f}%{marker}\n", "low")
-                        
-                        if near_high:
-                            self.scanner_results.insert(tk.END, 
-                                f"\n🔴 NEAR HIGH ({len(near_high)} markets):\n", "high")
-                            for m in sorted(near_high, key=lambda x: x['position_pct'], reverse=True)[:3]:
-                                marker = " 🔒" if m['is_closed'] else ""
-                                self.scanner_results.insert(tk.END, 
-                                    f"   • {m['name'][:28]:<30} {m['position_pct']:>5.1f}%{marker}\n", "high")
-                        
-                        # Cache info
-                        self.scanner_results.insert(tk.END, "\n\n")
-                        self.scanner_results.insert(tk.END, 
-                            f"💾 Cache: Historical data cached for 24 hours\n", "neutral")
-                        self.scanner_results.insert(tk.END, 
-                            f"   Next scan will be MUCH faster (only price updates)\n", "neutral")
-                        
+                            line = f"{name:<32} {position:>8} {signal}\n"
+                            self.scanner_results.insert(tk.END, line, tag)
                     else:
                         self.scanner_results.insert(tk.END, "No markets scanned\n")
                 
                 self.root.after(0, update_display)
                 
             except Exception as e:
-                self.log(f"Scan error: {str(e)}")
+                self.log(f"ERROR in scan: {str(e)}")
                 import traceback
                 self.log(traceback.format_exc())
         
         thread = threading.Thread(target=do_scan, daemon=True)
         thread.start()
-
+    
     def create_config_tab(self, parent):
         """Create configuration tab - placeholder for now"""
         card_bg = "#252a31"
