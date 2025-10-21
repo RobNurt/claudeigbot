@@ -5,9 +5,8 @@
     "high": 80.7699966430664,
     "low": 55.119998931884766,
     "source": "yahoo",
-    "num_candles": 253,
-    "timestamp": "2025-10-17T20:22:35.231151",
-    "age_hours": 19.860877530000003
+    "timestamp": "2025-10-19T21:53:06.812484",
+    "age_hours": 0.15722687999999999
   },
   "CC.D.LCO.USS.IP": {
     "epic": "CC.D.LCO.USS.IP",
@@ -15,9 +14,8 @@
     "high": 82.62999725341797,
     "low": 58.38999938964844,
     "source": "yahoo",
-    "num_candles": 253,
-    "timestamp": "2025-10-17T20:22:40.164573",
-    "age_hours": 19.859507135
+    "timestamp": "2025-10-19T21:53:07.167324",
+    "age_hours": 0.15712831333333332
   },
   "CC.D.NG.USS.IP": {
     "epic": "CC.D.NG.USS.IP",
@@ -25,9 +23,8 @@
     "high": 4.901000022888184,
     "low": 2.200000047683716,
     "source": "yahoo",
-    "num_candles": 253,
-    "timestamp": "2025-10-17T20:22:45.686008",
-    "age_hours": 19.857973403055556
+    "timestamp": "2025-10-19T21:53:07.609063",
+    "age_hours": 0.15700560805555555
   },
   "IX.D.FTSE.DAILY.IP": {
     "epic": "IX.D.FTSE.DAILY.IP",
@@ -35,8 +32,8 @@
     "high": 9577.099609375,
     "low": 7544.7998046875,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:48:25.567478",
-    "age_hours": 18.430228550277775
+    "timestamp": "2025-10-19T21:43:49.930166",
+    "age_hours": 0.31191641277777776
   },
   "IX.D.DAX.DAILY.IP": {
     "epic": "IX.D.DAX.DAILY.IP",
@@ -44,8 +41,8 @@
     "high": 24771.33984375,
     "low": 18489.91015625,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:48:33.015436",
-    "age_hours": 18.428159673055557
+    "timestamp": "2025-10-19T21:43:50.304722",
+    "age_hours": 0.3118123694444444
   },
   "CS.D.USCGC.TODAY.IP": {
     "epic": "CS.D.USCGC.TODAY.IP",
@@ -53,9 +50,8 @@
     "high": 4392.0,
     "low": 2554.199951171875,
     "source": "yahoo",
-    "num_candles": 253,
-    "timestamp": "2025-10-17T20:22:29.093079",
-    "age_hours": 19.86258255
+    "timestamp": "2025-10-19T21:53:05.963979",
+    "age_hours": 0.15746257583333334
   },
   "IX.D.SPTRD.DAILY.IP": {
     "epic": "IX.D.SPTRD.DAILY.IP",
@@ -63,9 +59,8 @@
     "high": 6764.580078125,
     "low": 4835.0400390625,
     "source": "yahoo",
-    "num_candles": 251,
-    "timestamp": "2025-10-17T20:22:51.808620",
-    "age_hours": 19.856272677499998
+    "timestamp": "2025-10-19T21:43:49.450620",
+    "age_hours": 0.31204961999999997
   },
   "IX.D.DOW.DAILY.IP": {
     "epic": "IX.D.DOW.DAILY.IP",
@@ -73,8 +68,8 @@
     "high": 47049.640625,
     "low": 36611.78125,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:48:37.537877",
-    "age_hours": 18.426903439444445
+    "timestamp": "2025-10-19T21:43:50.745537",
+    "age_hours": 0.31168992083333336
   },
   "IX.D.RUSSELL.DAILY.IP": {
     "epic": "IX.D.RUSSELL.DAILY.IP",
@@ -82,8 +77,8 @@
     "high": 2541.669921875,
     "low": 1732.989990234375,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:49:18.392100",
-    "age_hours": 18.415555044166666
+    "timestamp": "2025-10-19T21:52:47.198503",
+    "age_hours": 0.16267520805555558
   },
   "IX.D.NIKKEI.DAILY.IP": {
     "epic": "IX.D.NIKKEI.DAILY.IP",
@@ -91,8 +86,8 @@
     "high": 48597.078125,
     "low": 30792.740234375,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:49:24.091495",
-    "age_hours": 18.41397187888889
+    "timestamp": "2025-10-19T21:52:47.558180",
+    "age_hours": 0.16257529777777777
   },
   "IX.D.CAC.DAILY.IP": {
     "epic": "IX.D.CAC.DAILY.IP",
@@ -100,17 +95,17 @@
     "high": 8257.8798828125,
     "low": 6763.759765625,
     "source": "yahoo",
-    "timestamp": "2025-10-17T21:49:28.222251",
-    "age_hours": 18.412824446666665
+    "timestamp": "2025-10-19T21:52:54.348609",
+    "age_hours": 0.1606890675
   },
   "CS.D.CFSILVER.TODAY.IP": {
     "epic": "CS.D.CFSILVER.TODAY.IP",
     "name": "Spot Silver",
-    "high": 53.34000015258789,
+    "high": 53.76499938964844,
     "low": 28.309999465942383,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:23.012303",
-    "age_hours": 0
+    "timestamp": "2025-10-19T21:53:06.446334",
+    "age_hours": 0.15732858833333332
   },
   "CS.D.CFDXC.CFD.IP": {
     "epic": "CS.D.CFDXC.CFD.IP",
@@ -118,26 +113,26 @@
     "high": 5.894999980926514,
     "low": 3.9744999408721924,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:23.905457",
-    "age_hours": 0
+    "timestamp": "2025-10-19T21:53:08.059206",
+    "age_hours": 0.15688056833333333
   },
   "CS.D.PLATINUM.TODAY.IP": {
     "epic": "CS.D.PLATINUM.TODAY.IP",
     "name": "Platinum",
-    "high": 1741.199951171875,
+    "high": 1762.4000244140625,
     "low": 884.5,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:24.390277",
-    "age_hours": 0
+    "timestamp": "2025-10-19T21:53:08.413556",
+    "age_hours": 0.15678213777777777
   },
   "CS.D.PALLADIUM.TODAY.IP": {
     "epic": "CS.D.PALLADIUM.TODAY.IP",
     "name": "Palladium",
-    "high": 1655.0,
+    "high": 1692.5,
     "low": 876.5999755859375,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:24.657784",
-    "age_hours": 0
+    "timestamp": "2025-10-19T21:53:08.793907",
+    "age_hours": 0.15667648472222223
   },
   "CC.D.CC.USS.IP": {
     "epic": "CC.D.CC.USS.IP",
@@ -145,8 +140,8 @@
     "high": 12931.0,
     "low": 5631.0,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:25.159906",
-    "age_hours": 0
+    "timestamp": "2025-10-19T21:53:09.253284",
+    "age_hours": 0.15654888
   },
   "CC.D.SB.USS.IP": {
     "epic": "CC.D.SB.USS.IP",
@@ -154,7 +149,406 @@
     "high": 23.0,
     "low": 14.680000305175781,
     "source": "yahoo",
-    "timestamp": "2025-10-18T16:14:25.552730",
+    "timestamp": "2025-10-19T21:53:09.718344",
+    "age_hours": 0.15641969666666666
+  },
+  "IX.D.NASDAQ.DAILY.IP": {
+    "epic": "IX.D.NASDAQ.DAILY.IP",
+    "name": "US Tech 100",
+    "high": 23119.91015625,
+    "low": 14784.0302734375,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:43:51.197415",
+    "age_hours": 0.3115643991666666
+  },
+  "IX.D.HANGSENG.CASH.IP": {
+    "epic": "IX.D.HANGSENG.CASH.IP",
+    "name": "Hong Kong HS50",
+    "high": 27381.83984375,
+    "low": 18671.490234375,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:52:53.495537",
+    "age_hours": 0.16092603194444444
+  },
+  "IX.D.ASX.IFE.IP": {
+    "epic": "IX.D.ASX.IFE.IP",
+    "name": "Australia 200",
+    "high": 9109.7001953125,
+    "low": 7169.2001953125,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:52:53.938129",
+    "age_hours": 0.1608030897222222
+  },
+  "CC.D.CT.USS.IP": {
+    "epic": "CC.D.CT.USS.IP",
+    "name": "Cotton",
+    "high": 227.0,
+    "low": 28.200000762939453,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:58:03.069442",
+    "age_hours": 0.07493328055555556
+  },
+  "CC.D.KC.USS.IP": {
+    "epic": "CC.D.KC.USS.IP",
+    "name": "Coffee",
+    "high": 440.8500061035156,
+    "low": 41.5,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:58:03.821727",
+    "age_hours": 0.0747243125
+  },
+  "CC.D.W.USS.IP": {
+    "epic": "CC.D.W.USS.IP",
+    "name": "Wheat",
+    "high": 1425.25,
+    "low": 232.0,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:58:04.823371",
+    "age_hours": 0.07444607805555556
+  },
+  "CC.D.C.USS.IP": {
+    "epic": "CC.D.C.USS.IP",
+    "name": "Corn",
+    "high": 843.75,
+    "low": 174.0,
+    "source": "yahoo",
+    "timestamp": "2025-10-19T21:58:05.640380",
+    "age_hours": 0.07421913111111111
+  },
+  "CS.D.USCGC.TODAY.IP_Annual": {
+    "epic": "CS.D.USCGC.TODAY.IP",
+    "name": "Spot Gold",
+    "timeframe": "Annual",
+    "high": 4392.0,
+    "low": 2554.199951171875,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:01.678983",
+    "age_hours": 0.0086528525
+  },
+  "CS.D.CFSILVER.TODAY.IP_Annual": {
+    "epic": "CS.D.CFSILVER.TODAY.IP",
+    "name": "Spot Silver",
+    "timeframe": "Annual",
+    "high": 53.76499938964844,
+    "low": 28.309999465942383,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:02.129255",
+    "age_hours": 0.008527776944444444
+  },
+  "CC.D.CL.USS.IP_Annual": {
+    "epic": "CC.D.CL.USS.IP",
+    "name": "Oil - US Crude",
+    "timeframe": "Annual",
+    "high": 80.7699966430664,
+    "low": 55.119998931884766,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:02.604746",
+    "age_hours": 0.008395696111111111
+  },
+  "CC.D.LCO.USS.IP_Annual": {
+    "epic": "CC.D.LCO.USS.IP",
+    "name": "Oil - Brent Crude",
+    "timeframe": "Annual",
+    "high": 82.62999725341797,
+    "low": 58.38999938964844,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:03.054949",
+    "age_hours": 0.008270639722222223
+  },
+  "CC.D.NG.USS.IP_Annual": {
+    "epic": "CC.D.NG.USS.IP",
+    "name": "Natural Gas",
+    "timeframe": "Annual",
+    "high": 4.901000022888184,
+    "low": 2.200000047683716,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:03.418399",
+    "age_hours": 0.008169681388888888
+  },
+  "CS.D.CFDXC.CFD.IP_Annual": {
+    "epic": "CS.D.CFDXC.CFD.IP",
+    "name": "Copper",
+    "timeframe": "Annual",
+    "high": 5.894999980926514,
+    "low": 3.9744999408721924,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:03.851987",
+    "age_hours": 0.008049240277777777
+  },
+  "CS.D.PLATINUM.TODAY.IP_Annual": {
+    "epic": "CS.D.PLATINUM.TODAY.IP",
+    "name": "Platinum",
+    "timeframe": "Annual",
+    "high": 1762.4000244140625,
+    "low": 884.5,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:04.300907",
+    "age_hours": 0.007924540277777779
+  },
+  "CS.D.PALLADIUM.TODAY.IP_Annual": {
+    "epic": "CS.D.PALLADIUM.TODAY.IP",
+    "name": "Palladium",
+    "timeframe": "Annual",
+    "high": 1692.5,
+    "low": 876.5999755859375,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:04.887165",
+    "age_hours": 0.007761690833333334
+  },
+  "CC.D.CC.USS.IP_Annual": {
+    "epic": "CC.D.CC.USS.IP",
+    "name": "Cocoa",
+    "timeframe": "Annual",
+    "high": 12931.0,
+    "low": 5631.0,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:05.334809",
+    "age_hours": 0.007637345277777778
+  },
+  "CC.D.SB.USS.IP_Annual": {
+    "epic": "CC.D.SB.USS.IP",
+    "name": "Sugar",
+    "timeframe": "Annual",
+    "high": 23.0,
+    "low": 14.680000305175781,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:05.693057",
+    "age_hours": 0.007537831944444445
+  },
+  "CC.D.CT.USS.IP_Annual": {
+    "epic": "CC.D.CT.USS.IP",
+    "name": "Cotton",
+    "timeframe": "Annual",
+    "high": 73.69999694824219,
+    "low": 60.79999923706055,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:06.188089",
+    "age_hours": 0.007400323055555555
+  },
+  "CC.D.KC.USS.IP_Annual": {
+    "epic": "CC.D.KC.USS.IP",
+    "name": "Coffee",
+    "timeframe": "Annual",
+    "high": 440.8500061035156,
+    "low": 241.3000030517578,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:06.642332",
+    "age_hours": 0.0072741444444444445
+  },
+  "CC.D.W.USS.IP_Annual": {
+    "epic": "CC.D.W.USS.IP",
+    "name": "Wheat",
+    "timeframe": "Annual",
+    "high": 609.0,
+    "low": 492.25,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:07.025797",
+    "age_hours": 0.007167626388888889
+  },
+  "CC.D.C.USS.IP_Annual": {
+    "epic": "CC.D.C.USS.IP",
+    "name": "Corn",
+    "timeframe": "Annual",
+    "high": 504.5,
+    "low": 368.75,
+    "source": "yahoo",
+    "start_date": "2024-10-21",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:07.389151",
+    "age_hours": 0.007066694722222222
+  },
+  "CS.D.USCGC.TODAY.IP_All-Time": {
+    "epic": "CS.D.USCGC.TODAY.IP",
+    "name": "Spot Gold",
+    "timeframe": "All-Time",
+    "high": 4392.0,
+    "low": 255.0,
+    "source": "yahoo",
+    "start_date": "2000-08-30",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:33.118181",
+    "age_hours": 0
+  },
+  "CS.D.CFSILVER.TODAY.IP_All-Time": {
+    "epic": "CS.D.CFSILVER.TODAY.IP",
+    "name": "Spot Silver",
+    "timeframe": "All-Time",
+    "high": 53.76499938964844,
+    "low": 4.026000022888184,
+    "source": "yahoo",
+    "start_date": "2000-08-30",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:33.793788",
+    "age_hours": 0
+  },
+  "CC.D.CL.USS.IP_All-Time": {
+    "epic": "CC.D.CL.USS.IP",
+    "name": "Oil - US Crude",
+    "timeframe": "All-Time",
+    "high": 147.27000427246094,
+    "low": -40.31999969482422,
+    "source": "yahoo",
+    "start_date": "2000-08-23",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:34.316965",
+    "age_hours": 0
+  },
+  "CC.D.LCO.USS.IP_All-Time": {
+    "epic": "CC.D.LCO.USS.IP",
+    "name": "Oil - Brent Crude",
+    "timeframe": "All-Time",
+    "high": 147.42999267578125,
+    "low": 16.0,
+    "source": "yahoo",
+    "start_date": "2007-07-30",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:34.853333",
+    "age_hours": 0
+  },
+  "CC.D.NG.USS.IP_All-Time": {
+    "epic": "CC.D.NG.USS.IP",
+    "name": "Natural Gas",
+    "timeframe": "All-Time",
+    "high": 15.779999732971191,
+    "low": 1.4320000410079956,
+    "source": "yahoo",
+    "start_date": "2000-08-30",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:35.302522",
+    "age_hours": 0
+  },
+  "CS.D.CFDXC.CFD.IP_All-Time": {
+    "epic": "CS.D.CFDXC.CFD.IP",
+    "name": "Copper",
+    "timeframe": "All-Time",
+    "high": 5.894999980926514,
+    "low": 0.6039999723434448,
+    "source": "yahoo",
+    "start_date": "2000-08-30",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:35.916827",
+    "age_hours": 0
+  },
+  "CS.D.PLATINUM.TODAY.IP_All-Time": {
+    "epic": "CS.D.PLATINUM.TODAY.IP",
+    "name": "Platinum",
+    "timeframe": "All-Time",
+    "high": 2251.10009765625,
+    "low": 334.0,
+    "source": "yahoo",
+    "start_date": "1997-10-29",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:36.267209",
+    "age_hours": 0
+  },
+  "CS.D.PALLADIUM.TODAY.IP_All-Time": {
+    "epic": "CS.D.PALLADIUM.TODAY.IP",
+    "name": "Palladium",
+    "timeframe": "All-Time",
+    "high": 3380.5,
+    "low": 145.0,
+    "source": "yahoo",
+    "start_date": "1998-09-28",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:36.817917",
+    "age_hours": 0
+  },
+  "CC.D.CC.USS.IP_All-Time": {
+    "epic": "CC.D.CC.USS.IP",
+    "name": "Cocoa",
+    "timeframe": "All-Time",
+    "high": 12931.0,
+    "low": 674.0,
+    "source": "yahoo",
+    "start_date": "2000-01-03",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:37.252693",
+    "age_hours": 0
+  },
+  "CC.D.SB.USS.IP_All-Time": {
+    "epic": "CC.D.SB.USS.IP",
+    "name": "Sugar",
+    "timeframe": "All-Time",
+    "high": 36.08000183105469,
+    "low": 4.940000057220459,
+    "source": "yahoo",
+    "start_date": "2000-03-01",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:38.074520",
+    "age_hours": 0
+  },
+  "CC.D.CT.USS.IP_All-Time": {
+    "epic": "CC.D.CT.USS.IP",
+    "name": "Cotton",
+    "timeframe": "All-Time",
+    "high": 227.0,
+    "low": 28.200000762939453,
+    "source": "yahoo",
+    "start_date": "2000-01-03",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:38.599804",
+    "age_hours": 0
+  },
+  "CC.D.KC.USS.IP_All-Time": {
+    "epic": "CC.D.KC.USS.IP",
+    "name": "Coffee",
+    "timeframe": "All-Time",
+    "high": 440.8500061035156,
+    "low": 41.5,
+    "source": "yahoo",
+    "start_date": "2000-01-03",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:39.214182",
+    "age_hours": 0
+  },
+  "CC.D.W.USS.IP_All-Time": {
+    "epic": "CC.D.W.USS.IP",
+    "name": "Wheat",
+    "timeframe": "All-Time",
+    "high": 1425.25,
+    "low": 232.0,
+    "source": "yahoo",
+    "start_date": "2000-07-17",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:39.615126",
+    "age_hours": 0
+  },
+  "CC.D.C.USS.IP_All-Time": {
+    "epic": "CC.D.C.USS.IP",
+    "name": "Corn",
+    "timeframe": "All-Time",
+    "high": 843.75,
+    "low": 174.0,
+    "source": "yahoo",
+    "start_date": "2000-07-17",
+    "end_date": "2025-10-17",
+    "timestamp": "2025-10-19T22:02:40.184723",
     "age_hours": 0
   }
 }

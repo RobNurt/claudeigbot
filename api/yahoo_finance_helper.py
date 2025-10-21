@@ -76,7 +76,7 @@ def get_historical_range(ticker, period="1y"):
         period: "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "max"
     
     Returns:
-        dict with 'high', 'low', 'num_candles' or None
+        dict with 'high', 'low', 'num_candles', 'start_date', 'end_date' or None
     """
     try:
         stock = yf.Ticker(ticker)
@@ -86,10 +86,18 @@ def get_historical_range(ticker, period="1y"):
             print(f"No data for {ticker} (period: {period})")
             return None
         
+        # Get actual date range
+        start_date = hist.index[0].strftime('%Y-%m-%d')
+        end_date = hist.index[-1].strftime('%Y-%m-%d')
+        
+        print(f"Yahoo {ticker}: Got data from {start_date} to {end_date} ({len(hist)} candles)")
+        
         return {
             'high': float(hist['High'].max()),
             'low': float(hist['Low'].min()),
-            'num_candles': len(hist)
+            'num_candles': len(hist),
+            'start_date': start_date,
+            'end_date': end_date
         }
     except Exception as e:
         print(f"Yahoo Finance error for {ticker}: {str(e)}")

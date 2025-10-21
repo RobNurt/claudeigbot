@@ -109,12 +109,14 @@ class CachedMarketScanner:
         except Exception as e:
             print(f"Error saving cache: {e}")
     
-    def is_cache_valid(self, epic):
-        """Check if cached data for this epic is still valid"""
-        if epic not in self.historical_cache:
+    def is_cache_valid(self, epic, timeframe):
+        """Check if cached data for this epic AND timeframe is still valid"""
+        cache_key = f"{epic}_{timeframe}"
+        
+        if cache_key not in self.historical_cache:
             return False
         
-        cached_time = datetime.fromisoformat(self.historical_cache[epic]['timestamp'])
+        cached_time = datetime.fromisoformat(self.historical_cache[cache_key]['timestamp'])
         age_hours = (datetime.now() - cached_time).total_seconds() / 3600
         
         return age_hours < self.cache_duration_hours
@@ -133,9 +135,11 @@ class CachedMarketScanner:
     def get_historical_data(self, epic, name, timeframe, log_func):
         """Get historical data - Yahoo Finance first, then IG API, then cache"""
         
-        # Check cache first
-        if self.is_cache_valid(epic):
-            cached = self.historical_cache[epic]
+        # Check cache first (with timeframe)
+        cache_key = f"{epic}_{timeframe}"
+        
+        if self.is_cache_valid(epic, timeframe):
+            cached = self.historical_cache[cache_key]
             age_hours = cached.get('age_hours', 0)
             source = cached.get('source', 'unknown')
             log_func(f"  ✓ Using cached data for {name} ({age_hours:.1f}h old, source: {source})")
@@ -156,14 +160,17 @@ class CachedMarketScanner:
             yahoo_data = get_historical_range(yahoo_ticker, period)
             
             if yahoo_data:
-                # Cache it
-                self.historical_cache[epic] = {
+                # Cache it with timeframe in key
+                self.historical_cache[cache_key] = {
                     'epic': epic,
                     'name': name,
+                    'timeframe': timeframe,
                     'high': yahoo_data['high'],
                     'low': yahoo_data['low'],
                     'source': 'yahoo',
                     'num_candles': yahoo_data['num_candles'],
+                    'start_date': yahoo_data.get('start_date', 'unknown'),
+                    'end_date': yahoo_data.get('end_date', 'unknown'),
                     'timestamp': datetime.now().isoformat(),
                     'age_hours': 0
                 }
@@ -180,6 +187,11 @@ class CachedMarketScanner:
                 log_func(f"  ⚠️ Yahoo Finance failed for {yahoo_ticker}, trying IG API...")
         else:
             log_func(f"  ⚠️ No Yahoo ticker for {epic}, using IG API...")
+        
+        # Fallback to IG API (uses quota)
+        # ... existing IG API code would go here if needed ...
+        
+        return None
         
         # Fallback to IG API (uses quota)
         # ... existing IG API code would go here if needed ...
@@ -325,10 +337,13 @@ class CachedMarketScanner:
         
         return scan_results, stats
     
-    def scan_markets_yahoo_only(self, filter_type, timeframe, include_closed, market_limit, log_func):
+    def scan_markets_yahoo_only(self, filter_type, timeframe, include_closed, market_limit, log_func, force_refresh=False):
         """
         Scan using ONLY Yahoo Finance - ZERO IG API calls!
         Uses Yahoo for both historical ranges AND current prices
+        
+        Args:
+            force_refresh: If True, ignore cache and fetch fresh data
         """
         from api.market_list import get_popular_markets
         from api.yahoo_finance_helper import get_yahoo_ticker, get_historical_range, get_timeframe_period, get_current_price
@@ -343,6 +358,9 @@ class CachedMarketScanner:
         if market_limit and market_limit > 0:
             markets_list = markets_list[:market_limit]
             log_func(f"Limiting to {market_limit} markets")
+        
+        if force_refresh:
+            log_func(f"🔄 Force Refresh: Ignoring cache, fetching fresh data")
         
         log_func(f"🌟 Yahoo Only Mode: Scanning {len(markets_list)} markets (ZERO IG quota used)")
         
@@ -362,12 +380,14 @@ class CachedMarketScanner:
                 continue
             
             try:
-                # Check cache first
-                if self.is_cache_valid(epic):
-                    cached = self.historical_cache[epic]
+                # Check cache first (unless force refresh) - WITH TIMEFRAME
+                cache_key = f"{epic}_{timeframe}"
+                
+                if not force_refresh and self.is_cache_valid(epic, timeframe):
+                    cached = self.historical_cache[cache_key]
                     period_high = cached['high']
                     period_low = cached['low']
-                    log_func(f"  [{idx}/{len(markets_list)}] 💾 {name}: Using cache")
+                    log_func(f"  [{idx}/{len(markets_list)}] 💾 {name}: Using cache ({timeframe})")
                     stats['cached'] += 1
                 else:
                     # Fetch historical from Yahoo
@@ -381,13 +401,16 @@ class CachedMarketScanner:
                     period_high = yahoo_data['high']
                     period_low = yahoo_data['low']
                     
-                    # Cache it
-                    self.historical_cache[epic] = {
+                    # Cache it WITH TIMEFRAME IN KEY
+                    self.historical_cache[cache_key] = {
                         'epic': epic,
                         'name': name,
+                        'timeframe': timeframe,
                         'high': period_high,
                         'low': period_low,
                         'source': 'yahoo',
+                        'start_date': yahoo_data.get('start_date', 'unknown'),
+                        'end_date': yahoo_data.get('end_date', 'unknown'),
                         'timestamp': datetime.now().isoformat(),
                         'age_hours': 0
                     }

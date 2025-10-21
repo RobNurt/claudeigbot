@@ -1118,6 +1118,11 @@ class MainWindow:
                         self.scanner_results.insert(tk.END, 
                             f"✓ Scanned {len(scan_results)} markets\n\n", "header")
                         
+                        # Header row with Low and High
+                        header = f"{'Market':<28} {'Price':>10} {'Low':>10} {'High':>10} {'Pos':>8} {'Signal':>8}\n"
+                        self.scanner_results.insert(tk.END, header, "header")
+                        self.scanner_results.insert(tk.END, "="*85 + "\n", "header")
+                        
                         for result in scan_results:
                             if result['position_pct'] < 30:
                                 tag = "low"
@@ -1129,14 +1134,32 @@ class MainWindow:
                                 tag = "mid"
                                 signal = "🟡 MID"
                             
-                            name = result['name'][:30]
+                            name = result['name'][:26]
+                            price = result.get('price', 0)
+                            low = result.get('low', 0)
+                            high = result.get('high', 0)
                             position = f"{result['position_pct']:.1f}%"
                             
-                            line = f"{name:<32} {position:>8} {signal}\n"
+                            # Format numbers nicely
+                            def format_price(p):
+                                if not p:
+                                    return "N/A"
+                                elif p < 1:
+                                    return f"{p:.4f}"
+                                elif p < 100:
+                                    return f"{p:.2f}"
+                                else:
+                                    return f"{p:,.0f}"
+                            
+                            price_str = format_price(price)
+                            low_str = format_price(low)
+                            high_str = format_price(high)
+                            
+                            line = f"{name:<28} {price_str:>10} {low_str:>10} {high_str:>10} {position:>8} {signal:>8}\n"
                             self.scanner_results.insert(tk.END, line, tag)
                     else:
                         self.scanner_results.insert(tk.END, "No markets scanned\n")
-                
+        
                 self.root.after(0, update_display)
                 
             except Exception as e:
@@ -1307,8 +1330,7 @@ class MainWindow:
 
     def on_panic(self):
         """Handle emergency stop button"""
-        # Remove the messagebox - just execute immediately
-        self.log("EMERGENCY STOP ACTIVATED")
+        self.log("🚨 EMERGENCY STOP ACTIVATED")
 
         # Stop auto trading if running
         if self.auto_strategy.running:
@@ -1320,26 +1342,60 @@ class MainWindow:
         # Cancel all orders
         self.log("Cancelling all working orders...")
         orders = self.ig_client.get_working_orders()
+        cancelled_count = 0
+        failed_count = 0
+        
         for order in orders:
             deal_id = order.get("workingOrderData", {}).get("dealId")
             if deal_id:
-                self.ig_client.cancel_order(deal_id)
+                success, message = self.ig_client.cancel_order(deal_id)
+                if success:
+                    cancelled_count += 1
+                    self.log(f"  ✓ Cancelled order {deal_id}")
+                else:
+                    failed_count += 1
+                    self.log(f"  ✗ Failed to cancel {deal_id}: {message}")
                 time.sleep(0.2)
+        
+        self.log(f"Orders: {cancelled_count} cancelled, {failed_count} failed")
 
         # Close all positions
         self.log("Closing all open positions...")
         positions = self.ig_client.get_open_positions()
+        closed_count = 0
+        failed_closes = 0
+        
         for position in positions:
             deal_id = position.get("position", {}).get("dealId")
             direction = position.get("position", {}).get("direction")
             size = position.get("position", {}).get("dealSize")
+            epic = position.get("market", {}).get("epic", "Unknown")
+
+            self.log(f"  Closing: {epic} {direction} {size} (ID: {deal_id})")
 
             if deal_id and direction and size:
-                self.ig_client.close_position(deal_id, direction, size)
+                success, message = self.ig_client.close_position(deal_id, direction, size)
+                
+                if success:
+                    closed_count += 1
+                    self.log(f"  ✓ Closed {deal_id}")
+                else:
+                    failed_closes += 1
+                    self.log(f"  ✗ FAILED to close {deal_id}: {message}")
+                
                 time.sleep(0.5)
+            else:
+                failed_closes += 1
+                self.log(f"  ✗ Missing data for position")
 
-        self.log("EMERGENCY STOP COMPLETE - All positions closed")
+        if failed_closes > 0:
+            self.log(f"🚨 WARNING: {failed_closes} positions FAILED to close!")
+        
+        self.log(f"🚨 EMERGENCY STOP COMPLETE - Closed {closed_count}/{len(positions)} positions")
         self.ig_client.reset_emergency_stop()
+        
+        # Wait and verify
+        time.sleep(1)
         self.on_refresh_orders()
 
     def test_stop_update(self):
