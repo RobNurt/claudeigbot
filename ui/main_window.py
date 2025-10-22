@@ -4,6 +4,7 @@ CustomTkinter-based interface for the IG trading bot with modern UI
 """
 
 from concurrent.futures import thread
+from position_monitor import PositionMonitor
 from api.market_scanner import CachedMarketScanner
 import customtkinter as ctk
 from tkinter import scrolledtext, messagebox, simpledialog
@@ -56,6 +57,7 @@ class MainWindow:
         self.config = config
         self.ig_client = ig_client
         self.cached_scanner = CachedMarketScanner(ig_client)
+        self.position_monitor = PositionMonitor(ig_client)
         self.ladder_strategy = ladder_strategy
         self.auto_strategy = auto_strategy
         self.risk_manager = risk_manager
@@ -478,7 +480,7 @@ class MainWindow:
         ctk.CTkLabel(mgmt_card, text="Stop & Limit Management",
                     font=("Segoe UI", 11, "bold"), text_color=text_white).pack(side='left', pady=8, padx=10)
         
-        # Orders
+        # === BULK STOP UPDATE ===
         ctk.CTkLabel(mgmt_card, text="Orders:", font=("Segoe UI", 10),
                     text_color=text_white).pack(side='left', padx=3)
         
@@ -489,20 +491,6 @@ class MainWindow:
         
         ctk.CTkLabel(mgmt_card, text="pts", font=("Segoe UI", 9),
                     text_color="#9fa6b2").pack(side='left', padx=1)
-        
-        # GSLO checkbox - properly bound to BooleanVar
-        ctk.CTkLabel(top_row, text="GSLO:", font=("Segoe UI", 10),
-                    text_color=text_white).pack(side='left', padx=(8, 2))
-
-        self.gslo_checkbox = ctk.CTkCheckBox(
-            top_row, text="", 
-            variable=self.use_guaranteed_stops,
-            command=lambda: self.log(f"GSLO {'ON' if self.use_guaranteed_stops.get() else 'OFF'} - will apply to next ladder"),
-            fg_color=accent_teal, 
-            width=20, height=26,
-            font=("Segoe UI", 9)
-        )
-        self.gslo_checkbox.pack(side='left', padx=1)
         
         ctk.CTkButton(mgmt_card, text="Update",
                     command=self.on_bulk_update_stops,
@@ -515,11 +503,11 @@ class MainWindow:
         ctk.CTkLabel(mgmt_card, text="|", text_color="#3e444d",
                     font=("Segoe UI", 14)).pack(side='left', padx=8)
         
-        # On Trigger
-        ctk.CTkLabel(mgmt_card, text="Trigger:", font=("Segoe UI", 10),
+        # === AUTO-ATTACH ON TRIGGER ===
+        ctk.CTkLabel(mgmt_card, text="On Trigger:", font=("Segoe UI", 10),
                     text_color=text_white).pack(side='left', padx=3)
         
-        # Auto-stops
+        # Auto-stops toggle
         ctk.CTkLabel(mgmt_card, text="Stop:", font=("Segoe UI", 9),
                     text_color="#9fa6b2").pack(side='left', padx=1)
         
@@ -532,7 +520,35 @@ class MainWindow:
                     fg_color=card_bg, border_color="#3e444d",
                     font=("Segoe UI", 10)).pack(side='left', padx=1)
         
-        # Auto-limits
+        # Trailing toggle
+        ctk.CTkLabel(mgmt_card, text="Trail:", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left', padx=(6, 1))
+        
+        self.auto_trailing_toggle = ToggleSwitch(
+            mgmt_card, initial_state=False, callback=self.on_auto_trailing_toggled, bg=card_bg)
+        self.auto_trailing_toggle.pack(side='left', padx=2)
+        
+        # Trailing parameters (only shown when trailing is ON)
+        self.trailing_distance_var = ctk.StringVar(value="15")
+        self.trailing_entry_distance = ctk.CTkEntry(
+            mgmt_card, textvariable=self.trailing_distance_var, 
+            width=30, height=30,
+            fg_color=card_bg, border_color="#3e444d",
+            font=("Segoe UI", 9))
+        self.trailing_entry_distance.pack(side='left', padx=1)
+        
+        ctk.CTkLabel(mgmt_card, text="/", font=("Segoe UI", 9),
+                    text_color="#9fa6b2").pack(side='left')
+        
+        self.trailing_step_var = ctk.StringVar(value="5")
+        self.trailing_entry_step = ctk.CTkEntry(
+            mgmt_card, textvariable=self.trailing_step_var, 
+            width=30, height=30,
+            fg_color=card_bg, border_color="#3e444d",
+            font=("Segoe UI", 9))
+        self.trailing_entry_step.pack(side='left', padx=1)
+        
+        # Auto-limits toggle
         ctk.CTkLabel(mgmt_card, text="Lim:", font=("Segoe UI", 9),
                     text_color="#9fa6b2").pack(side='left', padx=(6, 1))
         
@@ -546,7 +562,7 @@ class MainWindow:
                     font=("Segoe UI", 10)).pack(side='left', padx=1)
         
         ctk.CTkLabel(mgmt_card, text="pts", font=("Segoe UI", 9),
-                    text_color="#9fa6b2").pack(side='left', padx=2)    
+                    text_color="#9fa6b2").pack(side='left', padx=2)
         
     def on_bulk_update_stops(self):
         """Update stop losses on all working orders - preserving GSLO if present"""
@@ -627,26 +643,126 @@ class MainWindow:
         if state:
             try:
                 stop_distance = float(self.auto_stop_distance_var.get())
-                self.log(f"Auto-stop enabled - will attach {stop_distance}pt stops to new positions")
-                self.ladder_strategy.start_position_monitoring(self.log, stop_distance)
+                trailing_enabled = self.auto_trailing_toggle.get()
+                
+                if trailing_enabled:
+                    trailing_distance = float(self.trailing_distance_var.get())
+                    trailing_step = float(self.trailing_step_var.get())
+                    self.log(f"Auto-stop enabled with trailing ({trailing_distance}/{trailing_step})")
+                else:
+                    self.log(f"Auto-stop enabled ({stop_distance}pts)")
+                
+                # Update monitor configuration
+                self.position_monitor.configure(
+                    auto_stop=True,
+                    stop_distance=stop_distance,
+                    auto_trailing=trailing_enabled,
+                    trailing_distance=float(self.trailing_distance_var.get()) if trailing_enabled else 15,
+                    trailing_step=float(self.trailing_step_var.get()) if trailing_enabled else 5,
+                    auto_limit=self.auto_limit_toggle.get(),
+                    limit_distance=float(self.auto_limit_distance_var.get())
+                )
+                
+                # Start monitoring if not already running
+                if not self.position_monitor.running:
+                    self.position_monitor.start(self.log)
+                    
             except ValueError:
-                self.log("Invalid auto-stop distance")
+                self.log("Invalid stop parameters")
                 self.auto_stop_toggle.set_state(False)
         else:
             self.log("Auto-stop disabled")
-            self.ladder_strategy.stop_position_monitoring()
-            
+            # Update monitor but keep it running
+            self.position_monitor.configure(
+                auto_stop=False,
+                auto_limit=self.auto_limit_toggle.get(),
+                limit_distance=float(self.auto_limit_distance_var.get()) if self.auto_limit_toggle.get() else 5
+            )
+
+    def on_auto_trailing_toggled(self, state):
+        """Handle auto-trailing toggle"""
+        if state:
+            try:
+                distance = float(self.trailing_distance_var.get())
+                step = float(self.trailing_step_var.get())
+                self.log(f"Trailing enabled - {distance}pt distance, {step}pt step")
+                
+                # Update monitor if auto-stop is also enabled
+                if self.auto_stop_toggle.get():
+                    self.position_monitor.configure(
+                        auto_stop=True,
+                        stop_distance=float(self.auto_stop_distance_var.get()),
+                        auto_trailing=True,
+                        trailing_distance=distance,
+                        trailing_step=step,
+                        auto_limit=self.auto_limit_toggle.get(),
+                        limit_distance=float(self.auto_limit_distance_var.get())
+                    )
+            except ValueError:
+                self.log("Invalid trailing parameters")
+                self.auto_trailing_toggle.set_state(False)
+        else:
+            self.log("Trailing disabled")
+            # Update monitor
+            if self.auto_stop_toggle.get():
+                self.position_monitor.configure(
+                    auto_stop=True,
+                    stop_distance=float(self.auto_stop_distance_var.get()),
+                    auto_trailing=False,
+                    auto_limit=self.auto_limit_toggle.get(),
+                    limit_distance=float(self.auto_limit_distance_var.get())
+                )
+
     def on_auto_limit_toggled(self, state):
         """Handle auto-limit toggle"""
         if state:
             try:
                 limit_distance = float(self.auto_limit_distance_var.get())
-                self.log(f"Auto-limits enabled - will attach {limit_distance}pt profit targets to new positions")
+                self.log(f"Auto-limits enabled ({limit_distance}pts)")
+                
+                # Update monitor
+                self.position_monitor.configure(
+                    auto_stop=self.auto_stop_toggle.get(),
+                    stop_distance=float(self.auto_stop_distance_var.get()),
+                    auto_trailing=self.auto_trailing_toggle.get(),
+                    trailing_distance=float(self.trailing_distance_var.get()),
+                    trailing_step=float(self.trailing_step_var.get()),
+                    auto_limit=True,
+                    limit_distance=limit_distance
+                )
+                
+                # Start monitoring if not running
+                if not self.position_monitor.running:
+                    self.position_monitor.start(self.log)
+                    
             except ValueError:
-                self.log("Invalid auto-limit distance")
+                self.log("Invalid limit parameters")
                 self.auto_limit_toggle.set_state(False)
         else:
             self.log("Auto-limits disabled")
+            # Update monitor
+            self.position_monitor.configure(
+                auto_stop=self.auto_stop_toggle.get(),
+                auto_trailing=self.auto_trailing_toggle.get(),
+                auto_limit=False
+            )
+            
+    def on_auto_trailing_toggled(self, state):
+        """Handle auto-trailing toggle"""
+        if state:
+            try:
+                distance = float(self.trailing_distance_var.get())
+                step = float(self.trailing_step_var.get())
+                self.log(f"Auto-trailing enabled - {distance}pt stop, {step}pt step")
+                # Enable the parameter fields
+                self.trailing_entry_distance.configure(state="normal")
+                self.trailing_entry_step.configure(state="normal")
+            except ValueError:
+                self.log("Invalid trailing parameters")
+                self.auto_trailing_toggle.set_state(False)
+        else:
+            self.log("Auto-trailing disabled")
+            # Keep fields enabled for manual editing
 
     def create_risk_tab(self, parent):
         """Create comprehensive risk management tab"""
@@ -1567,14 +1683,34 @@ class MainWindow:
             if market_details:
                 min_size = market_details['min_deal_size']
                 max_size = market_details['max_deal_size']
-            
-            # Check if max_size is 0 (missing from API - skip max validation)
-            if max_size == 0:
-                self.log(f"⚠️ No max size available for {selected_market} - skipping max check")
-                # Don't check max, just proceed
-            else:
-                # Only check max if it exists
-                if order_size > max_size:
+                
+                # Check if size is too small
+                if order_size < min_size:
+                    result = messagebox.askyesno(
+                        "Order Size Too Small",
+                        f"⚠️ Minimum size for {selected_market} is {min_size}\n\n"
+                        f"Your order size: {order_size}\n"
+                        f"Minimum required: {min_size}\n\n"
+                        f"Place orders at minimum size of {min_size} instead?",
+                        icon="warning"
+                    )
+                    
+                    if result:
+                        self.size_var.set(str(min_size))
+                        order_size = min_size
+                        self.log(f"✓ Order size adjusted to minimum: {min_size}")
+                    else:
+                        self.log("Order cancelled - size below minimum")
+                        self.ladder_btn.configure(
+                            state="normal", 
+                            text="PLACE LADDER",
+                            fg_color="#3b9f6f",
+                            hover_color="#4ab080"
+                        )
+                        return
+                
+                # Check if size is too large (ONLY if max_size is provided)
+                elif max_size > 0 and order_size > max_size:
                     result = messagebox.askyesno(
                         "Order Size Too Large",
                         f"⚠️ Maximum size for {selected_market} is {max_size}\n\n"
@@ -1590,31 +1726,6 @@ class MainWindow:
                         self.log(f"✓ Order size adjusted to maximum: {max_size}")
                     else:
                         self.log("Order cancelled - size above maximum")
-                        self.ladder_btn.configure(...)
-                        return
-
-            if market_details:
-                min_size = market_details['min_deal_size']
-                max_size = market_details['max_deal_size']
-                
-                # Check if size is too small
-                if order_size < min_size:
-                    result = messagebox.askyesno(
-                        "Order Size Too Small",
-                        f"⚠️ Minimum size for {selected_market} is {min_size}\n\n"
-                        f"Your order size: {order_size}\n"
-                        f"Minimum required: {min_size}\n\n"
-                        f"Place orders at minimum size of {min_size} instead?",
-                        icon="warning"
-                    )
-                    
-                    if result:
-                        # Update the size variable and log it
-                        self.size_var.set(str(min_size))
-                        order_size = min_size
-                        self.log(f"✓ Order size adjusted to minimum: {min_size}")
-                    else:
-                        self.log("Order cancelled - size below minimum")
                         self.ladder_btn.configure(
                             state="normal", 
                             text="PLACE LADDER",

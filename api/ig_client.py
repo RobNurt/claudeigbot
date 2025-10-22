@@ -229,6 +229,100 @@ class IGClient:
                 
         except Exception as e:
             return False, f"Update error: {str(e)}"
+        
+    def update_position_stops(self, deal_id, stop_level=None, stop_distance=None, 
+        trailing_stop=False, trailing_distance=None, trailing_step=None,
+        limit_level=None, limit_distance=None):
+        """
+        Update stops/limits on an open position
+        
+        Args:
+            deal_id: Position deal ID
+            stop_level: Absolute stop level (use either this OR stop_distance)
+            stop_distance: Stop distance from current price
+            trailing_stop: Enable trailing stop (requires trailing_distance and trailing_step)
+            trailing_distance: Distance for trailing stop
+            trailing_step: Step distance for trailing stop
+            limit_level: Absolute limit level
+            limit_distance: Limit distance from current price
+        
+        Returns:
+            (success, message)
+        """
+        try:
+            url = f"{self.base_url}/positions/otc/{deal_id}"
+            
+            print(f"DEBUG update_position_stops: deal_id={deal_id}")
+            print(f"DEBUG: stop_level={stop_level}, stop_distance={stop_distance}")
+            print(f"DEBUG: trailing_stop={trailing_stop}, trailing_distance={trailing_distance}, trailing_step={trailing_step}")
+            
+            update_data = {}
+            
+            # Stop configuration
+            if stop_level is not None:
+                update_data["stopLevel"] = str(stop_level)
+            elif stop_distance is not None:
+                update_data["stopDistance"] = str(stop_distance)
+            
+            # Trailing stop configuration
+            if trailing_stop and trailing_distance is not None and trailing_step is not None:
+                update_data["trailingStop"] = True
+                update_data["trailingStopDistance"] = str(trailing_distance)
+                update_data["trailingStopIncrement"] = str(trailing_step)
+            else:
+                update_data["trailingStop"] = False
+            
+            # Limit configuration
+            if limit_level is not None:
+                update_data["limitLevel"] = str(limit_level)
+            elif limit_distance is not None:
+                update_data["limitDistance"] = str(limit_distance)
+            
+            print(f"DEBUG update_position_stops: Sending data = {update_data}")
+            
+            headers = self.session.headers.copy()
+            headers["_method"] = "PUT"
+            headers["version"] = "2"  # V2 required for trailing stops
+            
+            response = self.session.put(url, json=update_data, headers=headers)
+            
+            print(f"DEBUG update_position_stops: Status = {response.status_code}")
+            print(f"DEBUG update_position_stops: Response = {response.text}")
+            
+            if response.status_code == 200:
+                deal_ref = response.json().get('dealReference')
+                print(f"DEBUG update_position_stops: dealReference = {deal_ref}")
+                
+                if deal_ref:
+                    deal_status = self.check_deal_status(deal_ref)
+                    print(f"DEBUG update_position_stops: Deal status = {deal_status}")
+                    
+                    if deal_status.get('dealStatus') == 'ACCEPTED':
+                        trailing_info = ""
+                        if trailing_stop:
+                            trailing_info = f" with trailing stop ({trailing_distance}/{trailing_step})"
+                        return True, f"Position updated{trailing_info}"
+                    else:
+                        reason = deal_status.get('reason', 'Unknown reason')
+                        print(f"DEBUG update_position_stops: REJECTED - {reason}")
+                        return False, f"Update rejected: {reason}"
+                else:
+                    print(f"DEBUG update_position_stops: No dealReference in response")
+                    return False, "No deal reference returned"
+            else:
+                print(f"DEBUG update_position_stops: HTTP error {response.status_code}")
+                return False, f"Update failed: {response.text}"
+                
+        except Exception as e:
+            print(f"DEBUG update_position_stops: EXCEPTION - {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False, f"Update error: {str(e)}"
+
+    def check_trailing_stops_enabled(self):
+        """Check if account has trailing stops enabled"""
+        # This is set during login from the session response
+        return getattr(self, 'trailing_stops_enabled', False)
     
     def get_working_orders(self):
         """Get list of working orders"""
