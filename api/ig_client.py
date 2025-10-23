@@ -318,6 +318,155 @@ class IGClient:
             import traceback
             traceback.print_exc()
             return False, f"Update error: {str(e)}"
+        
+    def update_position(self, deal_id, stop_level=None, stop_distance=None, limit_level=None):
+        """
+        Update an open position's stop and/or limit
+        
+        Args:
+            deal_id: Position deal ID
+            stop_level: Absolute stop level (use this OR stop_distance, not both)
+            stop_distance: Stop distance in points from current level
+            limit_level: Absolute limit level
+        
+        Returns:
+            (success: bool, message: str)
+        """
+        if not self.logged_in:
+            return False, "Not logged in"
+        
+        try:
+            url = f"{self.base_url}/positions/otc/{deal_id}"
+            
+            headers = {
+                **self.headers,
+                "Version": "2",
+                "_method": "PUT"
+            }
+            
+            # Build payload
+            payload = {}
+            
+            if stop_level is not None:
+                payload["stopLevel"] = stop_level
+            elif stop_distance is not None:
+                payload["stopDistance"] = stop_distance
+            
+            if limit_level is not None:
+                payload["limitLevel"] = limit_level
+            
+            if not payload:
+                return False, "No updates specified"
+            
+            print(f"DEBUG: Updating position {deal_id} with {payload}")
+            
+            response = requests.put(url, json=payload, headers=headers)
+            
+            print(f"DEBUG: Update response: {response.status_code} - {response.text}")
+            
+            if response.status_code == 200:
+                return True, "Position updated"
+            else:
+                error_data = response.json() if response.text else {}
+                error_msg = error_data.get("errorCode", response.text)
+                return False, f"Update failed: {error_msg}"
+                
+        except Exception as e:
+            print(f"ERROR updating position: {e}")
+            return False, str(e)
+
+    def update_working_order(self, deal_id, stop_level=None, limit_level=None, guaranteed_stop=None):
+        """
+        Update a working order's stop and/or limit
+        
+        Args:
+            deal_id: Working order deal ID
+            stop_level: New stop level
+            limit_level: New limit level
+            guaranteed_stop: True/False for GSLO, None to leave unchanged
+        
+        Returns:
+            (success: bool, message: str)
+        """
+        if not self.logged_in:
+            return False, "Not logged in"
+        
+        try:
+            url = f"{self.base_url}/workingorders/otc/{deal_id}"
+            
+            headers = {
+                **self.headers,
+                "Version": "2",
+                "_method": "PUT"
+            }
+            
+            # Build payload
+            payload = {}
+            
+            if stop_level is not None:
+                payload["stopLevel"] = stop_level
+            
+            if limit_level is not None:
+                payload["limitLevel"] = limit_level
+            
+            if guaranteed_stop is not None:
+                payload["guaranteedStop"] = guaranteed_stop
+            
+            if not payload:
+                return False, "No updates specified"
+            
+            print(f"DEBUG: Updating working order {deal_id} with {payload}")
+            
+            response = requests.put(url, json=payload, headers=headers)
+            
+            print(f"DEBUG: Update response: {response.status_code} - {response.text}")
+            
+            if response.status_code == 200:
+                return True, "Order updated"
+            else:
+                error_data = response.json() if response.text else {}
+                error_msg = error_data.get("errorCode", response.text)
+                return False, f"Update failed: {error_msg}"
+                
+        except Exception as e:
+            print(f"ERROR updating working order: {e}")
+            return False, str(e)
+
+    def get_margin_usage(self):
+        """
+        Get current margin usage percentage
+        
+        Returns:
+            float: Margin usage as percentage (0-100)
+        """
+        if not self.logged_in:
+            return 0.0
+        
+        try:
+            url = f"{self.base_url}/accounts"
+            response = requests.get(url, headers=self.headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                accounts = data.get("accounts", [])
+                
+                if accounts:
+                    account = accounts[0]  # Primary account
+                    balance = account.get("balance", {})
+                    
+                    available = balance.get("available", 0)
+                    deposit = balance.get("deposit", 0)
+                    
+                    if deposit > 0:
+                        used = deposit - available
+                        margin_pct = (used / deposit) * 100
+                        return margin_pct
+            
+            return 0.0
+            
+        except Exception as e:
+            print(f"ERROR getting margin usage: {e}")
+            return 0.0
 
     def check_trailing_stops_enabled(self):
         """Check if account has trailing stops enabled"""
