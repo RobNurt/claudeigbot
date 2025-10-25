@@ -1,0 +1,495 @@
+
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+[12:58:24] No working orders found
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4108.06, 'offer': 4108.56, 'mid': 4108.31, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.53, 'offer': 4112.03, 'mid': 4111.78, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.6, 'offer': 4112.1, 'mid': 4111.85, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.78, 'offer': 4112.28, 'mid': 4112.03, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.78, 'offer': 4112.28, 'mid': 4112.03, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.45, 'offer': 4111.95, 'mid': 4111.7, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.69, 'offer': 4112.19, 'mid': 4111.94, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.84, 'offer': 4112.14, 'mid': 4111.99, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4111.7, 'offer': 4112.2, 'mid': 4111.95, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4110.01, 'offer': 4110.51, 'mid': 4110.26, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4109.99, 'offer': 4110.49, 'mid': 4110.24, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+Orders error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Positions error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.65, 'offer': 4151.15, 'mid': 4150.9, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.24, 'offer': 4150.74, 'mid': 4150.49, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.42, 'offer': 4150.92, 'mid': 4150.67, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.09, 'offer': 4150.59, 'mid': 4150.34, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.37, 'offer': 4151.87, 'mid': 4151.62, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.37, 'offer': 4151.87, 'mid': 4151.62, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4152.34, 'offer': 4152.84, 'mid': 4152.59, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4152.34, 'offer': 4152.84, 'mid': 4152.59, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4152.02, 'offer': 4152.52, 'mid': 4152.27, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.91, 'offer': 4152.41, 'mid': 4152.16, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+[15:11:08] Trailing check #61 (next in 30s)...
+[15:11:08] No working orders found
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.71, 'offer': 4152.21, 'mid': 4151.96, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.6, 'offer': 4152.1, 'mid': 4151.85, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.94, 'offer': 4151.44, 'mid': 4151.19, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.14, 'offer': 4151.64, 'mid': 4151.39, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.0, 'offer': 4151.5, 'mid': 4151.25, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4151.08, 'offer': 4151.58, 'mid': 4151.33, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.98, 'offer': 4151.48, 'mid': 4151.23, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.98, 'offer': 4151.48, 'mid': 4151.23, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.71, 'offer': 4150.21, 'mid': 4149.96, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.64, 'offer': 4150.14, 'mid': 4149.89, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.78, 'offer': 4149.28, 'mid': 4149.03, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.99, 'offer': 4149.49, 'mid': 4149.24, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.91, 'offer': 4147.41, 'mid': 4147.16, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.87, 'offer': 4147.37, 'mid': 4147.12, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.15, 'offer': 4148.65, 'mid': 4148.4, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.46, 'offer': 4148.96, 'mid': 4148.71, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.4, 'offer': 4149.9, 'mid': 4149.65, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.43, 'offer': 4149.93, 'mid': 4149.68, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.93, 'offer': 4150.43, 'mid': 4150.18, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.09, 'offer': 4150.59, 'mid': 4150.34, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.01, 'offer': 4150.51, 'mid': 4150.26, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4150.01, 'offer': 4150.51, 'mid': 4150.26, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4149.02, 'offer': 4149.52, 'mid': 4149.27, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.94, 'offer': 4149.44, 'mid': 4149.19, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4147.84, 'offer': 4148.34, 'mid': 4148.09, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4147.9, 'offer': 4148.4, 'mid': 4148.15, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.55, 'offer': 4149.05, 'mid': 4148.8, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4148.49, 'offer': 4148.99, 'mid': 4148.74, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+[15:13:39] Trailing check #66 (next in 30s)...
+[15:13:39] No working orders found
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.84, 'offer': 4147.34, 'mid': 4147.09, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.86, 'offer': 4147.36, 'mid': 4147.11, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.27, 'offer': 4146.77, 'mid': 4146.52, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.29, 'offer': 4146.79, 'mid': 4146.54, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.0, 'offer': 4146.5, 'mid': 4146.25, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.0, 'offer': 4146.5, 'mid': 4146.25, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.09, 'offer': 4146.59, 'mid': 4146.34, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.13, 'offer': 4146.63, 'mid': 4146.38, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4144.32, 'offer': 4144.82, 'mid': 4144.57, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4144.31, 'offer': 4144.81, 'mid': 4144.56, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4144.08, 'offer': 4144.58, 'mid': 4144.33, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4143.99, 'offer': 4144.49, 'mid': 4144.24, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4143.24, 'offer': 4143.74, 'mid': 4143.49, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4143.48, 'offer': 4143.98, 'mid': 4143.73, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4142.67, 'offer': 4143.17, 'mid': 4142.92, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4142.66, 'offer': 4143.16, 'mid': 4142.91, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4141.38, 'offer': 4141.88, 'mid': 4141.63, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4141.38, 'offer': 4141.88, 'mid': 4141.63, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4139.68, 'offer': 4140.18, 'mid': 4139.93, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4140.15, 'offer': 4140.65, 'mid': 4140.4, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4145.28, 'offer': 4145.78, 'mid': 4145.53, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4145.45, 'offer': 4145.95, 'mid': 4145.7, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4145.53, 'offer': 4146.03, 'mid': 4145.78, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4145.53, 'offer': 4146.03, 'mid': 4145.78, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.04, 'offer': 4146.54, 'mid': 4146.29, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.07, 'offer': 4146.57, 'mid': 4146.32, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4147.18, 'offer': 4147.68, 'mid': 4147.43, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4147.18, 'offer': 4147.68, 'mid': 4147.43, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.89, 'offer': 4147.39, 'mid': 4147.14, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.78, 'offer': 4147.28, 'mid': 4147.03, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+Orders error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.16, 'offer': 4146.66, 'mid': 4146.41, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'
+DEBUG get_market_price: Fetching https://demo-api.ig.com/gateway/deal/markets/CS.D.USCGC.TODAY.IP
+DEBUG get_market_price: Headers = {'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'CST': '88abca2f536ab0a1f5595abf6b0cbf913747d6c513bc067cc8fe41052eda88CC01114', 'X-SECURITY-TOKEN': '0b1ffbe4fe3ce04d903aa7f9165d0da2cb5a9cc99332c591f906455f008bf8CD01113', 'X-IG-API-KEY': 'd165bb774f6835732e0050e39df4d84ae0616335', 'Content-Type': 'application/json', 'Version': '3'}
+DEBUG get_market_price: Status = 200
+DEBUG get_market_price: Response keys = dict_keys(['instrument', 'dealingRules', 'snapshot'])
+DEBUG get_market_price: Result = {'bid': 4146.18, 'offer': 4146.68, 'mid': 4146.43, 'market_status': 'TRADEABLE'}
+ERROR updating position: 'IGClient' object has no attribute 'headers'

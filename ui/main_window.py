@@ -238,10 +238,10 @@ class MainWindow:
             # Emergency stop button
             self.panic_btn = ctk.CTkButton(
                 header_frame,
-                text="⚠ EMERGENCY STOP",
+                text="CANCEL ALL",
                 command=self.on_panic,
                 fg_color="#de3618",
-                hover_color="#ee4626",
+                hover_color="#9a6e65",
                 font=Theme.font_medium(),
                 corner_radius=8,
                 width=180,
@@ -2532,6 +2532,8 @@ class MainWindow:
             for order in orders:
                 try:
                     order_data = order.get("workingOrderData", {})
+                    print(f"DEBUG: Order data keys = {order_data.keys()}")
+                    print(f"DEBUG: Full order data = {order_data}")
                     deal_id = order_data.get("dealId")
                     direction = order_data.get("direction")
                     order_level = order_data.get("orderLevel")
@@ -2812,6 +2814,238 @@ class MainWindow:
                 self.orders_text.insert(
                     tk.END, f"No markets found for '{search_term}'")
                 self.log(f"No markets found for '{search_term}'")
+                
+                # Add these methods to your MainWindow class in main_window.py
+
+    def on_add_market_to_list(self, market_name, epic):
+        """Add a market from search results to the trading list"""
+        try:
+            # Check if already exists
+            if market_name in self.config.markets:
+                self.log(f"⚠️ {market_name} already in your trading list")
+                return
+            
+            # Add to config
+            self.config.markets[market_name] = epic
+            
+            # Update the dropdown in Trading tab
+            if hasattr(self, 'market_var'):
+                # Get current markets list
+                current_markets = list(self.config.markets.keys())
+                
+                # Update the combobox
+                self.market_dropdown.configure(values=current_markets)
+                
+                self.log(f"✅ Added {market_name} to trading list")
+                
+                # Save to config file
+                self._save_markets_to_config()
+            
+        except Exception as e:
+            self.log(f"Error adding market: {e}")
+
+    def on_remove_market_from_list(self):
+        """Remove currently selected market from trading list"""
+        try:
+            selected_market = self.market_var.get()
+            
+            # Don't allow removing if it's the last one
+            if len(self.config.markets) <= 1:
+                messagebox.showwarning(
+                    "Cannot Remove",
+                    "You must have at least one market in your trading list!"
+                )
+                return
+            
+            # Confirm removal
+            result = messagebox.askyesno(
+                "Remove Market?",
+                f"Remove '{selected_market}' from your trading list?\n\nYou can always add it back using Market Search."
+            )
+            
+            if result:
+                # Remove from config
+                del self.config.markets[selected_market]
+                
+                # Update dropdown
+                current_markets = list(self.config.markets.keys())
+                self.market_dropdown.configure(values=current_markets)
+                
+                # Select first market in list
+                if current_markets:
+                    self.market_var.set(current_markets[0])
+                
+                self.log(f"✅ Removed {selected_market} from trading list")
+                
+                # Save to config file
+                self._save_markets_to_config()
+        
+        except Exception as e:
+            self.log(f"Error removing market: {e}")
+
+    def _save_markets_to_config(self):
+        """Save markets list to config.py file"""
+        try:
+            import os
+            
+            # Read current config file
+            config_path = os.path.join(os.path.dirname(__file__), '..', 'config.py')
+            
+            with open(config_path, 'r') as f:
+                lines = f.readlines()
+            
+            # Find the markets section and rebuild it
+            new_lines = []
+            in_markets = False
+            markets_written = False
+            
+            for line in lines:
+                if 'self.markets = {' in line:
+                    in_markets = True
+                    # Write updated markets dict
+                    new_lines.append('        self.markets = {\n')
+                    for name, epic in self.config.markets.items():
+                        new_lines.append(f'            "{name}": "{epic}",\n')
+                    new_lines.append('        }\n')
+                    markets_written = True
+                    continue
+                
+                if in_markets and '}' in line:
+                    in_markets = False
+                    continue
+                
+                if not in_markets:
+                    new_lines.append(line)
+            
+            # Write back to file
+            with open(config_path, 'w') as f:
+                f.writelines(new_lines)
+            
+            self.log("💾 Markets list saved to config")
+            
+        except Exception as e:
+            self.log(f"Warning: Could not save to config file: {e}")
+
+
+    # Update your Market Search results display
+    # Find the on_search_markets method and update the results display section:
+
+    def display_search_results_with_add_button(self, results):
+        """Display search results with Add to List buttons"""
+        # Clear previous results
+        for widget in self.search_results_frame.winfo_children():
+            widget.destroy()
+        
+        if not results:
+            ctk.CTkLabel(
+                self.search_results_frame,
+                text="No results found",
+                font=Theme.font_normal(),
+                text_color=Theme.TEXT_GRAY
+            ).pack(pady=20)
+            return
+        
+        # Display each result
+        for result in results[:50]:  # Limit to 50 results
+            result_frame = ctk.CTkFrame(
+                self.search_results_frame,
+                fg_color=Theme.CARD_BG,
+                corner_radius=6
+            )
+            result_frame.pack(fill="x", pady=2, padx=5)
+            
+            # Use grid for better layout
+            result_inner = ctk.CTkFrame(result_frame, fg_color=Theme.CARD_BG)
+            result_inner.pack(fill="x", padx=10, pady=5)
+            
+            # Market name
+            ctk.CTkLabel(
+                result_inner,
+                text=result['name'],
+                font=Theme.font_normal_bold(),
+                text_color=Theme.TEXT_WHITE,
+                width=250,
+                anchor="w"
+            ).grid(row=0, column=0, sticky="w", padx=5)
+            
+            # Epic code
+            ctk.CTkLabel(
+                result_inner,
+                text=result['epic'],
+                font=Theme.font_small(),
+                text_color=Theme.TEXT_GRAY,
+                width=200,
+                anchor="w"
+            ).grid(row=0, column=1, sticky="w", padx=5)
+            
+            # Type
+            ctk.CTkLabel(
+                result_inner,
+                text=result.get('type', 'N/A'),
+                font=Theme.font_small(),
+                text_color=Theme.TEXT_GRAY,
+                width=100,
+                anchor="w"
+            ).grid(row=0, column=2, sticky="w", padx=5)
+            
+            # Add button
+            add_btn = ctk.CTkButton(
+                result_inner,
+                text="➕ Add to Trading List",
+                command=lambda n=result['name'], e=result['epic']: self.on_add_market_to_list(n, e),
+                fg_color=Theme.ACCENT_TEAL,
+                hover_color="#4ab39f",
+                text_color="black",
+                corner_radius=6,
+                width=150,
+                height=28,
+                font=Theme.font_small_bold()
+            )
+            add_btn.grid(row=0, column=3, padx=10)
+
+
+        # Update your Trading tab Market selector to include Remove button
+        # In create_trading_tab, update the market row:
+
+        # Row 1: Market & Price - ADD REMOVE BUTTON
+        row1 = ctk.CTkFrame(placement_card, fg_color=card_bg)
+        row1.pack(fill="x", pady=8, padx=20)
+
+        ctk.CTkLabel(row1, text="Market:", font=Theme.font_normal_bold(),
+                    text_color=text_white, width=60, anchor="w").grid(row=0, column=0, padx=(0,5), sticky="w")
+
+        self.market_var = ctk.StringVar(value="Gold Spot")
+        self.market_dropdown = ctk.CTkComboBox(  # SAVE REFERENCE
+            row1, variable=self.market_var,
+            values=list(self.config.markets.keys()),
+            width=160, height=30,
+            fg_color=card_bg, button_color=accent_teal,
+            font=Theme.font_normal()
+        )
+        self.market_dropdown.grid(row=0, column=1, padx=5)
+
+        # ADD REMOVE BUTTON
+        ctk.CTkButton(
+            row1, 
+            text="➖",
+            command=self.on_remove_market_from_list,
+            fg_color="#e74c3c",
+            hover_color="#ee4626",
+            corner_radius=6,
+            width=30,
+            height=30,
+            font=Theme.font_normal_bold()
+        ).grid(row=0, column=2, padx=2)
+
+        ctk.CTkButton(row1, text="Get Price", command=self.on_get_price,
+                    fg_color="#3e444d", hover_color="#4a5159",
+                    corner_radius=8, width=90, height=30,
+                    font=Theme.font_normal()).grid(row=0, column=3, padx=10)
+
+        self.price_var = ctk.StringVar(value="--")
+        ctk.CTkLabel(row1, textvariable=self.price_var,
+                    font=Theme.font_medium_bold(),
+                    text_color=accent_teal, width=100).grid(row=0, column=4, padx=5)
 
     def run(self):
         """Start the GUI"""

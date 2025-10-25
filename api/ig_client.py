@@ -65,7 +65,7 @@ class IGClient:
         self.session = requests.Session()
         self.base_url = ""
 
-    def update_working_order(self, deal_id, new_level, stop_distance=None, guaranteed_stop=False):
+    def update_working_order(self, deal_id, new_level, stop_level=None, guaranteed_stop=False):
             """Update the level of a working order, preserving stop loss if provided"""
             try:
                 url = f"{self.base_url}/workingorders/otc/{deal_id}"

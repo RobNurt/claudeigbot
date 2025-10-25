@@ -338,11 +338,10 @@ class LadderStrategy:
                                         new_level = ideal_level
                                         
                                         success, message = self.ig_client.update_working_order(
-                                            deal_id, 
-                                            new_level,
-                                            stop_distance=stop_info['stop_distance'],
-                                            guaranteed_stop=stop_info['guaranteed']
-                                        )
+                                        deal_id=deal_id,
+                                        stop_level=new_level,
+                                        guaranteed_stop=stop_info['guaranteed']
+                                    )
                                         
                                         if success:
                                             stop_msg = f" (stop: {stop_info['stop_distance']})" if stop_info['stop_distance'] else ""
@@ -360,11 +359,10 @@ class LadderStrategy:
                                         new_level = ideal_level
                                         
                                         success, message = self.ig_client.update_working_order(
-                                            deal_id,
-                                            new_level,
-                                            stop_distance=stop_info['stop_distance'],
-                                            guaranteed_stop=stop_info['guaranteed']
-                                        )
+                                        deal_id=deal_id,
+                                        stop_level=new_level,
+                                        guaranteed_stop=stop_info['guaranteed']
+                                    )
                                         
                                         if success:
                                             stop_msg = f" (stop: {stop_info['stop_distance']})" if stop_info['stop_distance'] else ""

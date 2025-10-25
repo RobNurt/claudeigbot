@@ -123,6 +123,7 @@ class PositionMonitor:
         """Process a newly opened position"""
         try:
             position_data = position.get("position", {})
+            print(f"DEBUG: Full position data = {position_data}")
             market_data = position.get("market", {})
             
             deal_id = position_data.get("dealId")
