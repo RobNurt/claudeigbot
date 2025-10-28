@@ -1445,23 +1445,42 @@ class MainWindow:
         except:
             pass
 
+    """
+    UPDATED create_market_research_tab method for main_window.py
+    This replaces your existing method starting at line 1448
+
+    This version adds SUB-TABS:
+    - Market Scanner (existing - for spread betting)
+    - Stock Screener (NEW - for ISA investments)
+    """
+
     def create_market_research_tab(self, parent):
-        """Create market research and analysis tab with scanner"""
+        """Create market research tab with Market Scanner and Stock Screener sub-tabs"""
         card_bg = "#252a31"
         text_white = "#f4f5f7"
         accent_teal = "#5aa89a"
         bg_dark = "#1e2228"
         text_gray = "#9fa6b2"
         
-        # Make scrollable
-        scrollable = ctk.CTkScrollableFrame(parent, fg_color=bg_dark)
-        scrollable.pack(fill="both", expand=True, padx=20, pady=10)
+        # Create TabView for sub-tabs
+        self.research_tabview = ctk.CTkTabview(parent, fg_color=bg_dark)
+        self.research_tabview.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # === MARKET SCANNER ===
+        # Add sub-tabs
+        self.research_tabview.add("Market Scanner")
+        self.research_tabview.add("Stock Screener")
+        
+        # === MARKET SCANNER TAB (your existing code) ===
+        scanner_parent = self.research_tabview.tab("Market Scanner")
+        
+        # Make scrollable
+        scrollable = ctk.CTkScrollableFrame(scanner_parent, fg_color=bg_dark)
+        scrollable.pack(fill="both", expand=True, padx=10, pady=10)
+        
         scanner_frame = ctk.CTkFrame(scrollable, fg_color=card_bg, corner_radius=10)
         scanner_frame.pack(fill="both", expand=True, pady=(0, 10))
         
-        ctk.CTkLabel(scanner_frame, text="Market Scanner",
+        ctk.CTkLabel(scanner_frame, text="Market Scanner - Spread Betting",
                     font=Theme.font_xxlarge(), text_color=text_white).pack(pady=(15, 10), padx=15, anchor="w")
         
         # Scanner controls
@@ -1521,8 +1540,7 @@ class MainWindow:
             font=Theme.font_normal()
         ).pack(side="left", padx=(15, 5))
         
-        # Data Source Checkbox 
-        
+        # Data Source
         ctk.CTkLabel(control_row, text="Source:", 
                     font=Theme.font_medium(), text_color=text_white).pack(side="left", padx=(15, 5))
 
@@ -1569,6 +1587,423 @@ class MainWindow:
         # Initial message
         self.scanner_results.insert("1.0", "📊 Market Scanner\n\n", "header")
         self.scanner_results.insert("end", "Click 'Scan Markets' to analyze\n", "neutral")
+        
+        
+        # === STOCK SCREENER TAB (NEW - for ISA investments) ===
+        screener_parent = self.research_tabview.tab("Stock Screener")
+        
+        # Make scrollable
+        screener_scroll = ctk.CTkScrollableFrame(screener_parent, fg_color=bg_dark)
+        screener_scroll.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        screener_frame = ctk.CTkFrame(screener_scroll, fg_color=card_bg, corner_radius=10)
+        screener_frame.pack(fill="both", expand=True, pady=(0, 10))
+        
+        # Title
+        ctk.CTkLabel(
+            screener_frame, 
+            text="📈 ISA Stock Screener - Naked Trader Style",
+            font=Theme.font_xxlarge(), 
+            text_color=text_white
+        ).pack(pady=(15, 5), padx=15, anchor="w")
+        
+        ctk.CTkLabel(
+            screener_frame,
+            text="Filter UK stocks by fundamentals • Note: Director buying data coming soon",
+            font=Theme.font_small(),
+            text_color=text_gray
+        ).pack(pady=(0, 15), padx=15, anchor="w")
+        
+        # Filters section
+        filters_frame = ctk.CTkFrame(screener_frame, fg_color=card_bg)
+        filters_frame.pack(fill="x", padx=15, pady=(0, 10))
+        
+        # === FUNDAMENTAL FILTERS ===
+        fund_header = ctk.CTkLabel(
+            filters_frame,
+            text="Fundamental Filters:",
+            font=Theme.font_large_bold(),
+            text_color=text_white
+        )
+        fund_header.grid(row=0, column=0, columnspan=4, sticky="w", pady=(5, 10), padx=5)
+        
+        # Market Cap
+        self.screener_mcap_enabled = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            filters_frame,
+            text="Market Cap (£M):",
+            variable=self.screener_mcap_enabled,
+            fg_color=accent_teal,
+            font=Theme.font_normal(),
+            width=150
+        ).grid(row=1, column=0, sticky="w", padx=5, pady=3)
+        
+        ctk.CTkLabel(filters_frame, text="Min", font=Theme.font_small()).grid(row=1, column=1, padx=2)
+        self.screener_mcap_min = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_mcap_min.insert(0, "100")
+        self.screener_mcap_min.grid(row=1, column=2, padx=2)
+        
+        ctk.CTkLabel(filters_frame, text="Max", font=Theme.font_small()).grid(row=1, column=3, padx=2)
+        self.screener_mcap_max = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_mcap_max.insert(0, "2000")
+        self.screener_mcap_max.grid(row=1, column=4, padx=2)
+        
+        # P/E Ratio
+        self.screener_pe_enabled = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            filters_frame,
+            text="P/E Ratio:",
+            variable=self.screener_pe_enabled,
+            fg_color=accent_teal,
+            font=Theme.font_normal(),
+            width=150
+        ).grid(row=2, column=0, sticky="w", padx=5, pady=3)
+        
+        ctk.CTkLabel(filters_frame, text="Min", font=Theme.font_small()).grid(row=2, column=1, padx=2)
+        self.screener_pe_min = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_pe_min.insert(0, "5")
+        self.screener_pe_min.grid(row=2, column=2, padx=2)
+        
+        ctk.CTkLabel(filters_frame, text="Max", font=Theme.font_small()).grid(row=2, column=3, padx=2)
+        self.screener_pe_max = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_pe_max.insert(0, "20")
+        self.screener_pe_max.grid(row=2, column=4, padx=2)
+        
+        # Debt/Equity
+        self.screener_debt_enabled = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            filters_frame,
+            text="Debt/Equity (%):",
+            variable=self.screener_debt_enabled,
+            fg_color=accent_teal,
+            font=Theme.font_normal(),
+            width=150
+        ).grid(row=3, column=0, sticky="w", padx=5, pady=3)
+        
+        ctk.CTkLabel(filters_frame, text="Max", font=Theme.font_small()).grid(row=3, column=1, padx=2)
+        self.screener_debt_max = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_debt_max.insert(0, "50")
+        self.screener_debt_max.grid(row=3, column=2, padx=2)
+        
+        # Profit Margin
+        self.screener_margin_enabled = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            filters_frame,
+            text="Profit Margin (%):",
+            variable=self.screener_margin_enabled,
+            fg_color=accent_teal,
+            font=Theme.font_normal(),
+            width=150
+        ).grid(row=4, column=0, sticky="w", padx=5, pady=3)
+        
+        ctk.CTkLabel(filters_frame, text="Min", font=Theme.font_small()).grid(row=4, column=1, padx=2)
+        self.screener_margin_min = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_margin_min.insert(0, "10")
+        self.screener_margin_min.grid(row=4, column=2, padx=2)
+        
+        # Dividend Yield
+        self.screener_div_enabled = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            filters_frame,
+            text="Dividend Yield (%):",
+            variable=self.screener_div_enabled,
+            fg_color=accent_teal,
+            font=Theme.font_normal(),
+            width=150
+        ).grid(row=5, column=0, sticky="w", padx=5, pady=3)
+        
+        ctk.CTkLabel(filters_frame, text="Min", font=Theme.font_small()).grid(row=5, column=1, padx=2)
+        self.screener_div_min = ctk.CTkEntry(filters_frame, width=70, height=28, font=Theme.font_normal())
+        self.screener_div_min.insert(0, "2")
+        self.screener_div_min.grid(row=5, column=2, padx=2)
+        
+        # === TECHNICAL FILTERS ===
+        tech_header = ctk.CTkLabel(
+            filters_frame,
+            text="Technical Filters:",
+            font=Theme.font_large_bold(),
+            text_color=text_white
+        )
+        tech_header.grid(row=6, column=0, columnspan=4, sticky="w", pady=(15, 10), padx=5)
+        
+        tech_row = ctk.CTkFrame(filters_frame, fg_color=card_bg)
+        tech_row.grid(row=7, column=0, columnspan=5, sticky="w", padx=5, pady=3)
+        
+        self.screener_above_ma50 = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            tech_row,
+            text="Above 50-day MA",
+            variable=self.screener_above_ma50,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        self.screener_above_ma200 = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            tech_row,
+            text="Above 200-day MA",
+            variable=self.screener_above_ma200,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        self.screener_price_up_3m = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            tech_row,
+            text="Price up last 3 months",
+            variable=self.screener_price_up_3m,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        # === INDEX FILTERS ===
+        index_header = ctk.CTkLabel(
+            filters_frame,
+            text="Index Filters:",
+            font=Theme.font_large_bold(),
+            text_color=text_white
+        )
+        index_header.grid(row=8, column=0, columnspan=4, sticky="w", pady=(15, 10), padx=5)
+        
+        index_row = ctk.CTkFrame(filters_frame, fg_color=card_bg)
+        index_row.grid(row=9, column=0, columnspan=5, sticky="w", padx=5, pady=3)
+        
+        self.screener_ftse100 = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            index_row,
+            text="FTSE 100",
+            variable=self.screener_ftse100,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        self.screener_ftse250 = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(
+            index_row,
+            text="FTSE 250",
+            variable=self.screener_ftse250,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        self.screener_smallcap = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            index_row,
+            text="Small Cap",
+            variable=self.screener_smallcap,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        self.screener_aim = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            index_row,
+            text="AIM",
+            variable=self.screener_aim,
+            fg_color=accent_teal,
+            font=Theme.font_normal()
+        ).pack(side="left", padx=10)
+        
+        # === SCREEN BUTTON ===
+        button_frame = ctk.CTkFrame(screener_frame, fg_color=card_bg)
+        button_frame.pack(fill="x", padx=15, pady=15)
+        
+        self.screen_stocks_btn = ctk.CTkButton(
+            button_frame,
+            text="🔍 SCREEN STOCKS",
+            command=self.on_screen_stocks,
+            fg_color=accent_teal,
+            hover_color="#00f7cc",
+            corner_radius=8,
+            width=200,
+            height=40,
+            font=Theme.font_large_bold()
+        )
+        self.screen_stocks_btn.pack()
+        
+        # === RESULTS AREA ===
+        results_label = ctk.CTkLabel(
+            screener_frame,
+            text="Results:",
+            font=Theme.font_large_bold(),
+            text_color=text_white
+        )
+        results_label.pack(anchor="w", padx=15, pady=(5, 5))
+        
+        self.screener_results = scrolledtext.ScrolledText(
+            screener_frame,
+            width=100,
+            height=20,
+            bg="#1e2228",
+            fg=text_white,
+            font=("Consolas", 9),
+            relief="flat",
+            borderwidth=1
+        )
+        self.screener_results.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        
+        # Initial message
+        self.screener_results.insert("1.0", "📊 ISA Stock Screener\n\n")
+        self.screener_results.insert("end", "Configure filters above and click 'SCREEN STOCKS'\n\n")
+        self.screener_results.insert("end", "Note: First scan will be slow as it fetches data for all UK stocks.\n")
+        self.screener_results.insert("end", "Subsequent scans will be faster due to caching.\n")
+        
+    def on_screen_stocks(self):
+        """
+        Run the stock screener with current filters
+        Add this method to your MainWindow class
+        """
+        
+        def do_screen():
+            # Disable button while scanning
+            self.root.after(0, lambda: self.screen_stocks_btn.configure(state="disabled", text="⏳ SCREENING..."))
+            
+            # Clear previous results
+            def clear_results():
+                self.screener_results.delete("1.0", tk.END)
+                self.screener_results.insert(tk.END, "Starting stock screening...\n\n")
+            self.root.after(0, clear_results)
+            
+            # Build filters dict
+            filters = {}
+            
+            # Fundamental filters
+            if self.screener_mcap_enabled.get():
+                try:
+                    filters['market_cap_min'] = float(self.screener_mcap_min.get()) * 1_000_000
+                    filters['market_cap_max'] = float(self.screener_mcap_max.get()) * 1_000_000
+                except:
+                    pass
+            
+            if self.screener_pe_enabled.get():
+                try:
+                    filters['pe_min'] = float(self.screener_pe_min.get())
+                    filters['pe_max'] = float(self.screener_pe_max.get())
+                except:
+                    pass
+            
+            if self.screener_debt_enabled.get():
+                try:
+                    filters['debt_to_equity_max'] = float(self.screener_debt_max.get())
+                except:
+                    pass
+            
+            if self.screener_margin_enabled.get():
+                try:
+                    filters['profit_margin_min'] = float(self.screener_margin_min.get())
+                except:
+                    pass
+            
+            if self.screener_div_enabled.get():
+                try:
+                    filters['dividend_yield_min'] = float(self.screener_div_min.get())
+                except:
+                    pass
+            
+            # Technical filters
+            filters['above_ma_50'] = self.screener_above_ma50.get()
+            filters['above_ma_200'] = self.screener_above_ma200.get()
+            filters['price_up_3m'] = self.screener_price_up_3m.get()
+            
+            # Index filters
+            indices = []
+            if self.screener_ftse100.get():
+                indices.append("FTSE 100")
+            if self.screener_ftse250.get():
+                indices.append("FTSE 250")
+            if self.screener_smallcap.get():
+                indices.append("Small Cap")
+            if self.screener_aim.get():
+                indices.append("AIM")
+            filters['indices'] = indices
+            
+            # Run the screening
+            try:
+                from api.stock_screener import screen_stocks
+                
+                # Log to main window
+                def log_status(msg):
+                    self.root.after(0, lambda: self.screener_results.insert(tk.END, msg + "\n"))
+                
+                log_status("Fetching stock data from Yahoo Finance...")
+                log_status(f"Indices to scan: {', '.join(indices) if indices else 'All'}\n")
+                
+                results = screen_stocks(filters, log_status)
+                
+                # Display results
+                def display_results():
+                    self.screener_results.delete("1.0", tk.END)
+                    
+                    if not results:
+                        self.screener_results.insert(tk.END, "❌ No stocks match your criteria.\n\n")
+                        self.screener_results.insert(tk.END, "Try:\n")
+                        self.screener_results.insert(tk.END, "• Loosening some filters (uncheck boxes)\n")
+                        self.screener_results.insert(tk.END, "• Widening P/E or market cap ranges\n")
+                        self.screener_results.insert(tk.END, "• Unchecking technical filters\n")
+                    else:
+                        self.screener_results.insert(tk.END, f"✅ Found {len(results)} stocks matching your criteria:\n\n")
+                        
+                        # Header
+                        header = f"{'Ticker':<12} {'Name':<30} {'Price':>8} {'P/E':>7} {'Mkt Cap':>10} {'Div%':>6} {'Margin%':>8}\n"
+                        self.screener_results.insert(tk.END, header)
+                        self.screener_results.insert(tk.END, "=" * 95 + "\n")
+                        
+                        # Results rows
+                        for stock in results:
+                            ticker = stock['ticker'][:12]
+                            name = stock['name'][:30]
+                            price = f"£{stock['price']:.2f}" if stock['price'] else "N/A"
+                            pe = f"{stock['pe_ratio']:.1f}" if stock['pe_ratio'] else "N/A"
+                            
+                            # Format market cap
+                            if stock['market_cap']:
+                                if stock['market_cap'] > 1_000_000_000:
+                                    mcap = f"£{stock['market_cap']/1_000_000_000:.1f}B"
+                                else:
+                                    mcap = f"£{stock['market_cap']/1_000_000:.0f}M"
+                            else:
+                                mcap = "N/A"
+                            
+                            div = f"{stock['dividend_yield']:.1f}%" if stock['dividend_yield'] else "N/A"
+                            margin = f"{stock['profit_margin']:.1f}%" if stock['profit_margin'] else "N/A"
+                            
+                            row = f"{ticker:<12} {name:<30} {price:>8} {pe:>7} {mcap:>10} {div:>6} {margin:>8}\n"
+                            self.screener_results.insert(tk.END, row)
+                        
+                        # Summary
+                        self.screener_results.insert(tk.END, "\n" + "=" * 95 + "\n")
+                        self.screener_results.insert(tk.END, f"Total: {len(results)} stocks match your criteria\n\n")
+                        
+                        # Next steps
+                        self.screener_results.insert(tk.END, "💡 Next steps:\n")
+                        self.screener_results.insert(tk.END, "• Research these companies further on the LSE website\n")
+                        self.screener_results.insert(tk.END, "• Check recent director dealings (coming soon)\n")
+                        self.screener_results.insert(tk.END, "• Add promising stocks to your ISA watchlist\n")
+                    
+                    # Re-enable button
+                    self.screen_stocks_btn.configure(state="normal", text="🔍 SCREEN STOCKS")
+                
+                self.root.after(0, display_results)
+                
+            except Exception as e:
+                def show_error():
+                    self.screener_results.delete("1.0", tk.END)
+                    self.screener_results.insert(tk.END, f"❌ Error during screening:\n{str(e)}\n\n")
+                    self.screener_results.insert(tk.END, "Troubleshooting:\n")
+                    self.screener_results.insert(tk.END, "• Make sure you have internet connection\n")
+                    self.screener_results.insert(tk.END, "• Check that yfinance is installed: pip install yfinance\n")
+                    self.screener_results.insert(tk.END, "• Verify stock_screener.py is in your api/ folder\n")
+                    self.screen_stocks_btn.configure(state="normal", text="🔍 SCREEN STOCKS")
+                    
+                    # Also log to main log
+                    import traceback
+                    self.log(f"Stock screener error: {str(e)}")
+                    self.log(traceback.format_exc())
+                self.root.after(0, show_error)
+        
+        # Run in background thread
+        thread = threading.Thread(target=do_screen, daemon=True)
+        thread.start()
 
     def get_cached_market_details(self, epic):
         """Get market details with caching"""

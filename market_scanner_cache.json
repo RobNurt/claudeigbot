@@ -6,7 +6,7 @@
     "low": 55.119998931884766,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:06.812484",
-    "age_hours": 77.12328603
+    "age_hours": 158.86830589527779
   },
   "CC.D.LCO.USS.IP": {
     "epic": "CC.D.LCO.USS.IP",
@@ -15,7 +15,7 @@
     "low": 58.38999938964844,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:07.167324",
-    "age_hours": 77.12318746333334
+    "age_hours": 158.8682073286111
   },
   "CC.D.NG.USS.IP": {
     "epic": "CC.D.NG.USS.IP",
@@ -24,7 +24,7 @@
     "low": 2.200000047683716,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:07.609063",
-    "age_hours": 77.12306475805555
+    "age_hours": 158.86808462333332
   },
   "IX.D.FTSE.DAILY.IP": {
     "epic": "IX.D.FTSE.DAILY.IP",
@@ -33,7 +33,7 @@
     "low": 7544.7998046875,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:43:49.930166",
-    "age_hours": 77.27797556277778
+    "age_hours": 159.02299542805554
   },
   "IX.D.DAX.DAILY.IP": {
     "epic": "IX.D.DAX.DAILY.IP",
@@ -42,7 +42,7 @@
     "low": 18489.91015625,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:43:50.304722",
-    "age_hours": 77.27787151944445
+    "age_hours": 159.02289138472221
   },
   "CS.D.USCGC.TODAY.IP": {
     "epic": "CS.D.USCGC.TODAY.IP",
@@ -51,7 +51,7 @@
     "low": 2554.199951171875,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:05.963979",
-    "age_hours": 77.12352172583334
+    "age_hours": 158.86854159111112
   },
   "IX.D.SPTRD.DAILY.IP": {
     "epic": "IX.D.SPTRD.DAILY.IP",
@@ -60,7 +60,7 @@
     "low": 4835.0400390625,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:43:49.450620",
-    "age_hours": 77.27810876999999
+    "age_hours": 159.02312863527777
   },
   "IX.D.DOW.DAILY.IP": {
     "epic": "IX.D.DOW.DAILY.IP",
@@ -69,7 +69,7 @@
     "low": 36611.78125,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:43:50.745537",
-    "age_hours": 77.27774907083334
+    "age_hours": 159.0227689361111
   },
   "IX.D.RUSSELL.DAILY.IP": {
     "epic": "IX.D.RUSSELL.DAILY.IP",
@@ -78,7 +78,7 @@
     "low": 1732.989990234375,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:52:47.198503",
-    "age_hours": 77.12873435805555
+    "age_hours": 158.87375422333335
   },
   "IX.D.NIKKEI.DAILY.IP": {
     "epic": "IX.D.NIKKEI.DAILY.IP",
@@ -87,7 +87,7 @@
     "low": 30792.740234375,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:52:47.558180",
-    "age_hours": 77.12863444777778
+    "age_hours": 158.87365431305554
   },
   "IX.D.CAC.DAILY.IP": {
     "epic": "IX.D.CAC.DAILY.IP",
@@ -96,7 +96,7 @@
     "low": 6763.759765625,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:52:54.348609",
-    "age_hours": 77.12674821750001
+    "age_hours": 158.87176808277778
   },
   "CS.D.CFSILVER.TODAY.IP": {
     "epic": "CS.D.CFSILVER.TODAY.IP",
@@ -105,7 +105,7 @@
     "low": 28.309999465942383,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:06.446334",
-    "age_hours": 77.12338773833334
+    "age_hours": 158.86840760361113
   },
   "CS.D.CFDXC.CFD.IP": {
     "epic": "CS.D.CFDXC.CFD.IP",
@@ -114,7 +114,7 @@
     "low": 3.9744999408721924,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:08.059206",
-    "age_hours": 77.12293971833333
+    "age_hours": 158.8679595836111
   },
   "CS.D.PLATINUM.TODAY.IP": {
     "epic": "CS.D.PLATINUM.TODAY.IP",
@@ -123,7 +123,7 @@
     "low": 884.5,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:08.413556",
-    "age_hours": 77.12284128777779
+    "age_hours": 158.86786115305557
   },
   "CS.D.PALLADIUM.TODAY.IP": {
     "epic": "CS.D.PALLADIUM.TODAY.IP",
@@ -132,7 +132,7 @@
     "low": 876.5999755859375,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:08.793907",
-    "age_hours": 77.12273563472223
+    "age_hours": 158.86775550000002
   },
   "CC.D.CC.USS.IP": {
     "epic": "CC.D.CC.USS.IP",
@@ -141,7 +141,7 @@
     "low": 5631.0,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:09.253284",
-    "age_hours": 77.12260803000001
+    "age_hours": 158.8676278952778
   },
   "CC.D.SB.USS.IP": {
     "epic": "CC.D.SB.USS.IP",
@@ -150,7 +150,7 @@
     "low": 14.680000305175781,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:53:09.718344",
-    "age_hours": 77.12247884666667
+    "age_hours": 158.86749871194442
   },
   "IX.D.NASDAQ.DAILY.IP": {
     "epic": "IX.D.NASDAQ.DAILY.IP",
@@ -159,7 +159,7 @@
     "low": 14784.0302734375,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:43:51.197415",
-    "age_hours": 77.27762354916666
+    "age_hours": 159.02264341444445
   },
   "IX.D.HANGSENG.CASH.IP": {
     "epic": "IX.D.HANGSENG.CASH.IP",
@@ -168,7 +168,7 @@
     "low": 18671.490234375,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:52:53.495537",
-    "age_hours": 77.12698518194445
+    "age_hours": 158.87200504722222
   },
   "IX.D.ASX.IFE.IP": {
     "epic": "IX.D.ASX.IFE.IP",
@@ -177,7 +177,7 @@
     "low": 7169.2001953125,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:52:53.938129",
-    "age_hours": 77.12686223972221
+    "age_hours": 158.871882105
   },
   "CC.D.CT.USS.IP": {
     "epic": "CC.D.CT.USS.IP",
@@ -186,7 +186,7 @@
     "low": 28.200000762939453,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:58:03.069442",
-    "age_hours": 77.04099243055555
+    "age_hours": 158.78601229583333
   },
   "CC.D.KC.USS.IP": {
     "epic": "CC.D.KC.USS.IP",
@@ -195,7 +195,7 @@
     "low": 41.5,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:58:03.821727",
-    "age_hours": 77.0407834625
+    "age_hours": 158.78580332777776
   },
   "CC.D.W.USS.IP": {
     "epic": "CC.D.W.USS.IP",
@@ -204,7 +204,7 @@
     "low": 232.0,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:58:04.823371",
-    "age_hours": 77.04050522805555
+    "age_hours": 158.78552509333335
   },
   "CC.D.C.USS.IP": {
     "epic": "CC.D.C.USS.IP",
@@ -213,7 +213,7 @@
     "low": 174.0,
     "source": "yahoo",
     "timestamp": "2025-10-19T21:58:05.640380",
-    "age_hours": 77.04027828111111
+    "age_hours": 158.7852981463889
   },
   "CS.D.USCGC.TODAY.IP_Annual": {
     "epic": "CS.D.USCGC.TODAY.IP",
@@ -222,9 +222,9 @@
     "high": 4358.0,
     "low": 2554.199951171875,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:34.558894",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:26.274508",
     "age_hours": 0
   },
   "CS.D.CFSILVER.TODAY.IP_Annual": {
@@ -234,9 +234,9 @@
     "high": 53.34000015258789,
     "low": 28.309999465942383,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:35.215006",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:26.625590",
     "age_hours": 0
   },
   "CC.D.CL.USS.IP_Annual": {
@@ -246,9 +246,9 @@
     "high": 80.7699966430664,
     "low": 55.119998931884766,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:35.647439",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:27.161014",
     "age_hours": 0
   },
   "CC.D.LCO.USS.IP_Annual": {
@@ -258,9 +258,9 @@
     "high": 82.62999725341797,
     "low": 58.38999938964844,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:36.162084",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:27.511891",
     "age_hours": 0
   },
   "CC.D.NG.USS.IP_Annual": {
@@ -270,9 +270,9 @@
     "high": 4.901000022888184,
     "low": 2.200000047683716,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:36.715314",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:27.962148",
     "age_hours": 0
   },
   "CS.D.CFDXC.CFD.IP_Annual": {
@@ -282,9 +282,9 @@
     "high": 5.894999980926514,
     "low": 3.9744999408721924,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:37.059673",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:28.378151",
     "age_hours": 0
   },
   "CS.D.PLATINUM.TODAY.IP_Annual": {
@@ -294,9 +294,9 @@
     "high": 1741.199951171875,
     "low": 884.5,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:37.457244",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:29.045655",
     "age_hours": 0
   },
   "CS.D.PALLADIUM.TODAY.IP_Annual": {
@@ -306,9 +306,9 @@
     "high": 1655.0,
     "low": 876.5999755859375,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:37.974006",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:29.413900",
     "age_hours": 0
   },
   "CC.D.CC.USS.IP_Annual": {
@@ -318,9 +318,9 @@
     "high": 12931.0,
     "low": 5631.0,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:38.324271",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:29.889286",
     "age_hours": 0
   },
   "CC.D.SB.USS.IP_Annual": {
@@ -330,9 +330,9 @@
     "high": 23.0,
     "low": 14.680000305175781,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:38.674663",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:30.352316",
     "age_hours": 0
   },
   "CC.D.CT.USS.IP_Annual": {
@@ -342,9 +342,9 @@
     "high": 73.69999694824219,
     "low": 60.79999923706055,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:39.063817",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:30.858941",
     "age_hours": 0
   },
   "CC.D.KC.USS.IP_Annual": {
@@ -354,9 +354,9 @@
     "high": 440.8500061035156,
     "low": 241.3000030517578,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:39.805687",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:31.300785",
     "age_hours": 0
   },
   "CC.D.W.USS.IP_Annual": {
@@ -366,9 +366,9 @@
     "high": 609.0,
     "low": 492.25,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:40.515907",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:31.661395",
     "age_hours": 0
   },
   "CC.D.C.USS.IP_Annual": {
@@ -378,9 +378,9 @@
     "high": 504.5,
     "low": 368.75,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:40.883314",
+    "start_date": "2024-10-28",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:32.118874",
     "age_hours": 0
   },
   "CS.D.USCGC.TODAY.IP_All-Time": {
@@ -393,7 +393,7 @@
     "start_date": "2000-08-30",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:33.118181",
-    "age_hours": 76.96597889194445
+    "age_hours": 158.71099875722223
   },
   "CS.D.CFSILVER.TODAY.IP_All-Time": {
     "epic": "CS.D.CFSILVER.TODAY.IP",
@@ -405,7 +405,7 @@
     "start_date": "2000-08-30",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:33.793788",
-    "age_hours": 76.96579122333333
+    "age_hours": 158.7108110886111
   },
   "CC.D.CL.USS.IP_All-Time": {
     "epic": "CC.D.CL.USS.IP",
@@ -417,7 +417,7 @@
     "start_date": "2000-08-23",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:34.316965",
-    "age_hours": 76.96564589638889
+    "age_hours": 158.71066576166666
   },
   "CC.D.LCO.USS.IP_All-Time": {
     "epic": "CC.D.LCO.USS.IP",
@@ -429,7 +429,7 @@
     "start_date": "2007-07-30",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:34.853333",
-    "age_hours": 76.96549690527779
+    "age_hours": 158.71051677055556
   },
   "CC.D.NG.USS.IP_All-Time": {
     "epic": "CC.D.NG.USS.IP",
@@ -441,7 +441,7 @@
     "start_date": "2000-08-30",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:35.302522",
-    "age_hours": 76.96537213055556
+    "age_hours": 158.71039199583333
   },
   "CS.D.CFDXC.CFD.IP_All-Time": {
     "epic": "CS.D.CFDXC.CFD.IP",
@@ -453,7 +453,7 @@
     "start_date": "2000-08-30",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:35.916827",
-    "age_hours": 76.96520149027778
+    "age_hours": 158.71022135555557
   },
   "CS.D.PLATINUM.TODAY.IP_All-Time": {
     "epic": "CS.D.PLATINUM.TODAY.IP",
@@ -465,7 +465,7 @@
     "start_date": "1997-10-29",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:36.267209",
-    "age_hours": 76.96510416194444
+    "age_hours": 158.7101240272222
   },
   "CS.D.PALLADIUM.TODAY.IP_All-Time": {
     "epic": "CS.D.PALLADIUM.TODAY.IP",
@@ -477,7 +477,7 @@
     "start_date": "1998-09-28",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:36.817917",
-    "age_hours": 76.9649511875
+    "age_hours": 158.70997105277777
   },
   "CC.D.CC.USS.IP_All-Time": {
     "epic": "CC.D.CC.USS.IP",
@@ -489,7 +489,7 @@
     "start_date": "2000-01-03",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:37.252693",
-    "age_hours": 76.96483041638888
+    "age_hours": 158.70985028166666
   },
   "CC.D.SB.USS.IP_All-Time": {
     "epic": "CC.D.SB.USS.IP",
@@ -501,7 +501,7 @@
     "start_date": "2000-03-01",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:38.074520",
-    "age_hours": 76.9646021311111
+    "age_hours": 158.70962199638888
   },
   "CC.D.CT.USS.IP_All-Time": {
     "epic": "CC.D.CT.USS.IP",
@@ -513,7 +513,7 @@
     "start_date": "2000-01-03",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:38.599804",
-    "age_hours": 76.96445621888888
+    "age_hours": 158.70947608416668
   },
   "CC.D.KC.USS.IP_All-Time": {
     "epic": "CC.D.KC.USS.IP",
@@ -525,7 +525,7 @@
     "start_date": "2000-01-03",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:39.214182",
-    "age_hours": 76.96428555833333
+    "age_hours": 158.7093054236111
   },
   "CC.D.W.USS.IP_All-Time": {
     "epic": "CC.D.W.USS.IP",
@@ -537,7 +537,7 @@
     "start_date": "2000-07-17",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:39.615126",
-    "age_hours": 76.96417418499999
+    "age_hours": 158.70919405027777
   },
   "CC.D.C.USS.IP_All-Time": {
     "epic": "CC.D.C.USS.IP",
@@ -549,31 +549,31 @@
     "start_date": "2000-07-17",
     "end_date": "2025-10-17",
     "timestamp": "2025-10-19T22:02:40.184723",
-    "age_hours": 76.96401596361112
+    "age_hours": 158.7090358288889
   },
   "IX.D.SPTRD.DAILY.IP_Annual": {
     "epic": "IX.D.SPTRD.DAILY.IP",
     "name": "US 500",
     "timeframe": "Annual",
-    "high": 6764.580078125,
+    "high": 6807.10986328125,
     "low": 4835.0400390625,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-22T15:23:23.289801",
-    "age_hours": 11.6187089975
+    "start_date": "2024-10-25",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:22.211824",
+    "age_hours": 0
   },
   "IX.D.FTSE.DAILY.IP_Annual": {
     "epic": "IX.D.FTSE.DAILY.IP",
     "name": "FTSE 100",
     "timeframe": "Annual",
-    "high": 9577.099609375,
+    "high": 9645.599609375,
     "low": 7544.7998046875,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-22T15:23:23.719277",
-    "age_hours": 11.618589698611112
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:22.910028",
+    "age_hours": 0
   },
   "IX.D.DAX.DAILY.IP_Annual": {
     "epic": "IX.D.DAX.DAILY.IP",
@@ -582,34 +582,34 @@
     "high": 24771.33984375,
     "low": 18489.91015625,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-22T15:23:24.262347",
-    "age_hours": 11.618438845833333
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:23.286709",
+    "age_hours": 0
   },
   "IX.D.DOW.DAILY.IP_Annual": {
     "epic": "IX.D.DOW.DAILY.IP",
     "name": "Wall Street",
     "timeframe": "Annual",
-    "high": 47125.66015625,
+    "high": 47326.73046875,
     "low": 36611.78125,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-22T15:23:24.646536",
-    "age_hours": 11.618332126666667
+    "start_date": "2024-10-25",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:23.647217",
+    "age_hours": 0
   },
   "IX.D.NASDAQ.DAILY.IP_Annual": {
     "epic": "IX.D.NASDAQ.DAILY.IP",
     "name": "US Tech 100",
     "timeframe": "Annual",
-    "high": 23119.91015625,
+    "high": 23261.259765625,
     "low": 14784.0302734375,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-22T15:23:25.005966",
-    "age_hours": 11.618232285000001
+    "start_date": "2024-10-25",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:24.001325",
+    "age_hours": 0
   },
   "IX.D.RUSSELL.DAILY.IP_Annual": {
     "epic": "IX.D.RUSSELL.DAILY.IP",
@@ -618,9 +618,9 @@
     "high": 2541.669921875,
     "low": 1732.989990234375,
     "source": "yahoo",
-    "start_date": "2024-10-23",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:31.986055",
+    "start_date": "2024-10-25",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:24.382971",
     "age_hours": 0
   },
   "IX.D.NIKKEI.DAILY.IP_Annual": {
@@ -630,9 +630,9 @@
     "high": 49945.94921875,
     "low": 30792.740234375,
     "source": "yahoo",
-    "start_date": "2024-10-23",
-    "end_date": "2025-10-23",
-    "timestamp": "2025-10-23T03:00:32.852787",
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:24.768709",
     "age_hours": 0
   },
   "IX.D.HANGSENG.CASH.IP_Annual": {
@@ -642,9 +642,9 @@
     "high": 27381.83984375,
     "low": 18671.490234375,
     "source": "yahoo",
-    "start_date": "2024-10-23",
-    "end_date": "2025-10-23",
-    "timestamp": "2025-10-23T03:00:33.206561",
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:25.134392",
     "age_hours": 0
   },
   "IX.D.ASX.IFE.IP_Annual": {
@@ -654,9 +654,9 @@
     "high": 9115.2001953125,
     "low": 7169.2001953125,
     "source": "yahoo",
-    "start_date": "2024-10-23",
-    "end_date": "2025-10-23",
-    "timestamp": "2025-10-23T03:00:33.721091",
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:25.527049",
     "age_hours": 0
   },
   "IX.D.CAC.DAILY.IP_Annual": {
@@ -666,9 +666,9 @@
     "high": 8271.48046875,
     "low": 6763.759765625,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:34.204439",
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:25.920157",
     "age_hours": 0
   },
   "IX.D.IBEX.DAILY.IP_Annual": {
@@ -678,9 +678,9 @@
     "high": 15894.2001953125,
     "low": 11295.0,
     "source": "yahoo",
-    "start_date": "2024-10-22",
-    "end_date": "2025-10-22",
-    "timestamp": "2025-10-23T03:00:41.361816",
+    "start_date": "2024-10-24",
+    "end_date": "2025-10-24",
+    "timestamp": "2025-10-26T12:45:32.486229",
     "age_hours": 0
   },
   "IX.D.MIB.DAILY.IP_Annual": {
@@ -693,7 +693,7 @@
     "start_date": "2024-10-22",
     "end_date": "2025-10-22",
     "timestamp": "2025-10-23T03:00:41.971911",
-    "age_hours": 0
+    "age_hours": 81.74187272111111
   },
   "IX.D.AEX.DAILY.IP_Annual": {
     "epic": "IX.D.AEX.DAILY.IP",
@@ -705,7 +705,7 @@
     "start_date": "2024-10-22",
     "end_date": "2025-10-22",
     "timestamp": "2025-10-23T03:00:42.550112",
-    "age_hours": 0
+    "age_hours": 81.74171210972222
   },
   "IX.D.SWISSMI.IFE.IP_Annual": {
     "epic": "IX.D.SWISSMI.IFE.IP",
@@ -717,7 +717,7 @@
     "start_date": "2024-10-22",
     "end_date": "2025-10-22",
     "timestamp": "2025-10-23T03:00:42.984689",
-    "age_hours": 0
+    "age_hours": 81.7415913938889
   },
   "IX.D.KOSPI.DAILY.IP_Annual": {
     "epic": "IX.D.KOSPI.DAILY.IP",
@@ -729,7 +729,7 @@
     "start_date": "2024-10-23",
     "end_date": "2025-10-23",
     "timestamp": "2025-10-23T03:00:43.461809",
-    "age_hours": 0
+    "age_hours": 81.74145886055555
   },
   "IX.D.SINGAPORE.CASH.IP_Annual": {
     "epic": "IX.D.SINGAPORE.CASH.IP",
@@ -741,7 +741,7 @@
     "start_date": "2024-10-23",
     "end_date": "2025-10-23",
     "timestamp": "2025-10-23T03:00:44.017949",
-    "age_hours": 0
+    "age_hours": 81.74130437722222
   },
   "IX.D.BRAZIL.CASH.IP_Annual": {
     "epic": "IX.D.BRAZIL.CASH.IP",
@@ -753,7 +753,7 @@
     "start_date": "2024-10-22",
     "end_date": "2025-10-22",
     "timestamp": "2025-10-23T03:00:44.498369",
-    "age_hours": 0
+    "age_hours": 81.74117092722221
   },
   "IX.D.MEXICO.CASH.IP_Annual": {
     "epic": "IX.D.MEXICO.CASH.IP",
@@ -765,6 +765,6 @@
     "start_date": "2024-10-22",
     "end_date": "2025-10-22",
     "timestamp": "2025-10-23T03:00:45.121937",
-    "age_hours": 0
+    "age_hours": 81.74099771388889
   }
 }

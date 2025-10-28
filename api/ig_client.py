@@ -36,7 +36,8 @@ class IGClient:
                 "Content-Type": "application/json",
                 "Accept": "application/json",
                 "X-IG-API-KEY": api_key,
-                "Version": "2"
+                "Version": "2",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
             
             response = self.session.post(f"{self.base_url}/session",
@@ -48,7 +49,8 @@ class IGClient:
                     "X-SECURITY-TOKEN": response.headers.get("X-SECURITY-TOKEN"),
                     "X-IG-API-KEY": api_key,
                     "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Accept": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 })
                 
                 self.logged_in = True
@@ -65,7 +67,7 @@ class IGClient:
         self.session = requests.Session()
         self.base_url = ""
 
-    def update_working_order(self, deal_id, new_level, stop_level=None, guaranteed_stop=False):
+    def update_working_order(self, deal_id, new_level, stop_distance=None, guaranteed_stop=False):
             """Update the level of a working order, preserving stop loss if provided"""
             try:
                 url = f"{self.base_url}/workingorders/otc/{deal_id}"
@@ -105,46 +107,28 @@ class IGClient:
         """Get current market price for an epic"""
         try:
             url = f"{self.base_url}/markets/{epic}"
-            
-            # Add proper headers with version
-            headers = self.session.headers.copy()
-            headers['Version'] = '3'
-            
-            print(f"DEBUG get_market_price: Fetching {url}")
-            print(f"DEBUG get_market_price: Headers = {headers}")
-            
-            response = self.session.get(url, headers=headers)
-            
-            print(f"DEBUG get_market_price: Status = {response.status_code}")
+            response = self.session.get(url)
             
             if response.status_code == 200:
                 data = response.json()
-                print(f"DEBUG get_market_price: Response keys = {data.keys()}")
-                
                 snapshot = data.get('snapshot', {})
                 bid = snapshot.get('bid')
                 offer = snapshot.get('offer')
                 mid = (bid + offer) / 2 if bid and offer else None
                 
-                result = {
+                return {
                     'bid': bid,
                     'offer': offer,
                     'mid': mid,
                     'market_status': snapshot.get('marketStatus')
                 }
-                
-                print(f"DEBUG get_market_price: Result = {result}")
-                return result
             else:
-                print(f"DEBUG get_market_price: Error - {response.status_code}: {response.text}")
                 return None
-            
+                
         except Exception as e:
-            print(f"DEBUG get_market_price: Exception - {str(e)}")
-            import traceback
-            print(traceback.format_exc())
+            print(f"Price error: {str(e)}")
             return None
-        
+    
     def place_order(self, epic, direction, size, level, order_type="STOP", stop_distance=0, guaranteed_stop=False, limit_distance=0):
         """Place a single working order with optional stop loss and limit"""
         url = f"{self.base_url}/workingorders/otc"
@@ -229,249 +213,6 @@ class IGClient:
                 
         except Exception as e:
             return False, f"Update error: {str(e)}"
-        
-    def update_position_stops(self, deal_id, stop_level=None, stop_distance=None, 
-        trailing_stop=False, trailing_distance=None, trailing_step=None,
-        limit_level=None, limit_distance=None):
-        """
-        Update stops/limits on an open position
-        
-        Args:
-            deal_id: Position deal ID
-            stop_level: Absolute stop level (use either this OR stop_distance)
-            stop_distance: Stop distance from current price
-            trailing_stop: Enable trailing stop (requires trailing_distance and trailing_step)
-            trailing_distance: Distance for trailing stop
-            trailing_step: Step distance for trailing stop
-            limit_level: Absolute limit level
-            limit_distance: Limit distance from current price
-        
-        Returns:
-            (success, message)
-        """
-        try:
-            url = f"{self.base_url}/positions/otc/{deal_id}"
-            
-            print(f"DEBUG update_position_stops: deal_id={deal_id}")
-            print(f"DEBUG: stop_level={stop_level}, stop_distance={stop_distance}")
-            print(f"DEBUG: trailing_stop={trailing_stop}, trailing_distance={trailing_distance}, trailing_step={trailing_step}")
-            
-            update_data = {}
-            
-            # Stop configuration
-            if stop_level is not None:
-                update_data["stopLevel"] = str(stop_level)
-            elif stop_distance is not None:
-                update_data["stopDistance"] = str(stop_distance)
-            
-            # Trailing stop configuration
-            if trailing_stop and trailing_distance is not None and trailing_step is not None:
-                update_data["trailingStop"] = True
-                update_data["trailingStopDistance"] = str(trailing_distance)
-                update_data["trailingStopIncrement"] = str(trailing_step)
-            else:
-                update_data["trailingStop"] = False
-            
-            # Limit configuration
-            if limit_level is not None:
-                update_data["limitLevel"] = str(limit_level)
-            elif limit_distance is not None:
-                update_data["limitDistance"] = str(limit_distance)
-            
-            print(f"DEBUG update_position_stops: Sending data = {update_data}")
-            
-            headers = self.session.headers.copy()
-            headers["_method"] = "PUT"
-            headers["version"] = "2"  # V2 required for trailing stops
-            
-            response = self.session.put(url, json=update_data, headers=headers)
-            
-            print(f"DEBUG update_position_stops: Status = {response.status_code}")
-            print(f"DEBUG update_position_stops: Response = {response.text}")
-            
-            if response.status_code == 200:
-                deal_ref = response.json().get('dealReference')
-                print(f"DEBUG update_position_stops: dealReference = {deal_ref}")
-                
-                if deal_ref:
-                    deal_status = self.check_deal_status(deal_ref)
-                    print(f"DEBUG update_position_stops: Deal status = {deal_status}")
-                    
-                    if deal_status.get('dealStatus') == 'ACCEPTED':
-                        trailing_info = ""
-                        if trailing_stop:
-                            trailing_info = f" with trailing stop ({trailing_distance}/{trailing_step})"
-                        return True, f"Position updated{trailing_info}"
-                    else:
-                        reason = deal_status.get('reason', 'Unknown reason')
-                        print(f"DEBUG update_position_stops: REJECTED - {reason}")
-                        return False, f"Update rejected: {reason}"
-                else:
-                    print(f"DEBUG update_position_stops: No dealReference in response")
-                    return False, "No deal reference returned"
-            else:
-                print(f"DEBUG update_position_stops: HTTP error {response.status_code}")
-                return False, f"Update failed: {response.text}"
-                
-        except Exception as e:
-            print(f"DEBUG update_position_stops: EXCEPTION - {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return False, f"Update error: {str(e)}"
-        
-    def update_position(self, deal_id, stop_level=None, stop_distance=None, limit_level=None):
-        """
-        Update an open position's stop and/or limit
-        
-        Args:
-            deal_id: Position deal ID
-            stop_level: Absolute stop level (use this OR stop_distance, not both)
-            stop_distance: Stop distance in points from current level
-            limit_level: Absolute limit level
-        
-        Returns:
-            (success: bool, message: str)
-        """
-        if not self.logged_in:
-            return False, "Not logged in"
-        
-        try:
-            url = f"{self.base_url}/positions/otc/{deal_id}"
-            
-            headers = {
-                **self.headers,
-                "Version": "2",
-                "_method": "PUT"
-            }
-            
-            # Build payload
-            payload = {}
-            
-            if stop_level is not None:
-                payload["stopLevel"] = stop_level
-            elif stop_distance is not None:
-                payload["stopDistance"] = stop_distance
-            
-            if limit_level is not None:
-                payload["limitLevel"] = limit_level
-            
-            if not payload:
-                return False, "No updates specified"
-            
-            print(f"DEBUG: Updating position {deal_id} with {payload}")
-            
-            response = requests.put(url, json=payload, headers=headers)
-            
-            print(f"DEBUG: Update response: {response.status_code} - {response.text}")
-            
-            if response.status_code == 200:
-                return True, "Position updated"
-            else:
-                error_data = response.json() if response.text else {}
-                error_msg = error_data.get("errorCode", response.text)
-                return False, f"Update failed: {error_msg}"
-                
-        except Exception as e:
-            print(f"ERROR updating position: {e}")
-            return False, str(e)
-
-    def update_working_order(self, deal_id, stop_level=None, limit_level=None, guaranteed_stop=None):
-        """
-        Update a working order's stop and/or limit
-        
-        Args:
-            deal_id: Working order deal ID
-            stop_level: New stop level
-            limit_level: New limit level
-            guaranteed_stop: True/False for GSLO, None to leave unchanged
-        
-        Returns:
-            (success: bool, message: str)
-        """
-        if not self.logged_in:
-            return False, "Not logged in"
-        
-        try:
-            url = f"{self.base_url}/workingorders/otc/{deal_id}"
-            
-            headers = {
-                **self.headers,
-                "Version": "2",
-                "_method": "PUT"
-            }
-            
-            # Build payload
-            payload = {}
-            
-            if stop_level is not None:
-                payload["stopLevel"] = stop_level
-            
-            if limit_level is not None:
-                payload["limitLevel"] = limit_level
-            
-            if guaranteed_stop is not None:
-                payload["guaranteedStop"] = guaranteed_stop
-            
-            if not payload:
-                return False, "No updates specified"
-            
-            print(f"DEBUG: Updating working order {deal_id} with {payload}")
-            
-            response = requests.put(url, json=payload, headers=headers)
-            
-            print(f"DEBUG: Update response: {response.status_code} - {response.text}")
-            
-            if response.status_code == 200:
-                return True, "Order updated"
-            else:
-                error_data = response.json() if response.text else {}
-                error_msg = error_data.get("errorCode", response.text)
-                return False, f"Update failed: {error_msg}"
-                
-        except Exception as e:
-            print(f"ERROR updating working order: {e}")
-            return False, str(e)
-
-    def get_margin_usage(self):
-        """
-        Get current margin usage percentage
-        
-        Returns:
-            float: Margin usage as percentage (0-100)
-        """
-        if not self.logged_in:
-            return 0.0
-        
-        try:
-            url = f"{self.base_url}/accounts"
-            response = requests.get(url, headers=self.headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                accounts = data.get("accounts", [])
-                
-                if accounts:
-                    account = accounts[0]  # Primary account
-                    balance = account.get("balance", {})
-                    
-                    available = balance.get("available", 0)
-                    deposit = balance.get("deposit", 0)
-                    
-                    if deposit > 0:
-                        used = deposit - available
-                        margin_pct = (used / deposit) * 100
-                        return margin_pct
-            
-            return 0.0
-            
-        except Exception as e:
-            print(f"ERROR getting margin usage: {e}")
-            return 0.0
-
-    def check_trailing_stops_enabled(self):
-        """Check if account has trailing stops enabled"""
-        # This is set during login from the session response
-        return getattr(self, 'trailing_stops_enabled', False)
     
     def get_working_orders(self):
         """Get list of working orders"""
@@ -622,11 +363,13 @@ class IGClient:
                 return response.json().get('markets', [])
             else:
                 return []
-        
+            
+            
+                
         except Exception as e:
             print(f"Search error: {str(e)}")
             return []
-
+    
     def get_market_details(self, epic):
         """Get detailed market information including min/max deal sizes"""
         if not self.logged_in:
@@ -634,16 +377,9 @@ class IGClient:
         
         try:
             url = f"{self.base_url}/markets/{epic}"
-            
-            print(f"DEBUG market_details: Fetching {url}")
-            print(f"DEBUG market_details: Headers = {self.session.headers}")
-            
-            response = self.session.get(url, headers=self.session.headers)
-            
-            print(f"DEBUG market_details: Status = {response.status_code}")
+            response = self.session.get(url)
             
             if response.status_code == 200:
-                print(f"DEBUG market_details: Full Response = {response.text}")
                 data = response.json()
                 
                 # Extract dealing rules
@@ -655,258 +391,15 @@ class IGClient:
                     'name': market_data.get('name', 'Unknown'),
                     'type': market_data.get('type', 'Unknown'),
                     'min_deal_size': float(dealing_rules.get('minDealSize', {}).get('value', 0)),
-                    'max_deal_size': float(dealing_rules.get('maxDealSize', {}).get('value', 0)),  # ✅ CORRECT!
+                    'max_deal_size': float(dealing_rules.get('maxDealSize', {}).get('value', 0)),
                     'deal_size_unit': dealing_rules.get('minDealSize', {}).get('unit', 'AMOUNT'),
                     'min_stop_distance': float(dealing_rules.get('minNormalStopOrLimitDistance', {}).get('value', 0)),
                     'min_gslo_distance': float(dealing_rules.get('minControlledRiskStopDistance', {}).get('value', 0)),
                 }
             else:
-                print(f"DEBUG market_details: Error = {response.text}")
                 print(f"Failed to get market details: {response.status_code}")
                 return None
                 
         except Exception as e:
             print(f"Error getting market details: {str(e)}")
             return None
-            
-    def get_historical_prices(self, epic, resolution='DAY', num_points=365):
-        """
-        Get historical price data for an epic
-        
-        resolution: 'MINUTE', 'MINUTE_5', 'MINUTE_15', 'MINUTE_30', 
-                    'HOUR', 'HOUR_4', 'DAY', 'WEEK', 'MONTH'
-        num_points: Number of data points to retrieve
-        """
-        if not self.logged_in:
-            print(f"DEBUG historical: Not logged in")
-            return None
-        
-        try:
-            url = f"{self.base_url}/prices/{epic}"
-            
-            params = {
-                'resolution': resolution,
-                'max': num_points
-            }
-            
-            headers = self.session.headers.copy()
-            headers['Version'] = '3'
-            
-            print(f"DEBUG historical: Fetching {url}")
-            print(f"DEBUG historical: Params = resolution:{resolution}, max:{num_points}")
-            print(f"DEBUG historical: Headers = {headers}")
-            
-            response = self.session.get(url, params=params, headers=headers)
-            
-            print(f"DEBUG historical: Status = {response.status_code}")
-            
-            if response.status_code != 200:
-                print(f"DEBUG historical: Error response = {response.text}")
-                print(f"Historical data error: {response.status_code} - {response.text}")
-                return None
-            
-            data = response.json()
-            print(f"DEBUG historical: Response keys = {data.keys()}")
-            
-            prices = data.get('prices', [])
-            print(f"DEBUG historical: Got {len(prices)} candles")
-            
-            if not prices:
-                print(f"DEBUG historical: prices array is empty")
-                return None
-            
-            # Extract high/low from candles
-            all_highs = []
-            all_lows = []
-            
-            for idx, price in enumerate(prices):
-                snapshot = price.get('snapshot', {})
-                high = snapshot.get('high')
-                low = snapshot.get('low')
-                
-                if idx < 3:  # Print first 3 candles for debugging
-                    print(f"DEBUG historical: Candle {idx}: high={high}, low={low}")
-                
-                if high is not None:
-                    all_highs.append(high)
-                if low is not None:
-                    all_lows.append(low)
-            
-            print(f"DEBUG historical: Collected {len(all_highs)} highs, {len(all_lows)} lows")
-            
-            if all_highs and all_lows:
-                result = {
-                    'high': max(all_highs),
-                    'low': min(all_lows),
-                    'num_candles': len(prices)
-                }
-                print(f"DEBUG historical: Success! High={result['high']}, Low={result['low']}, Candles={result['num_candles']}")
-                return result
-            else:
-                print(f"DEBUG historical: No high/low data found in candles")
-                return None
-                
-        except Exception as e:
-            print(f"DEBUG historical: Exception = {str(e)}")
-            import traceback
-            print(traceback.format_exc())
-            return None
-
-    
-# ===== UPDATE in ig_client.py - get_all_markets_by_type method =====
-
-    def get_all_markets_by_type(self, market_type):
-        """
-        Get all SPOT markets of a specific type (filters out futures)
-        market_type: 'COMMODITIES', 'INDICES', etc.
-        """
-        if not self.logged_in:
-            return []
-        
-        try:
-            all_markets = []
-            
-            # For commodities, search common terms
-            if market_type == "COMMODITIES":
-                search_terms = ["gold", "silver", "oil", "copper", "gas", "platinum", 
-                            "palladium", "wheat", "corn", "sugar", "coffee", "cotton",
-                            "cocoa", "soybean", "lumber", "crude", "brent", "natural gas"]
-            # For indices, search common terms
-            elif market_type == "INDICES":
-                search_terms = ["index", "dow", "nasdaq", "s&p", "ftse", "dax", "nikkei",
-                            "cac", "asx", "hang seng", "russell", "stoxx", "ibex"]
-            else:
-                search_terms = [""]
-            
-            seen_epics = set()
-            
-            for term in search_terms:
-                try:
-                    url = f"{self.base_url}/markets"
-                    params = {"searchTerm": term}
-                    response = self.session.get(url, params=params)
-                    
-                    if response.status_code == 200:
-                        markets = response.json().get('markets', [])
-                        
-                        # Filter by type and remove duplicates
-                        for market in markets:
-                            epic = market.get('epic')
-                            instrument_type = market.get('instrumentType', '')
-                            instrument_name = market.get('instrumentName', '')
-                            expiry = market.get('expiry', '')
-                            
-                            # Skip if wrong type or duplicate
-                            if epic in seen_epics or instrument_type != market_type:
-                                continue
-                            
-                            # ===== SPOT FILTER - Only include DFB or - expiry =====
-                            if expiry not in ['DFB', '-']:
-                                continue  # Skip futures/monthly contracts
-                            
-                            # Skip mini/micro contracts and weekly/monthly options
-                            skip_terms = ['mini', 'micro', 'weekly', 'monthly', 'month1', 'month2', 'month3']
-                            if any(skip in instrument_name.lower() for skip in skip_terms):
-                                continue
-                            
-                            all_markets.append(market)
-                            seen_epics.add(epic)
-                    
-                    time.sleep(0.2)  # Rate limiting
-                    
-                except Exception as e:
-                    print(f"Error searching term '{term}': {str(e)}")
-                    continue
-            
-            return all_markets
-            
-        except Exception as e:
-            print(f"Error getting markets by type: {str(e)}")
-            return []
-        
-        # ===== ADD TO ig_client.py =====
-
-    def get_historical_prices(self, epic, resolution='DAY', num_points=365):
-        """
-        Get historical price data for an epic
-        
-        resolution: 'MINUTE', 'MINUTE_5', 'MINUTE_15', 'MINUTE_30', 
-                    'HOUR', 'HOUR_4', 'DAY', 'WEEK', 'MONTH'
-        num_points: Number of data points to retrieve (max depends on resolution)
-        """
-        if not self.logged_in:
-            return None
-        
-        try:
-            url = f"{self.base_url}/prices/{epic}"
-            
-            params = {
-                'resolution': resolution,
-                'max': num_points
-            }
-            
-            headers = self.session.headers.copy()
-            headers['Version'] = '3'
-            
-            response = self.session.get(url, params=params, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                prices = data.get('prices', [])
-                
-                if not prices:
-                    return None
-                
-                # Extract high/low from candles
-                all_highs = []
-                all_lows = []
-                
-                for price in prices:
-                    snapshot = price.get('snapshot', {})
-                    high = snapshot.get('high')
-                    low = snapshot.get('low')
-                    
-                    if high is not None:
-                        all_highs.append(high)
-                    if low is not None:
-                        all_lows.append(low)
-                
-                if all_highs and all_lows:
-                    return {
-                        'high': max(all_highs),
-                        'low': min(all_lows),
-                        'num_candles': len(prices)
-                    }
-                else:
-                    return None
-            else:
-                print(f"Historical data error: {response.status_code} - {response.text}")
-                return None
-                
-        except Exception as e:
-            print(f"Error getting historical prices: {str(e)}")
-            return None
-
-
-    # ===== HELPER FUNCTION =====
-
-def get_timeframe_params(timeframe):
-    """
-    Get resolution and num_points for different timeframes
-    
-    timeframe: 'Daily', 'Weekly', 'Monthly', 'Annual', 'All-Time'
-    Returns: dict with 'resolution' and 'num_points'
-    """
-    params = {
-        'Daily': {'resolution': 'HOUR', 'num_points': 24},
-        'Weekly': {'resolution': 'HOUR_4', 'num_points': 42},
-        'Monthly': {'resolution': 'DAY', 'num_points': 30},
-        'Quarterly': {'resolution': 'DAY', 'num_points': 90},
-        '6-Month': {'resolution': 'DAY', 'num_points': 180},
-        'Annual': {'resolution': 'DAY', 'num_points': 365},
-        '2-Year': {'resolution': 'WEEK', 'num_points': 104},
-        '5-Year': {'resolution': 'WEEK', 'num_points': 260},
-        'All-Time': {'resolution': 'MONTH', 'num_points': 1200},
-    }
-    
-    return params.get(timeframe, params['Annual'])
