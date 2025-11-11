@@ -2,6 +2,7 @@
 Position Monitor
 Watches for working orders becoming positions and auto-attaches stops/limits
 Now includes VERIFICATION logic - checks if stops exist, adds if missing
+FIXED: Retry mechanism for None levels, better trailing logic
 """
 import threading
 import time
@@ -16,6 +17,7 @@ class PositionMonitor:
         self.monitor_thread = None
         self.known_positions = set()  # Track position deal IDs we've already processed
         self.known_working_orders = set()  # Track working order deal IDs
+        self.pending_retries = {}  # Track positions waiting for level to populate: {deal_id: retry_count}
         
         # Configuration
         self.auto_stop_enabled = True  # Default ON for safety
@@ -30,6 +32,7 @@ class PositionMonitor:
         self.auto_limit_distance = 10
         
         self.check_interval = 10  # Check every 10 seconds
+        self.max_retries = 5  # Try 5 times before giving up (50 seconds total)
         
     def configure(self, auto_stop=True, stop_distance=20, verify_stops=True,
                   auto_trailing=False, trailing_distance=15, trailing_step=5,
@@ -111,6 +114,10 @@ class PositionMonitor:
                 # Update known positions
                 self.known_positions = current_position_ids
             
+            # Retry any pending positions that had None level
+            if self.pending_retries:
+                self._retry_pending_positions(current_positions)
+            
             # Handle trailing for existing positions
             if self.auto_trailing_enabled:
                 self._update_trailing_stops(current_positions)
@@ -119,11 +126,43 @@ class PositionMonitor:
             if self.log_func:
                 self.log_func(f"Error checking positions: {e}")
     
+    def _retry_pending_positions(self, current_positions):
+        """Retry attaching stops/limits to positions that had None level"""
+        completed = []
+        
+        for deal_id, retry_count in list(self.pending_retries.items()):
+            # Find the position
+            position = next((p for p in current_positions if p.get("position", {}).get("dealId") == deal_id), None)
+            
+            if not position:
+                # Position closed or not found
+                completed.append(deal_id)
+                continue
+            
+            position_data = position.get("position", {})
+            level = position_data.get("openLevel")  # FIXED: positions use openLevel
+            
+            if level is not None:
+                # Level populated! Try attaching stop/limit again
+                self.log_func(f"🔄 Retry #{retry_count}: Position {deal_id} now has level {level}")
+                self._process_new_position(position)
+                completed.append(deal_id)
+            elif retry_count >= self.max_retries:
+                # Give up after max retries
+                self.log_func(f"❌ Gave up on position {deal_id} after {self.max_retries} retries - level still None")
+                completed.append(deal_id)
+            else:
+                # Increment retry count
+                self.pending_retries[deal_id] = retry_count + 1
+        
+        # Remove completed retries
+        for deal_id in completed:
+            del self.pending_retries[deal_id]
+    
     def _process_new_position(self, position):
         """Process a newly opened position"""
         try:
             position_data = position.get("position", {})
-            print(f"DEBUG: Full position data = {position_data}")
             market_data = position.get("market", {})
             
             deal_id = position_data.get("dealId")
@@ -131,10 +170,18 @@ class PositionMonitor:
             instrument_name = market_data.get("instrumentName", epic)
             direction = position_data.get("direction")
             size = position_data.get("dealSize")
-            level = position_data.get("level")
+            level = position_data.get("openLevel")  # FIXED: positions use openLevel
             
             # Check current stop level
             current_stop = position_data.get("stopLevel")
+            
+            # Check if level is None - schedule retry
+            if level is None:
+                if deal_id not in self.pending_retries:
+                    self.log_func(f"📍 Processing new position: {instrument_name} {direction} {size} @ None")
+                    self.log_func(f"⏳ Position level is None - will retry in {self.check_interval}s")
+                    self.pending_retries[deal_id] = 1
+                return
             
             self.log_func(f"📍 Processing new position: {instrument_name} {direction} {size} @ {level}")
             
@@ -158,7 +205,7 @@ class PositionMonitor:
             
             # Add trailing if enabled
             if self.auto_trailing_enabled and current_stop:
-                self.log_func(f"🔄 Enabling trailing stop ({self.trailing_distance}/{self.trailing_step})")
+                self.log_func(f"🔄 Trailing enabled ({self.trailing_distance}pts distance, {self.trailing_step}pts step)")
                 # Trailing will be handled by _update_trailing_stops
             
             # Add limit if enabled
@@ -178,7 +225,11 @@ class PositionMonitor:
             position_data = position.get("position", {})
             deal_id = position_data.get("dealId")
             direction = position_data.get("direction")
-            level = position_data.get("level")
+            level = position_data.get("openLevel")  # FIXED: positions use openLevel
+            
+            # Check if level exists
+            if level is None:
+                return False
             
             # Calculate stop level
             if direction == "BUY":
@@ -190,7 +241,7 @@ class PositionMonitor:
             success, message = self.ig_client.update_position(
                 deal_id=deal_id,
                 stop_level=stop_level,
-                stop_distance=None,  # Use level, not distance
+                stop_distance=None,
                 limit_level=None
             )
             
@@ -206,7 +257,11 @@ class PositionMonitor:
             position_data = position.get("position", {})
             deal_id = position_data.get("dealId")
             direction = position_data.get("direction")
-            level = position_data.get("level")
+            level = position_data.get("openLevel")  # FIXED: positions use openLevel
+            
+            # Check if level exists
+            if level is None:
+                return False
             
             # Calculate limit level
             if direction == "BUY":
@@ -237,12 +292,13 @@ class PositionMonitor:
                 
                 deal_id = position_data.get("dealId")
                 direction = position_data.get("direction")
-                current_level = position_data.get("level")
+                current_level = position_data.get("openLevel")  # FIXED: positions use openLevel
                 current_stop = position_data.get("stopLevel")
                 epic = market_data.get("epic")
+                instrument_name = market_data.get("instrumentName", epic)
                 
-                if not current_stop:
-                    continue  # No stop to trail
+                if not current_stop or current_level is None:
+                    continue  # No stop to trail or no level
                 
                 # Get current market price
                 price_data = self.ig_client.get_market_price(epic)
@@ -267,7 +323,9 @@ class PositionMonitor:
                         )
                         
                         if success:
-                            self.log_func(f"🔄 Trailed stop UP: {current_stop:.2f} → {new_stop:.2f}")
+                            self.log_func(f"🔄 {instrument_name}: Trailed stop UP {current_stop:.2f} → {new_stop:.2f}")
+                        else:
+                            self.log_func(f"❌ Failed to trail stop: {message}")
                         
                 else:  # SELL
                     ideal_stop = current_price + self.trailing_distance
@@ -284,8 +342,63 @@ class PositionMonitor:
                         )
                         
                         if success:
-                            self.log_func(f"🔄 Trailed stop DOWN: {current_stop:.2f} → {new_stop:.2f}")
+                            self.log_func(f"🔄 {instrument_name}: Trailed stop DOWN {current_stop:.2f} → {new_stop:.2f}")
+                        else:
+                            self.log_func(f"❌ Failed to trail stop: {message}")
                             
         except Exception as e:
             if self.log_func:
                 self.log_func(f"Error updating trailing stops: {e}")
+    
+    def bulk_update_stops(self, stop_distance):
+        """Update stop distance on ALL open positions"""
+        try:
+            positions = self.ig_client.get_open_positions()
+            updated = 0
+            failed = 0
+            
+            self.log_func(f"🔄 Updating stops on {len(positions)} positions to {stop_distance}pts...")
+            
+            for position in positions:
+                position_data = position.get("position", {})
+                market_data = position.get("market", {})
+                
+                deal_id = position_data.get("dealId")
+                direction = position_data.get("direction")
+                level = position_data.get("openLevel")  # FIXED: positions use openLevel
+                instrument_name = market_data.get("instrumentName", "")
+                
+                if level is None:
+                    self.log_func(f"⚠️ Skipping {instrument_name} - no level")
+                    failed += 1
+                    continue
+                
+                # Calculate new stop level
+                if direction == "BUY":
+                    new_stop = level - stop_distance
+                else:  # SELL
+                    new_stop = level + stop_distance
+                
+                # Update position
+                success, message = self.ig_client.update_position(
+                    deal_id=deal_id,
+                    stop_level=new_stop,
+                    stop_distance=None,
+                    limit_level=None
+                )
+                
+                if success:
+                    self.log_func(f"✅ {instrument_name}: Stop updated to {new_stop:.2f}")
+                    updated += 1
+                else:
+                    self.log_func(f"❌ {instrument_name}: Failed - {message}")
+                    failed += 1
+                
+                time.sleep(0.5)  # Rate limiting
+            
+            self.log_func(f"📊 Bulk update complete: {updated} updated, {failed} failed")
+            return updated > 0
+            
+        except Exception as e:
+            self.log_func(f"Error in bulk update: {e}")
+            return False

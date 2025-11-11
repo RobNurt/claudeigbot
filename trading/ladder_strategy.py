@@ -139,17 +139,6 @@ class LadderStrategy:
 
         log(f"Limit toggle complete on {len(self.placed_orders)} orders")
 
-# Replace the start_trailing method in ladder_strategy.py
-
-# Add these methods to the LadderStrategy class in ladder_strategy.py
-
-    def __init__(self, ig_client):
-        self.ig_client = ig_client
-        self.placed_orders = []
-        self.trailing_active = False
-        self.cancel_requested = False
-        self.position_monitoring_active = False  # ADD THIS
-        self.monitored_positions = set()  # ADD THIS - track processed positions
 
     def start_position_monitoring(self, log, stop_distance):
         """
@@ -338,8 +327,9 @@ class LadderStrategy:
                                         new_level = ideal_level
                                         
                                         success, message = self.ig_client.update_working_order(
-                                        deal_id=deal_id,
-                                        stop_level=new_level,
+                                        deal_id,
+                                        new_level,  # ✅ Second positional argument (the new order price)
+                                        stop_distance=stop_info['stop_distance'],  # ✅ Preserve the stop distance
                                         guaranteed_stop=stop_info['guaranteed']
                                     )
                                         
@@ -359,11 +349,11 @@ class LadderStrategy:
                                         new_level = ideal_level
                                         
                                         success, message = self.ig_client.update_working_order(
-                                        deal_id=deal_id,
-                                        stop_level=new_level,
+                                        deal_id,
+                                        new_level,  # ✅ This is the order price
+                                        stop_distance=stop_info['stop_distance'],  # ✅ This preserves the stop
                                         guaranteed_stop=stop_info['guaranteed']
                                     )
-                                        
                                         if success:
                                             stop_msg = f" (stop: {stop_info['stop_distance']})" if stop_info['stop_distance'] else ""
                                             log(f"{epic} SELL: Trailed UP {current_level:.2f} → {new_level:.2f}{stop_msg}")

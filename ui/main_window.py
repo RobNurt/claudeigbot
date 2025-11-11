@@ -613,8 +613,28 @@ class MainWindow:
             row5_inner, initial_state=False, callback=self.on_trailing_entry_toggled, bg="#2a2e35")
         self.trailing_entry_toggle.grid(row=0, column=2, padx=10)
         
-        ctk.CTkLabel(row5_inner, text="ℹ️ Automatically moves order entry levels down/up as market moves",
-                    font=Theme.font_tiny(), text_color=text_gray).grid(row=0, column=3, padx=10, sticky="w")
+        # Min Move configuration
+        ctk.CTkLabel(row5_inner, text="Min:", font=Theme.font_normal(),
+                    text_color=text_gray).grid(row=0, column=3, padx=(20,5), sticky="e")
+        self.trailing_min_move_var = ctk.StringVar(value="0.5")
+        ctk.CTkEntry(row5_inner, textvariable=self.trailing_min_move_var, width=50, height=28,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=Theme.font_normal()).grid(row=0, column=4, padx=2)
+        ctk.CTkLabel(row5_inner, text="pts", font=Theme.font_small(),
+                    text_color=text_gray).grid(row=0, column=5, padx=(2,15), sticky="w")
+        
+        # Check Interval configuration
+        ctk.CTkLabel(row5_inner, text="Check:", font=Theme.font_normal(),
+                    text_color=text_gray).grid(row=0, column=6, padx=5, sticky="e")
+        self.trailing_check_interval_var = ctk.StringVar(value="30")
+        ctk.CTkEntry(row5_inner, textvariable=self.trailing_check_interval_var, width=50, height=28,
+                    fg_color=card_bg, border_color="#3e444d",
+                    font=Theme.font_normal()).grid(row=0, column=7, padx=2)
+        ctk.CTkLabel(row5_inner, text="sec", font=Theme.font_small(),
+                    text_color=text_gray).grid(row=0, column=8, padx=2, sticky="w")
+        
+        ctk.CTkLabel(row5_inner, text="ℹ️ Moves entries as market moves | BUY trails down, SELL trails up",
+                    font=Theme.font_tiny(), text_color=text_gray).grid(row=0, column=9, padx=10, sticky="w")
         
         # Row 6: Action Buttons - CENTERED
         row6 = ctk.CTkFrame(placement_card, fg_color=card_bg)
@@ -973,17 +993,21 @@ class MainWindow:
             )
             
     def on_trailing_entry_toggled(self, state):
-        """Handle trailing entry toggle (Follow Price)"""
+        """Handle trailing entry toggle with configuration"""
         if state:
-            self.log("📉 Follow Price enabled - order entries will trail market")
-            # Start trailing for working orders
-            if hasattr(self.ladder_strategy, 'start_trailing'):
-                self.ladder_strategy.start_trailing(self.log)
+            try:
+                # Read configuration values from UI
+                min_move = float(self.trailing_min_move_var.get())
+                check_interval = int(self.trailing_check_interval_var.get())
+                
+                self.log(f"📉 Follow Price enabled - min move: {min_move} pts, check every {check_interval}s")
+                self.ladder_strategy.start_trailing(self.log, min_move, check_interval)
+            except ValueError as e:
+                self.log(f"❌ Invalid trailing configuration: {e}")
+                self.trailing_entry_toggle.set_state(False)
         else:
-            self.log("Follow Price disabled")
-            # Stop trailing
-            if hasattr(self.ladder_strategy, 'stop_trailing'):
-                self.ladder_strategy.stop_trailing()        
+            self.log("📉 Follow Price stopped")
+            self.ladder_strategy.stop_trailing()  
             
     def on_auto_trailing_toggled(self, state):
         """Handle auto-trailing toggle"""
@@ -2967,14 +2991,18 @@ class MainWindow:
             for order in orders:
                 try:
                     order_data = order.get("workingOrderData", {})
-                    print(f"DEBUG: Order data keys = {order_data.keys()}")
-                    print(f"DEBUG: Full order data = {order_data}")
                     deal_id = order_data.get("dealId")
                     direction = order_data.get("direction")
-                    order_level = order_data.get("orderLevel")
+                    order_level = order_data.get("level")  # FIXED: was orderLevel
                     current_gslo = order_data.get("guaranteedStop", False)
                     
-                    # Calculate new stop level
+                    # FIX: Check if order_level exists before math
+                    if order_level is None:
+                        self.log(f"⚠️ Skipping order {deal_id} - no level")
+                        continue
+                    
+                    # Calculate new stop level (NOT NEEDED - we keep order at same level)
+                    # Just update the stop distance
                     if direction == "BUY":
                         new_stop = order_level - stop_distance
                     else:
@@ -2983,10 +3011,11 @@ class MainWindow:
                     # Decide GSLO for this order
                     use_gslo = current_gslo if (preserve_gslo and current_gslo) else False
                     
-                    # Update order
+                    # FIX: Update order with correct parameters
                     success, message = self.ig_client.update_working_order(
-                        deal_id=deal_id,
-                        stop_level=new_stop,
+                        deal_id,
+                        order_level,  # Keep order at same level
+                        stop_distance=stop_distance,  # Update stop distance
                         guaranteed_stop=use_gslo
                     )
                     
@@ -3008,7 +3037,12 @@ class MainWindow:
                     position_data = position.get("position", {})
                     deal_id = position_data.get("dealId")
                     direction = position_data.get("direction")
-                    open_level = position_data.get("level")
+                    open_level = position_data.get("openLevel")  # FIXED: positions use openLevel
+                    
+                    # FIX: Check if open_level exists before math
+                    if open_level is None:
+                        self.log(f"⚠️ Skipping position {deal_id} - no level")
+                        continue
                     
                     # Calculate new stop level
                     if direction == "BUY":

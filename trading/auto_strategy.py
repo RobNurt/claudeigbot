@@ -139,18 +139,17 @@ class AutoStrategy:
                     new_level = current_price - offset
                 
                 # Calculate new stop level if stop exists
-                new_stop_level = None
+                new_stop_distance = None
                 if stop_level:
                     stop_distance = abs(old_level - stop_level)
-                    if direction == "BUY":
-                        new_stop_level = new_level - stop_distance
-                    else:
-                        new_stop_level = new_level + stop_distance
+                    # Preserve the same stop distance with the new level
+                    new_stop_distance = stop_distance
                 
-                # Update the order - USE CORRECT PARAMETER NAME
+                # Update the order - FIX: Use correct parameter names
                 success, message = self.ig_client.update_working_order(
-                    deal_id=deal_id,
-                    stop_level=new_stop_level,  # CORRECT: stop_level not stop_distance
+                    deal_id,  # positional arg
+                    new_level,  # positional arg - new order level
+                    stop_distance=new_stop_distance,  # preserve stop
                     guaranteed_stop=guaranteed_stop
                 )
                 

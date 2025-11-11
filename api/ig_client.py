@@ -214,6 +214,46 @@ class IGClient:
         except Exception as e:
             return False, f"Update error: {str(e)}"
     
+    def update_position(self, deal_id, stop_level=None, stop_distance=None, limit_level=None):
+        """Update stop and/or limit on an open position - flexible method for position_monitor"""
+        try:
+            url = f"{self.base_url}/positions/otc/{deal_id}"
+            
+            update_data = {}
+            
+            # Add stop if provided (prefer stop_level over stop_distance)
+            if stop_level is not None:
+                update_data["stopLevel"] = str(stop_level)
+            elif stop_distance is not None:
+                update_data["stopDistance"] = str(stop_distance)
+            
+            # Add limit if provided
+            if limit_level is not None:
+                update_data["limitLevel"] = str(limit_level)
+            
+            if not update_data:
+                return False, "No updates specified"
+            
+            headers = self.session.headers.copy()
+            headers["version"] = "2"
+            headers["_method"] = "PUT"
+            
+            response = self.session.post(url, json=update_data, headers=headers)
+            
+            if response.status_code == 200:
+                deal_ref = response.json().get('dealReference')
+                if deal_ref:
+                    deal_status = self.check_deal_status(deal_ref)
+                    if deal_status.get('dealStatus') == 'ACCEPTED':
+                        return True, "Position updated"
+                    else:
+                        return False, deal_status.get('reason')
+            else:
+                return False, response.text
+                
+        except Exception as e:
+            return False, str(e)
+    
     def get_working_orders(self):
         """Get list of working orders"""
         try:
