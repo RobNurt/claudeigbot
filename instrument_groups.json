@@ -1,0 +1,11 @@
+{
+  "Commodities": [
+    "CS.D.GOLD.TODAY.IP",
+    "CC.D.RUS.USS.IP"
+  ],
+  "Major Indices": [
+    "IX.D.FTSE.DAILY.IP",
+    "IX.D.DAX.DAILY.IP",
+    "IX.D.DOW.DAILY.IP"
+  ]
+}

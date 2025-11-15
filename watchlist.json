@@ -1,0 +1,59 @@
+{
+  "instruments": [
+    {
+      "epic": "CS.D.USCGC.TODAY.IP",
+      "name": "Gold",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "CS.D.USSLV.TODAY.IP",
+      "name": "Silver",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "CS.D.USCRD.TODAY.IP",
+      "name": "Crude Oil",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "CS.D.NGCUSD.TODAY.IP",
+      "name": "Natural Gas",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.SPTRD.DAILY.IP",
+      "name": "S&P 500",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.DOW.DAILY.IP",
+      "name": "Dow Jones",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.NASDAQ.DAILY.IP",
+      "name": "NASDAQ",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.RUSSELL.DAILY.IP",
+      "name": "Russell 2000",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.FTSE.DAILY.IP",
+      "name": "FTSE 100",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.DAX.DAILY.IP",
+      "name": "DAX",
+      "added": "2025-11-11"
+    },
+    {
+      "epic": "IX.D.NIKKEI.DAILY.IP",
+      "name": "Nikkei 225",
+      "added": "2025-11-11"
+    }
+  ]
+}

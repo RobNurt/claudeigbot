@@ -704,10 +704,6 @@ class MainWindow:
             font=Theme.font_medium()
         ).grid(row=0, column=2, padx=10)
         
-        
-        # ✅ FIX: Call method that adds POSITION MANAGEMENT and INSTRUMENT GROUPS sections
-        # This fixes the 'auto_stop_toggle' error by creating the missing toggle switches
-        self.add_to_create_trading_tab(parent, scrollable_frame, card_bg, accent_teal, text_white, text_gray)
     def add_to_create_trading_tab(self, parent, scrollable_frame, card_bg, accent_teal, text_white, text_gray):
         """
         ADD THIS CODE TO YOUR create_trading_tab() METHOD
@@ -925,7 +921,7 @@ class MainWindow:
         ctk.CTkButton(
             close_frame, 
             text="🔴 Close All Positions",
-            command=self.close_all_positions,
+            command=self.on_close_positions,
             fg_color="#e74c3c", hover_color="#ee4626",
             corner_radius=8, width=200, height=40,
             font=Theme.font_medium()

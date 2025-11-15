@@ -134,7 +134,7 @@ class TrendAnalyzer:
         try:
             # Map timeframe to yfinance parameters
             interval_map = {
-                '3m': ('3m', '5d'),    # 3-minute bars, last 5 days
+                '5m': ('5m', '5d'),    # 5-minute bars, last 5 days (3m not supported!)
                 '1h': ('1h', '1mo'),   # 1-hour bars, last month
                 '4h': ('1h', '3mo'),   # Use 1h and resample to 4h, last 3 months
                 '1d': ('1d', '1y')     # Daily bars, last year
@@ -222,12 +222,12 @@ class TrendAnalyzer:
         Detect if there's a rally happening
         
         Rally criteria:
-        - For 3m: >0.5% move in last bar OR >1% in last 5 bars
+        - For 5m: >0.5% move in last bar OR >1% in last 5 bars
         - Volume spike (>1.5x average)
         - RSI momentum (either oversold bounce or strong momentum)
         """
-        if timeframe == '3m':
-            # Quick rally detection for 3-minute charts
+        if timeframe == '5m':
+            # Quick rally detection for 5-minute charts
             strong_move = change_1_bar > 0.5 or change_5_bars > 1.0
             volume_spike = volume_ratio and volume_ratio > 1.5
             

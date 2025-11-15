@@ -4,6 +4,7 @@ Manages user's watchlist of instruments to monitor
 """
 import json
 import os
+from datetime import datetime
 
 
 class WatchlistManager:
@@ -23,22 +24,77 @@ class WatchlistManager:
                     self.watchlist = data.get('instruments', [])
             except Exception as e:
                 print(f"Error loading watchlist: {e}")
-                self.watchlist = []
+                self.watchlist = self._get_default_watchlist()
+                self.save()
         else:
-            # Create default watchlist
-            self.watchlist = [
-                {
-                    'epic': 'CS.D.USCGC.TODAY.IP',
-                    'name': 'Gold',
-                    'added': '2025-11-10'
-                },
-                {
-                    'epic': 'IX.D.RUSSELL.DAILY.IP',
-                    'name': 'Russell 2000',
-                    'added': '2025-11-10'
-                }
-            ]
+            # Create default watchlist with major instruments
+            self.watchlist = self._get_default_watchlist()
             self.save()
+    
+    def _get_default_watchlist(self):
+        """Get default watchlist with major commodities and indices"""
+        return [
+            # Commodities
+            {
+                'epic': 'CS.D.USCGC.TODAY.IP',
+                'name': 'Gold',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'CS.D.USSLV.TODAY.IP',
+                'name': 'Silver',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'CS.D.USCRD.TODAY.IP',
+                'name': 'Crude Oil',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'CS.D.NGCUSD.TODAY.IP',
+                'name': 'Natural Gas',
+                'added': str(datetime.now().date())
+            },
+            # Major US Indices
+            {
+                'epic': 'IX.D.SPTRD.DAILY.IP',
+                'name': 'S&P 500',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'IX.D.DOW.DAILY.IP',
+                'name': 'Dow Jones',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'IX.D.NASDAQ.DAILY.IP',
+                'name': 'NASDAQ',
+                'added': str(datetime.now().date())
+            },
+            {
+                'epic': 'IX.D.RUSSELL.DAILY.IP',
+                'name': 'Russell 2000',
+                'added': str(datetime.now().date())
+            },
+            # UK Indices
+            {
+                'epic': 'IX.D.FTSE.DAILY.IP',
+                'name': 'FTSE 100',
+                'added': str(datetime.now().date())
+            },
+            # European Indices
+            {
+                'epic': 'IX.D.DAX.DAILY.IP',
+                'name': 'DAX',
+                'added': str(datetime.now().date())
+            },
+            # Asian Indices
+            {
+                'epic': 'IX.D.NIKKEI.DAILY.IP',
+                'name': 'Nikkei 225',
+                'added': str(datetime.now().date())
+            },
+        ]
     
     def save(self):
         """Save watchlist to file"""
@@ -94,7 +150,8 @@ class WatchlistManager:
         """Clear entire watchlist"""
         self.watchlist = []
         self.save()
-
-
-# Import datetime for the add method
-from datetime import datetime
+    
+    def reset_to_default(self):
+        """Reset watchlist to default instruments"""
+        self.watchlist = self._get_default_watchlist()
+        self.save()
